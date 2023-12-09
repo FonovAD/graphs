@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Construct simple graphs.">
+    <title>Simple Graph Playground</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="stylesheet" href="css/style.css">
+  </head>
+
+  <body>
+    <div id="container">
+      <h1>Simple Graph Playground</h1>
+      <hr>
+      <div id="instructions" style="text-align: center;">
+        <p>To add a vertex <b>left click</b> on whitespace. To add an edge <b>drag</b> from one vertex to another. To delete a vertex or edge <b>right click</b> on it. To move a vertex <b>hold Ctrl and drag</b> it.</p>
+      </div>
+      <div style="text-align: center;">
+        <button type="button" id="clear">Clear All</button>
+      </div>
+
+      <div style="text-align: center;">
+        <button type="button" id="sendTaskComponents">Send Task Components</button>
+      </div>
+
+      <div style="text-align: center;">
+        <p id="components">Components = </p>
+      </div>
+
+      <div style="text-align: center;">
+        <button type="button" id="sendTaskIsEuler">Send Task Is Euler</button>
+      </div>
+
+      <div style="text-align: center;">
+        <p id="isEuler">isEuler = </p>
+      </div>
+
+      <div style="text-align: center;">
+        <button type="button" id="sendTaskIsBipartition">Send Task Is Bipartition</button>
+      </div>
+
+      <div style="text-align: center;">
+        <p id="isBipartition">isBipartition = </p>
+      </div>
+
+      <div id="svg-wrap">
+      </div>
+    </div>
+  </body>
+  <script src="js/d3.v5.min.js"></script>
+  <script src="js/script.js"></script>
+  <script>
+    function getGraph() {
+      const cloneNodes = structuredClone(nodes);
+
+      for (node of cloneNodes) {
+        delete node["x"];
+        delete node["y"];
+        delete node["vy"];
+        delete node["vx"];
+        delete node["index"];
+      }
+
+      const cloneLinks = structuredClone(links)
+
+      for (link of cloneLinks) {
+        delete link["source"]["x"];
+        delete link["source"]["y"];
+        delete link["source"]["vy"];
+        delete link["source"]["vx"];
+        delete link["source"]["index"];
+
+        delete link["target"]["x"];
+        delete link["target"]["y"];
+        delete link["target"]["vy"];
+        delete link["target"]["vx"];
+        delete link["target"]["index"];
+
+        delete link["index"];
+      }
+
+      return {"nodes": cloneNodes, "links": cloneLinks}
+    }
+
+    function sendTaskComponents()
+    {
+      let url = "/task_components"
+
+      let graph = getGraph()
+
+      let json = JSON.stringify(graph);
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", url);
+      xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+      xhr.responseType = 'json';
+      xhr.send(json);
+
+      xhr.onload = function() {
+        if (xhr.status !== 200) { // HTTP ошибка?
+          // обработаем ошибку
+          alert( 'Ошибка: ' + xhr.status);
+        }
+
+        document.querySelector("#components").innerHTML = "Components = " + xhr.response["component"];
+
+        // получим ответ из xhr.response
+      };
+    }
+
+    function sendTaskIsEuler()
+    {
+      let url = "/task_is_euler"
+
+      let graph = getGraph()
+
+      let json = JSON.stringify(graph);
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", url);
+      xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+      xhr.responseType = 'json';
+      xhr.send(json);
+
+      xhr.onload = function() {
+        if (xhr.status !== 200) { // HTTP ошибка?
+          // обработаем ошибку
+          alert( 'Ошибка: ' + xhr.status);
+        }
+
+        document.querySelector("#isEuler").innerHTML = "isEuler = " + xhr.response["isEuler"];
+
+
+        // получим ответ из xhr.response
+      };
+    }
+
+    function sendTaskIsBipartition()
+    {
+      let url = "/task_is_bipartition"
+
+      let graph = getGraph()
+
+      let json = JSON.stringify(graph);
+
+      let xhr = new XMLHttpRequest();
+      xhr.open("POST", url);
+      xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+      xhr.responseType = 'json';
+      xhr.send(json);
+
+      xhr.onload = function() {
+        if (xhr.status !== 200) { // HTTP ошибка?
+          // обработаем ошибку
+          alert( 'Ошибка: ' + xhr.status);
+        }
+
+        document.querySelector("#isBipartition").innerHTML = "isBipartition = " + xhr.response["isBipartition"];
+
+        // получим ответ из xhr.response
+      };
+    }
+
+    document.querySelector("#sendTaskComponents").onclick = function() {
+      sendTaskComponents();
+    }
+
+    document.querySelector("#sendTaskIsEuler").onclick = function() {
+      sendTaskIsEuler();
+    }
+
+    document.querySelector("#sendTaskIsBipartition").onclick = function() {
+      sendTaskIsBipartition();
+    }
+  </script>
+</html>

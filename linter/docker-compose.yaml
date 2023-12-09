@@ -1,0 +1,8 @@
+version: '3.5'
+
+services:
+  graphs_back_lint:
+    container_name: graphs_back_lint
+    build:
+      context: ..
+      dockerfile: linter/Dockerfile

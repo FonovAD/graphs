@@ -1,0 +1,291 @@
+definitions:
+  dto.Result:
+    properties:
+      end:
+        type: string
+      grade:
+        type: integer
+      id:
+        type: integer
+      start:
+        type: string
+      studentID:
+        type: integer
+      testID:
+        type: integer
+    type: object
+  dto.Task:
+    properties:
+      answer:
+        type: string
+      data:
+        type: string
+      grade:
+        type: integer
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.Test:
+    properties:
+      end:
+        type: string
+      id:
+        type: integer
+      interval:
+        type: string
+      name:
+        type: string
+      start:
+        type: string
+    type: object
+  model.BadRequestResponse:
+    properties:
+      error_msg:
+        type: string
+    type: object
+  model.Component:
+    properties:
+      component:
+        type: integer
+    type: object
+  model.Graph:
+    properties:
+      links:
+        items:
+          $ref: '#/definitions/model.Link'
+        type: array
+      nodes:
+        items:
+          $ref: '#/definitions/model.Node'
+        type: array
+    type: object
+  model.InternalServerErrorResponse:
+    properties:
+      error_msg:
+        type: string
+    type: object
+  model.Link:
+    properties:
+      source:
+        $ref: '#/definitions/model.Node'
+      target:
+        $ref: '#/definitions/model.Node'
+    type: object
+  model.Node:
+    properties:
+      id:
+        type: integer
+    type: object
+  rest_models.AuthUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  rest_models.AuthUserResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  rest_models.CheckResultsResponse:
+    properties:
+      results:
+        items:
+          $ref: '#/definitions/dto.Result'
+        type: array
+    type: object
+  rest_models.CreateUserRequest:
+    properties:
+      email:
+        type: string
+      firstName:
+        type: string
+      lastName:
+        type: string
+      password:
+        type: string
+    type: object
+  rest_models.CreateUserResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  rest_models.GetTasksFromTestsRequest:
+    properties:
+      test_id:
+        type: integer
+    type: object
+  rest_models.GetTasksFromTestsResponse:
+    properties:
+      tasks:
+        items:
+          $ref: '#/definitions/dto.Task'
+        type: array
+    type: object
+  rest_models.GetTestsResponse:
+    properties:
+      tests:
+        items:
+          $ref: '#/definitions/dto.Test'
+        type: array
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a sample server celler server.
+  title: Swagger Example API
+  version: "1.0"
+paths:
+  /auth_user:
+    post:
+      consumes:
+      - application/json
+      description: AuthUser
+      parameters:
+      - description: AuthUser
+        in: body
+        name: AuthUser
+        required: true
+        schema:
+          $ref: '#/definitions/rest_models.AuthUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest_models.AuthUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.InternalServerErrorResponse'
+      summary: AuthUser
+  /check_results:
+    get:
+      description: CheckResults
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest_models.CheckResultsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.InternalServerErrorResponse'
+      summary: CheckResults
+  /create_user:
+    post:
+      consumes:
+      - application/json
+      description: CreateUser
+      parameters:
+      - description: CreateUser
+        in: body
+        name: CreateUser
+        required: true
+        schema:
+          $ref: '#/definitions/rest_models.CreateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest_models.CreateUserResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.InternalServerErrorResponse'
+      summary: CreateUser
+  /get_tasks_from_test:
+    post:
+      consumes:
+      - application/json
+      description: GetTasksFromTest
+      parameters:
+      - description: GetTasksFromTest
+        in: body
+        name: GetTasksFromTest
+        required: true
+        schema:
+          $ref: '#/definitions/rest_models.GetTasksFromTestsRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest_models.GetTasksFromTestsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.InternalServerErrorResponse'
+      summary: GetTasksFromTest
+  /get_tests:
+    get:
+      description: GetTests
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rest_models.GetTestsResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.InternalServerErrorResponse'
+      summary: GetTests
+  /task_components:
+    post:
+      consumes:
+      - application/json
+      description: Task Components
+      parameters:
+      - description: query params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/model.Graph'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Component'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/model.BadRequestResponse'
+      summary: Task
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

@@ -1,0 +1,42 @@
+version: '3.5'
+
+networks:
+  graphs:
+
+services:
+  graphs_back:
+    container_name: graphs_back
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - ENV=docker
+    ports:
+      - "8080:8080"
+    networks:
+      - graphs
+    depends_on:
+      graphs_db:
+        condition: service_healthy
+
+  graphs_db:
+    image: postgres
+    container_name: database
+    ports:
+      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER} -h localhost -p 5432" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ../scripts/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+    networks:
+      - graphs
