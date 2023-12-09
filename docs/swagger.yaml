@@ -20,9 +20,9 @@ definitions:
         type: string
       data:
         type: string
-      grade:
-        type: integer
       id:
+        type: integer
+      maxGrade:
         type: integer
       name:
         type: string
@@ -45,37 +45,16 @@ definitions:
       error_msg:
         type: string
     type: object
-  model.Component:
-    properties:
-      component:
-        type: integer
-    type: object
-  model.Graph:
-    properties:
-      links:
-        items:
-          $ref: '#/definitions/model.Link'
-        type: array
-      nodes:
-        items:
-          $ref: '#/definitions/model.Node'
-        type: array
-    type: object
   model.InternalServerErrorResponse:
     properties:
       error_msg:
         type: string
     type: object
-  model.Link:
+  rest_models.Answer:
     properties:
-      source:
-        $ref: '#/definitions/model.Node'
-      target:
-        $ref: '#/definitions/model.Node'
-    type: object
-  model.Node:
-    properties:
-      id:
+      answer:
+        type: string
+      taskID:
         type: integer
     type: object
   rest_models.AuthUserRequest:
@@ -131,6 +110,20 @@ definitions:
         items:
           $ref: '#/definitions/dto.Test'
         type: array
+    type: object
+  rest_models.SendAnswersRequest:
+    properties:
+      answers:
+        items:
+          $ref: '#/definitions/rest_models.Answer'
+        type: array
+      testID:
+        type: integer
+    type: object
+  rest_models.SendAnswersResponse:
+    properties:
+      result:
+        $ref: '#/definitions/dto.Result'
     type: object
 host: localhost:8080
 info:
@@ -261,30 +254,34 @@ paths:
           schema:
             $ref: '#/definitions/model.InternalServerErrorResponse'
       summary: GetTests
-  /task_components:
+  /send_answers:
     post:
       consumes:
       - application/json
-      description: Task Components
+      description: SendAnswers
       parameters:
-      - description: query params
+      - description: SendAnswers
         in: body
-        name: request
+        name: SendAnswers
         required: true
         schema:
-          $ref: '#/definitions/model.Graph'
+          $ref: '#/definitions/rest_models.SendAnswersRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Component'
+            $ref: '#/definitions/rest_models.SendAnswersResponse'
         "400":
           description: Bad Request
           schema:
             $ref: '#/definitions/model.BadRequestResponse'
-      summary: Task
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/model.InternalServerErrorResponse'
+      summary: SendAnswers
 securityDefinitions:
   BasicAuth:
     type: basic

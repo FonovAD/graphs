@@ -27,15 +27,6 @@ type Handler interface {
 	TaskIsBipartition(ctx echo.Context) error
 }
 
-// TaskComponents godoc
-// @Summary 	 Task
-// @Description  Task Components
-// @Accept 		 json
-// @Produce 	 json
-// @Param        request body 	model.Graph true "query params"
-// @Success      200  {object}  model.Component
-// @Failure      400  {object}  model.BadRequestResponse
-// @Router       /task_components [post]
 func (h *handler) TaskComponents(ctx echo.Context) error {
 	var request model.Graph
 

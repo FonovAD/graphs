@@ -203,24 +203,24 @@ const docTemplate = `{
                 }
             }
         },
-        "/task_components": {
+        "/send_answers": {
             "post": {
-                "description": "Task Components",
+                "description": "SendAnswers",
                 "consumes": [
                     "application/json"
                 ],
                 "produces": [
                     "application/json"
                 ],
-                "summary": "Task",
+                "summary": "SendAnswers",
                 "parameters": [
                     {
-                        "description": "query params",
-                        "name": "request",
+                        "description": "SendAnswers",
+                        "name": "SendAnswers",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.Graph"
+                            "$ref": "#/definitions/rest_models.SendAnswersRequest"
                         }
                     }
                 ],
@@ -228,13 +228,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Component"
+                            "$ref": "#/definitions/rest_models.SendAnswersResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/model.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/model.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -274,10 +280,10 @@ const docTemplate = `{
                 "data": {
                     "type": "string"
                 },
-                "grade": {
+                "id": {
                     "type": "integer"
                 },
-                "id": {
+                "maxGrade": {
                     "type": "integer"
                 },
                 "name": {
@@ -313,31 +319,6 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Component": {
-            "type": "object",
-            "properties": {
-                "component": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.Graph": {
-            "type": "object",
-            "properties": {
-                "links": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Link"
-                    }
-                },
-                "nodes": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Node"
-                    }
-                }
-            }
-        },
         "model.InternalServerErrorResponse": {
             "type": "object",
             "properties": {
@@ -346,21 +327,13 @@ const docTemplate = `{
                 }
             }
         },
-        "model.Link": {
+        "rest_models.Answer": {
             "type": "object",
             "properties": {
-                "source": {
-                    "$ref": "#/definitions/model.Node"
+                "answer": {
+                    "type": "string"
                 },
-                "target": {
-                    "$ref": "#/definitions/model.Node"
-                }
-            }
-        },
-        "model.Node": {
-            "type": "object",
-            "properties": {
-                "id": {
+                "taskID": {
                     "type": "integer"
                 }
             }
@@ -447,6 +420,28 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/dto.Test"
                     }
+                }
+            }
+        },
+        "rest_models.SendAnswersRequest": {
+            "type": "object",
+            "properties": {
+                "answers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/rest_models.Answer"
+                    }
+                },
+                "testID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "rest_models.SendAnswersResponse": {
+            "type": "object",
+            "properties": {
+                "result": {
+                    "$ref": "#/definitions/dto.Result"
                 }
             }
         }

@@ -58,11 +58,11 @@ func (db *database) GetTests(ctx context.Context) ([]dto.Test, error) {
 }
 func (db *database) GetTasksFromTest(ctx context.Context, testID int64) ([]dto.Task, error) {
 	return []dto.Task{{
-		ID:     228,
-		Name:   "228",
-		Data:   "",
-		Answer: "",
-		Grade:  1,
+		ID:       228,
+		Name:     "228",
+		Data:     "",
+		Answer:   "",
+		MaxGrade: 1,
 	}}, nil
 }
 func (db *database) GetResultsByUserID(ctx context.Context, userID int64) ([]dto.Result, error) {
