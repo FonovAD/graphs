@@ -36,6 +36,7 @@ func (h *handler) GetTasksFromTest(ctx echo.Context) error {
 	}
 
 	// удаляю ответы
+	// TODO Очень грубый костыль, необходимо перенести эту логику в котроллер (создать новый метод), так как GetTasksFromTest уже используется в другом месте
 	for i := 0; i < len(tasks); i++ {
 		tasks[i].Answer = ""
 	}
