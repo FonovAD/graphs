@@ -40,13 +40,19 @@ func (c *controller) SendAnswers(ctx context.Context, answers []rest_models.Answ
 		grade += c.checkResult(answer, c.findAnswerByID(tasksWithAnswers, answer.TaskID))
 	}
 
-	return dto.Result{
+	result := dto.Result{
 		Start:     time.Time{},
 		End:       time.Now(),
 		Grade:     grade,
 		StudentID: 0,
 		TestID:    testID,
-	}, nil
+	}
+	err = c.db.InsertResult(ctx, result)
+	if err != nil {
+		return dto.Result{}, err
+	}
+
+	return result, nil
 }
 
 func (c *controller) findAnswerByID(tasksWithAnswer []dto.Task, taskID int64) dto.Task {
@@ -119,6 +125,7 @@ func (c *controller) GetTests(ctx context.Context) (rest_models.GetTestsResponse
 }
 
 func (c *controller) GetTasksFromTest(ctx context.Context, testID int64) ([]dto.Task, error) {
+
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 

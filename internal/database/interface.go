@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"fmt"
+	"github.com/labstack/gommon/log"
 	"golang_graphs/internal/dto"
 	"time"
 )
@@ -22,41 +24,68 @@ func (db *database) Ping(ctx context.Context) error {
 }
 
 func (db *database) InsertUser(ctx context.Context, user dto.User) (dto.User, error) {
-	return dto.User{
-		Id:               1,
-		DateRegistration: time.Time{},
-		Email:            "123213",
-		Password:         "33",
-		FirstName:        "2",
-		LastName:         "3123",
-		Role:             "asada",
-		PasswordSalt:     "zxczxcasf",
-	}, nil
+	log.Info("InsertUser", user)
+	var id int64
+
+	row := db.client.QueryRowContext(ctx, insertIntoUsers,
+		user.Role, user.FirstName, user.LastName, user.Email, "", user.Password, user.PasswordSalt, user.DateRegistration)
+
+	err := row.Scan(&id)
+
+	if err != nil {
+		return dto.User{}, fmt.Errorf("create user error %w", err)
+	}
+
+	user.Id = id
+
+	return user, nil
 }
 
 func (db *database) SelectUserByEmail(ctx context.Context, email string) (dto.User, error) {
-	return dto.User{
-		Id:               1,
-		DateRegistration: time.Time{},
-		Email:            "123213",
-		Password:         "33",
-		FirstName:        "2",
-		LastName:         "3123",
-		Role:             "asada",
-		PasswordSalt:     "zxczxcasf",
-	}, nil
+	log.Info("SelectUserByEmail", email)
+	row := db.client.QueryRowContext(ctx, SelectUserByEmail, email)
+
+	user := dto.User{
+		Email: email,
+	}
+
+	fatherName := ""
+
+	err := row.Scan(&user.Role, &user.FirstName, &user.LastName, &user.Email, &fatherName, &user.Password, &user.PasswordSalt, &user.DateRegistration)
+	if err != nil {
+		return dto.User{}, fmt.Errorf("select user by email error %w", err)
+	}
+
+	return user, nil
 }
 
 func (db *database) GetTests(ctx context.Context) ([]dto.Test, error) {
-	return []dto.Test{{
-		ID:       228,
-		Name:     "228",
-		Start:    time.Time{},
-		End:      time.Time{},
-		Interval: time.Time{},
-	}}, nil
+	log.Info("GetTests")
+	rows, err := db.client.QueryContext(ctx, SelectAllAvailableTests)
+	if err != nil {
+		return nil, fmt.Errorf("select error %w", err)
+	}
+	defer rows.Close()
+
+	tests := make([]dto.Test, 0)
+
+	for rows.Next() {
+		test := dto.Test{}
+		if err := rows.Scan(&test.ID, &test.Name, &test.Start, &test.End); err != nil {
+			return nil, fmt.Errorf("get tests row scan error %w", err)
+		}
+		tests = append(tests, test)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("get tests rows err %w", err)
+	}
+
+	return tests, nil
 }
+
 func (db *database) GetTasksFromTest(ctx context.Context, testID int64) ([]dto.Task, error) {
+	log.Info("GetTasksFromTest", testID)
 	return []dto.Task{{
 		ID:       228,
 		Name:     "228",
@@ -65,7 +94,9 @@ func (db *database) GetTasksFromTest(ctx context.Context, testID int64) ([]dto.T
 		MaxGrade: 1,
 	}}, nil
 }
+
 func (db *database) GetResultsByUserID(ctx context.Context, userID int64) ([]dto.Result, error) {
+	log.Info("GetResultByUserID", userID)
 	return []dto.Result{{
 		ID:        228,
 		Start:     time.Time{},
@@ -75,6 +106,19 @@ func (db *database) GetResultsByUserID(ctx context.Context, userID int64) ([]dto
 		TestID:    1,
 	}}, nil
 }
+
 func (db *database) InsertResult(ctx context.Context, result dto.Result) error {
+	log.Info("InsertResult", result)
+	var id int64
+
+	row := db.client.QueryRowContext(ctx, InsertIntoResult,
+		result.Start, result.End, result.Grade, result.StudentID, result.TestID)
+
+	err := row.Scan(&id)
+
+	if err != nil {
+		return fmt.Errorf("insert result error %w", err)
+	}
+
 	return nil
 }
