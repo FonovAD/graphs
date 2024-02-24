@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users
 (
-  usersid INT NOT NULL,
+  usersid SERIAL,
   role VARCHAR(100) NOT NULL,
   first_name VARCHAR(100) NOT NULL,
   last_name VARCHAR(100) NOT NULL,
@@ -9,7 +9,6 @@ CREATE TABLE IF NOT EXISTS users
   password VARCHAR(100) NOT NULL,
   passwordsalt VARCHAR(6) NOT NULL,
   date_registration DATE NOT NULL,
-  PRIMARY KEY (usersid),
   UNIQUE (email)
 );
 
@@ -23,9 +22,8 @@ CREATE TABLE IF NOT EXISTS teacher
 
 CREATE TABLE IF NOT EXISTS groups
 (
-    groupsid INT NOT NULL,
-    groupsname VARCHAR(10),
-    PRIMARY KEY (groupsid)
+    groupsid SERIAL,
+    groupsname VARCHAR(10)
 );
 
 CREATE TABLE IF NOT EXISTS student
@@ -50,10 +48,9 @@ CREATE TABLE IF NOT EXISTS tests
 
 CREATE TABLE IF NOT EXISTS teachergroup
 (
-    teachergroupid INT NOT NULL,
+    teachergroupid SERIAL,
     teacherid INT NOT NULL,
     groupsid INT NOT NULL,
-    PRIMARY KEY (teachergroupid),
     FOREIGN KEY (teacherid) REFERENCES teacher(teacherid),
     FOREIGN KEY (groupsid) REFERENCES groups(groupsid)
 );
@@ -62,41 +59,37 @@ CREATE TABLE IF NOT EXISTS result
 (
     time_start TIMESTAMP NOT NULL,
     time_end  TIMESTAMP NOT NULL,
-    resultid INT NOT NULL,
+    resultid SERIAL,
     sum_grade INT NOT NULL,
     studentid INT NOT NULL,
     testsid INT NOT NULL,
-    PRIMARY KEY (resultid),
     FOREIGN KEY (studentid) REFERENCES student(studentid),
     FOREIGN KEY (testsid) REFERENCES tests(testsid)
 );
 
 CREATE TABLE IF NOT EXISTS task
 (
-    taskid INT NOT NULL,
+    taskid SERIAL,
     task_name VARCHAR(100) NOT NULL,
     answer JSONB NOT NULL,
     data JSONB NOT NULL,
     max_grade INT NOT NULL,
-    description VARCHAR (1000) NOT NULL,
-    PRIMARY KEY (taskid)
+    description VARCHAR (1000) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS test_task
 (
-    testtaskid INT NOT NULL,
+    testtaskid SERIAL,
     testsid INT NOT NULL,
     taskid INT NOT NULL,
-    PRIMARY KEY (testtaskid),
     FOREIGN KEY (testsid) REFERENCES tests(testsid),
     FOREIGN KEY (taskid) REFERENCES task(taskid)
 );
 
 CREATE TABLE grade
 (
-    gradeid INT NOT NULL,
+    gradeid SERIAL,
     grade INT NOT NULL,
     resultid INT NOT NULL,
-    PRIMARY KEY (gradeid),
     FOREIGN KEY (resultid) REFERENCES result(resultid)
 );
