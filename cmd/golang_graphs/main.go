@@ -10,6 +10,8 @@ import (
 	"github.com/heetch/confita/backend/file"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/swaggo/echo-swagger"
 	"golang_graphs/internal/config"
 	"golang_graphs/internal/controller"
@@ -31,6 +33,13 @@ import (
 	"time"
 
 	_ "golang_graphs/docs"
+)
+
+var (
+	counterRPS = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "rps",
+		Help: "An example counter metric",
+	})
 )
 
 // @title           Swagger Example API
@@ -76,6 +85,12 @@ func main() {
 
 	handler.SetupRoutes(e, commonHandler, filesHandler, taskHandler)
 
+	log.Println("prometheus setup start")
+
+	go setupPrometheus()
+
+	log.Println("prometheus setup end")
+
 	go func() {
 		if err := e.Start(":" + cfg.Port); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			e.Logger.Fatal("shutting down the server")
@@ -89,6 +104,18 @@ func main() {
 	defer cancel()
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
+	}
+}
+
+func setupPrometheus() {
+	// Регистрируем счетчик в реестре метрик
+	prometheus.MustRegister(counterRPS)
+
+	// Запускаем HTTP-сервер для экспорта метрик
+	http.Handle("/metrics", promhttp.Handler())
+	err := http.ListenAndServe(":9091", nil)
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -114,6 +141,17 @@ func setupEcho(authService auth.Service, rootPath string) *echo.Echo {
 	e := echo.New()
 
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			// Инкрементируем счетчик
+			counterRPS.Inc()
+			if err := next(c); err != nil {
+				c.Error(err)
+			}
+			return nil
+		}
+	})
 
 	e.Use(Logger)
 
