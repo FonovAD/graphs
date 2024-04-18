@@ -2,5 +2,6 @@ scrape_configs:
   - job_name: node
     scrape_interval: 5s
     static_configs:
-      - targets: ['graphs_back:9091']
+#      - targets: ['graphs_back:9091', 'node-exporter:9100']
+      - targets: ['graphs_back:9091', 'node-exporter:9100']
 #      - targets: ['node-exporter:9100']

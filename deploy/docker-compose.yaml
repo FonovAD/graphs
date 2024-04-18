@@ -27,7 +27,7 @@ services:
     volumes:
       - ../prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
     container_name: prometheus
-    hostname: prometheus
+    hostname: prometheusS
     command:
       - --config.file=/etc/prometheus/prometheus.yml
     ports:
