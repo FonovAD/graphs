@@ -3,12 +3,11 @@ package common
 import (
 	"github.com/labstack/echo/v4"
 	"golang_graphs/internal/controller"
-	"golang_graphs/pkg/auth"
 )
 
 // New constructor for Handler, user for code generation in wire
-func New(ctrl controller.Controller, authService auth.Service) Handler {
-	return &handler{ctrl: ctrl, authService: authService}
+func New(ctrl controller.Controller) Handler {
+	return &handler{ctrl: ctrl}
 }
 
 type Handler interface {
@@ -22,6 +21,5 @@ type Handler interface {
 
 // Handler struct for declaring api methods
 type handler struct {
-	ctrl        controller.Controller
-	authService auth.Service
+	ctrl controller.Controller
 }

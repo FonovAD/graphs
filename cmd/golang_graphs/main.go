@@ -12,15 +12,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/swaggo/echo-swagger"
+	echoSwagger "github.com/swaggo/echo-swagger"
 	"golang_graphs/internal/config"
 	"golang_graphs/internal/controller"
-	"golang_graphs/internal/controller/controller_task"
 	"golang_graphs/internal/database"
 	"golang_graphs/internal/handler"
 	"golang_graphs/internal/handler/common"
-	"golang_graphs/internal/handler/files"
-	"golang_graphs/internal/handler/task"
 	"golang_graphs/pkg/auth"
 	"golang_graphs/pkg/create_random_string"
 	"html/template"
@@ -61,29 +58,15 @@ func main() {
 
 	creator := create_random_string.New(5)
 
-	userCtrl := controller.NewController(db, creator)
-
 	authService := auth.New("your-256-bit-secret")
 
-	commonHandler := common.New(userCtrl, authService)
+	userCtrl := controller.NewController(db, creator, authService)
 
-	var handlerRootPath string
-
-	if os.Getenv("ENV") == "docker" {
-		handlerRootPath = "."
-	} else {
-		handlerRootPath = ".."
-	}
-
-	filesHandler := files.NewHandler(handlerRootPath)
-
-	taskCtrl := controller_task.NewController()
-
-	taskHandler := task.NewHandler(taskCtrl)
+	commonHandler := common.New(userCtrl)
 
 	e := setupEcho(authService, rootPath)
 
-	handler.SetupRoutes(e, commonHandler, filesHandler, taskHandler)
+	handler.SetupRoutes(e, commonHandler)
 
 	log.Println("prometheus setup start")
 
@@ -140,8 +123,6 @@ func setupDb(cfg config.Config) (database.Database, error) {
 func setupEcho(authService auth.Service, rootPath string) *echo.Echo {
 	e := echo.New()
 
-	e.GET("/swagger/*", echoSwagger.WrapHandler)
-
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			// Инкрементируем счетчик
@@ -153,16 +134,13 @@ func setupEcho(authService auth.Service, rootPath string) *echo.Echo {
 		}
 	})
 
+	e.GET("/swagger/*", echoSwagger.WrapHandler)
+
 	e.Use(Logger)
 
 	e.Use(CreateJwtMiddlewareWithService(authService))
 
 	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(10)))
-
-	renderer := &TemplateRenderer{
-		templates: template.Must(template.ParseGlob(fmt.Sprintf("%s/internal/view/graphPlayground/*.html", rootPath))),
-	}
-	e.Renderer = renderer
 
 	return e
 }

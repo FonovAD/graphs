@@ -3,40 +3,43 @@ package controller
 import (
 	"context"
 	"fmt"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	"golang_graphs/internal/database"
 	"golang_graphs/internal/dto"
-	"golang_graphs/internal/rest_models"
+	"golang_graphs/internal/models"
+	"golang_graphs/pkg/auth"
 	"golang_graphs/pkg/create_random_string"
 	"time"
 )
 
 type controller struct {
-	db      database.Database
-	creator create_random_string.Creator
+	db          database.Database
+	creator     create_random_string.Creator
+	authService auth.Service
 }
 
-func NewController(db database.Database, creator create_random_string.Creator) Controller {
-	return &controller{db: db, creator: creator}
+func NewController(db database.Database, creator create_random_string.Creator, authService auth.Service) Controller {
+	return &controller{db: db, creator: creator, authService: authService}
 }
 
 type Controller interface {
-	CreateUser(ctx context.Context, user rest_models.CreateUserRequest) (dto.User, error)
-	AuthUser(ctx context.Context, email, password string) (dto.User, error)
-	GetTests(ctx context.Context) (rest_models.GetTestsResponse, error)
-	GetTasksFromTest(ctx context.Context, testID int64) ([]dto.Task, error)
-	CheckResults(ctx context.Context, userID int64) (rest_models.CheckResultsResponse, error)
-	SendAnswers(ctx context.Context, answers []rest_models.Answer, testID int64) (dto.Result, error)
+	CreateUser(ctx context.Context, user models.CreateUserRequest) (models.CreateUserResponse, error)
+	AuthUser(ctx context.Context, request models.AuthUserRequest) (models.AuthUserResponse, error)
+	GetTests(ctx context.Context) (models.GetTestsResponse, error)
+	GetTasksFromTest(ctx context.Context, request models.GetTasksFromTestsRequest) (models.GetTasksFromTestsResponse, error)
+	CheckResults(ctx context.Context, userID int64) (models.CheckResultsResponse, error)
+	SendAnswers(ctx context.Context, request models.SendAnswersRequest) (models.SendAnswersResponse, error)
 }
 
-func (c *controller) SendAnswers(ctx context.Context, answers []rest_models.Answer, testID int64) (dto.Result, error) {
-	tasksWithAnswers, err := c.GetTasksFromTest(ctx, testID)
+func (c *controller) SendAnswers(ctx context.Context, request models.SendAnswersRequest) (models.SendAnswersResponse, error) {
+	tasksWithAnswers, err := c.db.GetTasksFromTest(ctx, request.TestID)
 	if err != nil {
-		return dto.Result{}, nil
+		return models.SendAnswersResponse{}, errors.Wrap(err, "error getting tasks from test ID")
 	}
 
 	grade := int64(0)
-	for _, answer := range answers {
+	for _, answer := range request.Answers {
 		grade += c.checkResult(answer, c.findAnswerByID(tasksWithAnswers, answer.TaskID))
 	}
 
@@ -45,14 +48,14 @@ func (c *controller) SendAnswers(ctx context.Context, answers []rest_models.Answ
 		End:       time.Now(),
 		Grade:     grade,
 		StudentID: 0,
-		TestID:    testID,
+		TestID:    request.TestID,
 	}
 	err = c.db.InsertResult(ctx, result)
 	if err != nil {
-		return dto.Result{}, err
+		return models.SendAnswersResponse{}, err
 	}
 
-	return result, nil
+	return models.SendAnswersResponse{Result: result}, nil
 }
 
 func (c *controller) findAnswerByID(tasksWithAnswer []dto.Task, taskID int64) dto.Task {
@@ -64,26 +67,26 @@ func (c *controller) findAnswerByID(tasksWithAnswer []dto.Task, taskID int64) dt
 	return dto.Task{}
 }
 
-func (c *controller) checkResult(answer rest_models.Answer, taskWithAnswer dto.Task) int64 {
+func (c *controller) checkResult(answer models.Answer, taskWithAnswer dto.Task) int64 {
 	if answer.Answer == taskWithAnswer.Answer {
 		return int64(taskWithAnswer.MaxGrade)
 	}
 	return 0
 }
 
-func (c *controller) CheckResults(ctx context.Context, userID int64) (rest_models.CheckResultsResponse, error) {
+func (c *controller) CheckResults(ctx context.Context, userID int64) (models.CheckResultsResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
 	results, err := c.db.GetResultsByUserID(ctx, userID)
 	if err != nil {
-		return rest_models.CheckResultsResponse{}, err
+		return models.CheckResultsResponse{}, errors.Wrap(err, "error getting results from DB")
 	}
 
-	return rest_models.CheckResultsResponse{Results: results}, nil
+	return models.CheckResultsResponse{Results: results}, nil
 }
 
-func (c *controller) CreateUser(ctx context.Context, user rest_models.CreateUserRequest) (dto.User, error) {
+func (c *controller) CreateUser(ctx context.Context, user models.CreateUserRequest) (models.CreateUserResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
@@ -91,7 +94,7 @@ func (c *controller) CreateUser(ctx context.Context, user rest_models.CreateUser
 
 	hash, err := hashPassword(user.Password, salt)
 	if err != nil {
-		return dto.User{}, err
+		return models.CreateUserResponse{}, errors.Wrap(err, "hash password")
 	}
 
 	userDto := dto.User{
@@ -104,55 +107,69 @@ func (c *controller) CreateUser(ctx context.Context, user rest_models.CreateUser
 		PasswordSalt:     salt,
 	}
 
-	userFromBD, err := c.db.InsertUser(ctx, userDto)
+	userFromDB, err := c.db.InsertUser(ctx, userDto)
 	if err != nil {
-		return dto.User{}, err
+		return models.CreateUserResponse{}, errors.Wrap(err, "insert user")
 	}
 
-	return userFromBD, nil
+	token, err := c.authService.CreateToken(userFromDB)
+	if err != nil {
+		return models.CreateUserResponse{}, errors.Wrap(err, "error creating token")
+	}
+
+	return models.CreateUserResponse{Token: token}, nil
 }
 
-func (c *controller) GetTests(ctx context.Context) (rest_models.GetTestsResponse, error) {
+func (c *controller) GetTests(ctx context.Context) (models.GetTestsResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
 	tests, err := c.db.GetTests(ctx)
 	if err != nil {
-		return rest_models.GetTestsResponse{}, err
+		return models.GetTestsResponse{}, err
 	}
 
-	return rest_models.GetTestsResponse{Tests: tests}, nil
+	return models.GetTestsResponse{Tests: tests}, nil
 }
 
-func (c *controller) GetTasksFromTest(ctx context.Context, testID int64) ([]dto.Task, error) {
-
+func (c *controller) GetTasksFromTest(ctx context.Context, request models.GetTasksFromTestsRequest) (models.GetTasksFromTestsResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	tasks, err := c.db.GetTasksFromTest(ctx, testID)
+	tasks, err := c.db.GetTasksFromTest(ctx, request.TestID)
 	if err != nil {
-		return nil, err
+		return models.GetTasksFromTestsResponse{}, err
 	}
 
-	return tasks, nil
+	// удаляю ответы
+	for i := 0; i < len(tasks); i++ {
+		tasks[i].Answer = ""
+	}
+
+	return models.GetTasksFromTestsResponse{Tasks: tasks}, nil
 }
 
-func (c *controller) AuthUser(ctx context.Context, email, password string) (dto.User, error) {
+func (c *controller) AuthUser(ctx context.Context, request models.AuthUserRequest) (models.AuthUserResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	user, err := c.db.SelectUserByEmail(ctx, email)
+	user, err := c.db.SelectUserByEmail(ctx, request.Email)
 	if err != nil {
-		return dto.User{}, err
+		return models.AuthUserResponse{}, err
 	}
 
-	password = password + user.PasswordSalt
+	password := request.Password + user.PasswordSalt
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
-		return dto.User{}, fmt.Errorf("incorrect nick or password %w", err)
+		return models.AuthUserResponse{}, fmt.Errorf("incorrect nick or password %w", err)
 	}
 
-	return user, nil
+	token, err := c.authService.CreateToken(user)
+	if err != nil {
+		return models.AuthUserResponse{}, errors.Wrap(err, "error creating token")
+	}
+
+	return models.AuthUserResponse{Token: token}, nil
 }
 
 // Hash password using the bcrypt hashing algorithm

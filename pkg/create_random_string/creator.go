@@ -1,6 +1,8 @@
 package create_random_string
 
-import "math/rand"
+import (
+	"github.com/samber/lo"
+)
 
 type creator struct {
 	n int
@@ -14,12 +16,8 @@ func New(n int) Creator {
 	return &creator{n: n}
 }
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+var charset = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890")
 
 func (c *creator) RandomString() string {
-	b := make([]byte, c.n)
-	for i := range b {
-		b[i] = letterBytes[rand.Intn(len(letterBytes))]
-	}
-	return string(b)
+	return lo.RandomString(c.n, charset)
 }

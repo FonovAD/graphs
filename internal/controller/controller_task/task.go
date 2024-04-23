@@ -3,7 +3,7 @@ package controller_task
 import (
 	"context"
 	gograph "github.com/yourbasic/graph"
-	"golang_graphs/internal/model"
+	"golang_graphs/internal/models"
 )
 
 type controller struct {
@@ -14,12 +14,12 @@ func NewController() Controller {
 }
 
 type Controller interface {
-	TaskComponents(ctx context.Context, graph model.Graph) (int, error)
-	TaskIsEulerUndirected(ctx context.Context, graph model.Graph) (bool, error)
-	TaskIsBipartition(ctx context.Context, graph model.Graph) (bool, error)
+	TaskComponents(ctx context.Context, graph models.Graph) (int, error)
+	TaskIsEulerUndirected(ctx context.Context, graph models.Graph) (bool, error)
+	TaskIsBipartition(ctx context.Context, graph models.Graph) (bool, error)
 }
 
-func (c *controller) TaskComponents(ctx context.Context, graph model.Graph) (int, error) {
+func (c *controller) TaskComponents(ctx context.Context, graph models.Graph) (int, error) {
 	g := createGograph(graph)
 
 	components := len(gograph.Components(g))
@@ -27,7 +27,7 @@ func (c *controller) TaskComponents(ctx context.Context, graph model.Graph) (int
 	return components, nil
 }
 
-func (c *controller) TaskIsEulerUndirected(ctx context.Context, graph model.Graph) (bool, error) {
+func (c *controller) TaskIsEulerUndirected(ctx context.Context, graph models.Graph) (bool, error) {
 	g := createGograph(graph)
 
 	components := len(gograph.Components(g))
@@ -41,7 +41,7 @@ func (c *controller) TaskIsEulerUndirected(ctx context.Context, graph model.Grap
 	return isEuler, nil
 }
 
-func (c *controller) TaskIsBipartition(ctx context.Context, graph model.Graph) (bool, error) {
+func (c *controller) TaskIsBipartition(ctx context.Context, graph models.Graph) (bool, error) {
 	g := createGograph(graph)
 
 	components := len(gograph.Components(g))
@@ -55,7 +55,7 @@ func (c *controller) TaskIsBipartition(ctx context.Context, graph model.Graph) (
 	return isBipartition, nil
 }
 
-func createGograph(graph model.Graph) *gograph.Mutable {
+func createGograph(graph models.Graph) *gograph.Mutable {
 	if len(graph.Nodes) == 0 {
 		return gograph.New(0)
 	}

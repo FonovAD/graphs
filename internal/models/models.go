@@ -1,4 +1,4 @@
-package rest_models
+package models
 
 import "golang_graphs/internal/dto"
 
@@ -50,4 +50,12 @@ type SendAnswersResponse struct {
 type Answer struct {
 	TaskID int64
 	Answer string
+}
+
+type BadRequestResponse struct {
+	ErrorMsg string `json:"error_msg"`
+}
+
+type InternalServerErrorResponse struct {
+	ErrorMsg string `json:"error_msg"`
 }

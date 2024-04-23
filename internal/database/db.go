@@ -1,9 +1,7 @@
 package database
 
 import (
-	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	_ "github.com/lib/pq"
 )
@@ -28,22 +26,4 @@ func NewDatabase(config Config) (Database, error) {
 	}
 
 	return &database{client: client}, nil
-}
-
-func (db *database) AuthUser(ctx context.Context, email string) (int64, string, error) {
-	row := db.client.QueryRowContext(ctx, authUser, email)
-
-	var id int64
-	var hash string
-
-	err := row.Scan(&id, &hash)
-
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		return 0, "", UserNotFoundError
-	case err != nil:
-		return 0, "", err
-	}
-
-	return id, hash, nil
 }

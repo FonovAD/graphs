@@ -3,7 +3,7 @@ package common
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"golang_graphs/internal/model"
+	"golang_graphs/internal/models"
 	"net/http"
 )
 
@@ -11,16 +11,16 @@ import (
 // @Summary      GetTests
 // @Description  GetTests
 // @Produce      json
-// @Success      200  {object}  rest_models.GetTestsResponse
-// @Failure      400  {object}  model.BadRequestResponse
-// @Failure      500  {object}  model.InternalServerErrorResponse
+// @Success      200  {object}  models.GetTestsResponse
+// @Failure      400  {object}  models.BadRequestResponse
+// @Failure      500  {object}  models.InternalServerErrorResponse
 // @Router       /get_tests [get]
 func (h *handler) GetTests(ctx echo.Context) error {
 	ctxBack := context.Background()
 
 	response, err := h.ctrl.GetTests(ctxBack)
 	if err != nil {
-		return ctx.JSON(http.StatusInternalServerError, model.InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, models.InternalServerErrorResponse{ErrorMsg: err.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)

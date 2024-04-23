@@ -21,7 +21,7 @@ create_swagger:
 	swag init -g cmd/golang_graphs/main.go
 
 
-## Писать в формате FunctionName (CamelCase и первая буква заглавная)
-## Например CreateUser
-create_file_handler_common:
-	python3 $(ROOT_FOLDER)/internal/handler/common/create_file.py $(call args) $(ROOT_FOLDER)/internal/handler/common/
+### Писать в формате FunctionName (CamelCase и первая буква заглавная)
+### Например CreateUser
+#create_file_handler_common:
+#	python3 $(ROOT_FOLDER)/internal/handler/common/create_file.py $(call args) $(ROOT_FOLDER)/internal/handler/common/

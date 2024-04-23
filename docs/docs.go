@@ -33,7 +33,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest_models.AuthUserRequest"
+                            "$ref": "#/definitions/models.AuthUserRequest"
                         }
                     }
                 ],
@@ -41,19 +41,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.AuthUserResponse"
+                            "$ref": "#/definitions/models.AuthUserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -70,19 +70,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.CheckResultsResponse"
+                            "$ref": "#/definitions/models.CheckResultsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -105,7 +105,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest_models.CreateUserRequest"
+                            "$ref": "#/definitions/models.CreateUserRequest"
                         }
                     }
                 ],
@@ -113,19 +113,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.CreateUserResponse"
+                            "$ref": "#/definitions/models.CreateUserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -148,7 +148,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest_models.GetTasksFromTestsRequest"
+                            "$ref": "#/definitions/models.GetTasksFromTestsRequest"
                         }
                     }
                 ],
@@ -156,19 +156,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.GetTasksFromTestsResponse"
+                            "$ref": "#/definitions/models.GetTasksFromTestsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -185,19 +185,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.GetTestsResponse"
+                            "$ref": "#/definitions/models.GetTestsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -220,7 +220,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest_models.SendAnswersRequest"
+                            "$ref": "#/definitions/models.SendAnswersRequest"
                         }
                     }
                 ],
@@ -228,19 +228,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.SendAnswersResponse"
+                            "$ref": "#/definitions/models.SendAnswersResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -311,7 +311,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.BadRequestResponse": {
+        "model_deprecated.BadRequestResponse": {
             "type": "object",
             "properties": {
                 "error_msg": {
@@ -319,7 +319,7 @@ const docTemplate = `{
                 }
             }
         },
-        "model.InternalServerErrorResponse": {
+        "model_deprecated.InternalServerErrorResponse": {
             "type": "object",
             "properties": {
                 "error_msg": {
@@ -327,7 +327,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.Answer": {
+        "models.Answer": {
             "type": "object",
             "properties": {
                 "answer": {
@@ -338,7 +338,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.AuthUserRequest": {
+        "models.AuthUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -349,7 +349,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.AuthUserResponse": {
+        "models.AuthUserResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -357,7 +357,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.CheckResultsResponse": {
+        "models.CheckResultsResponse": {
             "type": "object",
             "properties": {
                 "results": {
@@ -368,7 +368,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.CreateUserRequest": {
+        "models.CreateUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -385,7 +385,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.CreateUserResponse": {
+        "models.CreateUserResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -393,7 +393,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.GetTasksFromTestsRequest": {
+        "models.GetTasksFromTestsRequest": {
             "type": "object",
             "properties": {
                 "test_id": {
@@ -401,7 +401,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.GetTasksFromTestsResponse": {
+        "models.GetTasksFromTestsResponse": {
             "type": "object",
             "properties": {
                 "tasks": {
@@ -412,7 +412,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.GetTestsResponse": {
+        "models.GetTestsResponse": {
             "type": "object",
             "properties": {
                 "tests": {
@@ -423,13 +423,13 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.SendAnswersRequest": {
+        "models.SendAnswersRequest": {
             "type": "object",
             "properties": {
                 "answers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest_models.Answer"
+                        "$ref": "#/definitions/models.Answer"
                     }
                 },
                 "testID": {
@@ -437,7 +437,7 @@ const docTemplate = `{
                 }
             }
         },
-        "rest_models.SendAnswersResponse": {
+        "models.SendAnswersResponse": {
             "type": "object",
             "properties": {
                 "result": {

@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS users
 (
-    usersid INT NOT NULL,
+    usersid SERIAL NOT NULL,
     role VARCHAR(100) NOT NULL,
     first_name VARCHAR(100) NOT NULL,
     last_name VARCHAR(100) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    email VARCHAR(100) CHECK (email LIKE '%@%.%') NOT NULL,
     father_name VARCHAR(100) NOT NULL,
     password VARCHAR(100) NOT NULL,
     passwordsalt VARCHAR(6) NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users
 
 CREATE TABLE IF NOT EXISTS teacher
 (
-    teacherid INT NOT NULL,
+    teacherid SERIAL NOT NULL,
     usersid INT NOT NULL,
     PRIMARY KEY (teacherid),
     FOREIGN KEY (usersid) REFERENCES users(usersid)
@@ -23,14 +23,14 @@ CREATE TABLE IF NOT EXISTS teacher
 
 CREATE TABLE IF NOT EXISTS groups
 (
-    groupsid INT NOT NULL,
+    groupsid SERIAL NOT NULL,
     groupsname VARCHAR(10),
     PRIMARY KEY (groupsid)
 );
 
 CREATE TABLE IF NOT EXISTS student
 (
-    studentid INT NOT NULL,
+    studentid SERIAL NOT NULL,
     usersid INT NOT NULL,
     groupsid INT NOT NULL,
     PRIMARY KEY (studentid),
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS student
 
 CREATE TABLE IF NOT EXISTS tests
 (
-    testsid INT NOT NULL,
+    testsid SERIAL NOT NULL,
     test_name varchar (100) NOT NULL,
     date_start DATE NOT NULL,
     time INTERVAL HOUR TO SECOND NOT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS tests
 
 CREATE TABLE IF NOT EXISTS teachergroup
 (
-    teachergroupid INT NOT NULL,
+    teachergroupid SERIAL NOT NULL,
     teacherid INT NOT NULL,
     groupsid INT NOT NULL,
     PRIMARY KEY (teachergroupid),
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS result
 (
     time_start TIMESTAMP NOT NULL,
     time_end  TIMESTAMP NOT NULL,
-    resultid INT NOT NULL,
+    resultid SERIAL NOT NULL,
     sum_grade INT NOT NULL,
     studentid INT NOT NULL,
     testsid INT NOT NULL,
@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS result
 
 CREATE TABLE IF NOT EXISTS task
 (
-    taskid INT NOT NULL,
+    taskid SERIAL NOT NULL,
     task_name VARCHAR(100) NOT NULL,
     answer JSONB NOT NULL,
     data JSONB NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS task
 
 CREATE TABLE IF NOT EXISTS test_task
 (
-    testtaskid INT NOT NULL,
+    testtaskid SERIAL NOT NULL,
     testsid INT NOT NULL,
     taskid INT NOT NULL,
     PRIMARY KEY (testtaskid),
@@ -92,9 +92,9 @@ CREATE TABLE IF NOT EXISTS test_task
     FOREIGN KEY (taskid) REFERENCES task(taskid)
 );
 
-CREATE TABLE grade
+CREATE TABLE IF NOT EXISTS grade
 (
-    gradeid INT NOT NULL,
+    gradeid SERIAL NOT NULL,
     grade INT NOT NULL,
     resultid INT NOT NULL,
     PRIMARY KEY (gradeid),
