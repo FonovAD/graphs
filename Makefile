@@ -27,7 +27,13 @@ create_swagger:
 bench:
 	go test -bench=BenchmarkSimplest -benchmem -benchtime=1x
 
-
+docker_run:
+	set -ex
+	sudo docker-compose -f $(ROOT_FOLDER)/deploy/docker-compose.yaml -p deploy up --build -d graphs_db
+	sudo docker-compose -f $(ROOT_FOLDER)/deploy/docker-compose.yaml -p deploy up --build -d node-exporter
+	sudo docker-compose -f $(ROOT_FOLDER)/deploy/docker-compose.yaml -p deploy up --build -d prometheus
+	sudo docker-compose -f $(ROOT_FOLDER)/deploy/docker-compose.yaml -p deploy up --build -d grafana
+	sudo docker-compose -f $(ROOT_FOLDER)/deploy/docker-compose.yaml -p deploy up --build -d graphs_back
 ### Писать в формате FunctionName (CamelCase и первая буква заглавная)
 ### Например CreateUser
 #create_file_handler_common:
