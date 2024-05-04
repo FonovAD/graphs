@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/labstack/gommon/log"
 	"golang_graphs/internal/dto"
-	"time"
 )
 
 type Database interface {
@@ -17,6 +16,8 @@ type Database interface {
 	GetTasksFromTest(ctx context.Context, testID int64) ([]dto.Task, error)
 	GetResultsByUserID(ctx context.Context, userID int64) ([]dto.Result, error)
 	InsertResult(ctx context.Context, result dto.Result) error
+	InsertTest(ctx context.Context, test dto.Test) (int64, error)
+	InsertTask(ctx context.Context, task dto.Task) (int64, error)
 }
 
 func (db *database) Ping(ctx context.Context) error {
@@ -85,26 +86,51 @@ func (db *database) GetTests(ctx context.Context) ([]dto.Test, error) {
 }
 
 func (db *database) GetTasksFromTest(ctx context.Context, testID int64) ([]dto.Task, error) {
-	log.Info("GetTasksFromTest", testID)
-	return []dto.Task{{
-		ID:       228,
-		Name:     "228",
-		Data:     "",
-		Answer:   "",
-		MaxGrade: 1,
-	}}, nil
+	rows, err := db.client.QueryContext(ctx, SelectTasksByTestID, testID)
+	if err != nil {
+		return nil, fmt.Errorf("select error %w", err)
+	}
+	defer rows.Close()
+
+	tasks := make([]dto.Task, 0)
+
+	for rows.Next() {
+		task := dto.Task{}
+		if err := rows.Scan(&task.ID, &task.Name, &task.Answer, &task.Data, &task.MaxGrade, &task.Description); err != nil {
+			return nil, fmt.Errorf("get tasks row scan error %w", err)
+		}
+		tasks = append(tasks, task)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("get tasks rows err %w", err)
+	}
+
+	return tasks, nil
 }
 
 func (db *database) GetResultsByUserID(ctx context.Context, userID int64) ([]dto.Result, error) {
-	log.Info("GetResultByUserID", userID)
-	return []dto.Result{{
-		ID:        228,
-		Start:     time.Time{},
-		End:       time.Time{},
-		Grade:     228,
-		StudentID: 1,
-		TestID:    1,
-	}}, nil
+	rows, err := db.client.QueryContext(ctx, SelectResultsByUserID, userID)
+	if err != nil {
+		return nil, fmt.Errorf("select error %w", err)
+	}
+	defer rows.Close()
+
+	results := make([]dto.Result, 0)
+
+	for rows.Next() {
+		result := dto.Result{}
+		if err := rows.Scan(&result.ID, &result.Start, &result.End, &result.Grade, &result.MaxGrade, &result.StudentID, &result.TestID); err != nil {
+			return nil, fmt.Errorf("get results row scan error %w", err)
+		}
+		results = append(results, result)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("get results rows err %w", err)
+	}
+
+	return results, nil
 }
 
 func (db *database) InsertResult(ctx context.Context, result dto.Result) error {
@@ -112,7 +138,7 @@ func (db *database) InsertResult(ctx context.Context, result dto.Result) error {
 	var id int64
 
 	row := db.client.QueryRowContext(ctx, InsertIntoResult,
-		result.Start, result.End, result.Grade, result.StudentID, result.TestID)
+		result.Start, result.End, result.Grade, result.MaxGrade, result.StudentID, result.TestID)
 
 	err := row.Scan(&id)
 
@@ -121,4 +147,32 @@ func (db *database) InsertResult(ctx context.Context, result dto.Result) error {
 	}
 
 	return nil
+}
+
+func (db *database) InsertTest(ctx context.Context, test dto.Test) (int64, error) {
+	log.Info("InsertTest", test)
+	var id int64
+
+	row := db.client.QueryRowContext(ctx, InsertTest, test.Name, test.Description, "24h", test.Start, test.End)
+	err := row.Scan(&id)
+
+	if err != nil {
+		return 0, fmt.Errorf("insert result error %w", err)
+	}
+
+	return id, nil
+}
+
+func (db *database) InsertTask(ctx context.Context, task dto.Task) (int64, error) {
+	log.Info("InsertTask", task)
+	var id int64
+
+	row := db.client.QueryRowContext(ctx, InsertTask, task.TestID, task.Name, task.Answer, task.Data, task.MaxGrade, task.Description)
+	err := row.Scan(&id)
+
+	if err != nil {
+		return 0, fmt.Errorf("insert result error %w", err)
+	}
+
+	return id, nil
 }

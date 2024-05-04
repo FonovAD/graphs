@@ -17,6 +17,8 @@ type Handler interface {
 	CheckResults(ctx echo.Context) error
 	AuthUser(ctx echo.Context) error
 	SendAnswers(ctx echo.Context) error
+	InsertTask(ctx echo.Context) error
+	InsertTest(ctx echo.Context) error
 }
 
 // Handler struct for declaring api methods

@@ -3,11 +3,8 @@ package common
 import (
 	"context"
 	"github.com/labstack/echo/v4"
-	"golang_graphs/internal/consts"
 	"golang_graphs/internal/models"
-	"log"
 	"net/http"
-	"time"
 )
 
 // CreateUser godoc
@@ -22,24 +19,17 @@ import (
 // @Router       /create_user [post]
 func (h *handler) CreateUser(ctx echo.Context) error {
 	var request models.CreateUserRequest
-
 	if err := ctx.Bind(&request); err != nil {
-		log.Println(consts.ErrorDescriptions[http.StatusBadRequest], err)
+		ctx.Set("error", err.Error())
 		return ctx.JSON(http.StatusBadRequest, models.BadRequestResponse{ErrorMsg: err.Error()})
 	}
 
 	ctxBack := context.Background()
-
 	response, err := h.ctrl.CreateUser(ctxBack, request)
 	if err != nil {
+		ctx.Set("error", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, models.InternalServerErrorResponse{ErrorMsg: err.Error()})
 	}
-
-	cookie := new(http.Cookie)
-	cookie.Name = "token"
-	cookie.Value = response.Token
-	cookie.Expires = time.Now().Add(48 * time.Hour)
-	ctx.SetCookie(cookie)
 
 	return ctx.JSON(http.StatusOK, response)
 }

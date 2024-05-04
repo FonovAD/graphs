@@ -25,7 +25,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest_models.AuthUserRequest"
+                            "$ref": "#/definitions/models.AuthUserRequest"
                         }
                     }
                 ],
@@ -33,48 +33,59 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.AuthUserResponse"
+                            "$ref": "#/definitions/models.AuthUserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
             }
         },
         "/check_results": {
-            "get": {
+            "post": {
                 "description": "CheckResults",
                 "produces": [
                     "application/json"
                 ],
                 "summary": "CheckResults",
+                "parameters": [
+                    {
+                        "description": "CheckResultsRequest",
+                        "name": "CheckResultsRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CheckResultsRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.CheckResultsResponse"
+                            "$ref": "#/definitions/models.CheckResultsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -97,7 +108,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest_models.CreateUserRequest"
+                            "$ref": "#/definitions/models.CreateUserRequest"
                         }
                     }
                 ],
@@ -105,19 +116,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.CreateUserResponse"
+                            "$ref": "#/definitions/models.CreateUserResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -140,7 +151,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest_models.GetTasksFromTestsRequest"
+                            "$ref": "#/definitions/models.GetTasksFromTestsRequest"
                         }
                     }
                 ],
@@ -148,19 +159,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.GetTasksFromTestsResponse"
+                            "$ref": "#/definitions/models.GetTasksFromTestsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -177,19 +188,105 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.GetTestsResponse"
+                            "$ref": "#/definitions/models.GetTestsResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/insert_task": {
+            "post": {
+                "description": "InsertTask",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "InsertTask",
+                "parameters": [
+                    {
+                        "description": "InsertTest",
+                        "name": "InsertTest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.InsertTaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.InsertTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/insert_test": {
+            "post": {
+                "description": "InsertTest",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "InsertTest",
+                "parameters": [
+                    {
+                        "description": "InsertTest",
+                        "name": "InsertTest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.InsertTestRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.InsertTestResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -212,7 +309,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/rest_models.SendAnswersRequest"
+                            "$ref": "#/definitions/models.SendAnswersRequest"
                         }
                     }
                 ],
@@ -220,19 +317,19 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/rest_models.SendAnswersResponse"
+                            "$ref": "#/definitions/models.SendAnswersResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -250,6 +347,9 @@
                     "type": "integer"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "maxGrade": {
                     "type": "integer"
                 },
                 "start": {
@@ -272,6 +372,9 @@
                 "data": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -280,20 +383,23 @@
                 },
                 "name": {
                     "type": "string"
+                },
+                "testID": {
+                    "type": "integer"
                 }
             }
         },
         "dto.Test": {
             "type": "object",
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "end": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
-                },
-                "interval": {
-                    "type": "string"
                 },
                 "name": {
                     "type": "string"
@@ -303,23 +409,7 @@
                 }
             }
         },
-        "model.BadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error_msg": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.InternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error_msg": {
-                    "type": "string"
-                }
-            }
-        },
-        "rest_models.Answer": {
+        "models.Answer": {
             "type": "object",
             "properties": {
                 "answer": {
@@ -330,7 +420,7 @@
                 }
             }
         },
-        "rest_models.AuthUserRequest": {
+        "models.AuthUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -341,7 +431,7 @@
                 }
             }
         },
-        "rest_models.AuthUserResponse": {
+        "models.AuthUserResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -349,7 +439,23 @@
                 }
             }
         },
-        "rest_models.CheckResultsResponse": {
+        "models.BadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CheckResultsRequest": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CheckResultsResponse": {
             "type": "object",
             "properties": {
                 "results": {
@@ -360,7 +466,7 @@
                 }
             }
         },
-        "rest_models.CreateUserRequest": {
+        "models.CreateUserRequest": {
             "type": "object",
             "properties": {
                 "email": {
@@ -377,7 +483,7 @@
                 }
             }
         },
-        "rest_models.CreateUserResponse": {
+        "models.CreateUserResponse": {
             "type": "object",
             "properties": {
                 "token": {
@@ -385,7 +491,7 @@
                 }
             }
         },
-        "rest_models.GetTasksFromTestsRequest": {
+        "models.GetTasksFromTestsRequest": {
             "type": "object",
             "properties": {
                 "test_id": {
@@ -393,7 +499,7 @@
                 }
             }
         },
-        "rest_models.GetTasksFromTestsResponse": {
+        "models.GetTasksFromTestsResponse": {
             "type": "object",
             "properties": {
                 "tasks": {
@@ -404,7 +510,7 @@
                 }
             }
         },
-        "rest_models.GetTestsResponse": {
+        "models.GetTestsResponse": {
             "type": "object",
             "properties": {
                 "tests": {
@@ -415,21 +521,64 @@
                 }
             }
         },
-        "rest_models.SendAnswersRequest": {
+        "models.InsertTaskRequest": {
+            "type": "object",
+            "properties": {
+                "task": {
+                    "$ref": "#/definitions/dto.Task"
+                }
+            }
+        },
+        "models.InsertTaskResponse": {
+            "type": "object",
+            "properties": {
+                "task_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.InsertTestRequest": {
+            "type": "object",
+            "properties": {
+                "test": {
+                    "$ref": "#/definitions/dto.Test"
+                }
+            }
+        },
+        "models.InsertTestResponse": {
+            "type": "object",
+            "properties": {
+                "test_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.InternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SendAnswersRequest": {
             "type": "object",
             "properties": {
                 "answers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/rest_models.Answer"
+                        "$ref": "#/definitions/models.Answer"
                     }
                 },
                 "testID": {
                     "type": "integer"
+                },
+                "token": {
+                    "type": "string"
                 }
             }
         },
-        "rest_models.SendAnswersResponse": {
+        "models.SendAnswersResponse": {
             "type": "object",
             "properties": {
                 "result": {

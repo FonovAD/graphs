@@ -17,6 +17,9 @@ args = `arg="$(filter-out $@,$(MAKECMDGOALS))" && echo $${arg:-${1}}`
 run:  ##@Application Run application server
 	go run $(ROOT_FOLDER)/cmd/golang_graphs --rootPath $(ROOT_FOLDER)
 
+run_test:  ##@Application Run application server
+	TESTING="testing" go run $(ROOT_FOLDER)/cmd/golang_graphs --rootPath $(ROOT_FOLDER)
+
 create_swagger:
 	swag init -g cmd/golang_graphs/main.go
 

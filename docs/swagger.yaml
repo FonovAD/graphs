@@ -7,6 +7,8 @@ definitions:
         type: integer
       id:
         type: integer
+      maxGrade:
+        type: integer
       start:
         type: string
       studentID:
@@ -20,63 +22,67 @@ definitions:
         type: string
       data:
         type: string
+      description:
+        type: string
       id:
         type: integer
       maxGrade:
         type: integer
       name:
         type: string
+      testID:
+        type: integer
     type: object
   dto.Test:
     properties:
+      description:
+        type: string
       end:
         type: string
       id:
         type: integer
-      interval:
-        type: string
       name:
         type: string
       start:
         type: string
     type: object
-  model.BadRequestResponse:
-    properties:
-      error_msg:
-        type: string
-    type: object
-  model.InternalServerErrorResponse:
-    properties:
-      error_msg:
-        type: string
-    type: object
-  rest_models.Answer:
+  models.Answer:
     properties:
       answer:
         type: string
       taskID:
         type: integer
     type: object
-  rest_models.AuthUserRequest:
+  models.AuthUserRequest:
     properties:
       email:
         type: string
       password:
         type: string
     type: object
-  rest_models.AuthUserResponse:
+  models.AuthUserResponse:
     properties:
       token:
         type: string
     type: object
-  rest_models.CheckResultsResponse:
+  models.BadRequestResponse:
+    properties:
+      error_msg:
+        type: string
+    type: object
+  models.CheckResultsRequest:
+    properties:
+      token:
+        type: string
+    type: object
+  models.CheckResultsResponse:
     properties:
       results:
         items:
           $ref: '#/definitions/dto.Result'
         type: array
     type: object
-  rest_models.CreateUserRequest:
+  models.CreateUserRequest:
     properties:
       email:
         type: string
@@ -87,40 +93,67 @@ definitions:
       password:
         type: string
     type: object
-  rest_models.CreateUserResponse:
+  models.CreateUserResponse:
     properties:
       token:
         type: string
     type: object
-  rest_models.GetTasksFromTestsRequest:
+  models.GetTasksFromTestsRequest:
     properties:
       test_id:
         type: integer
     type: object
-  rest_models.GetTasksFromTestsResponse:
+  models.GetTasksFromTestsResponse:
     properties:
       tasks:
         items:
           $ref: '#/definitions/dto.Task'
         type: array
     type: object
-  rest_models.GetTestsResponse:
+  models.GetTestsResponse:
     properties:
       tests:
         items:
           $ref: '#/definitions/dto.Test'
         type: array
     type: object
-  rest_models.SendAnswersRequest:
+  models.InsertTaskRequest:
+    properties:
+      task:
+        $ref: '#/definitions/dto.Task'
+    type: object
+  models.InsertTaskResponse:
+    properties:
+      task_id:
+        type: integer
+    type: object
+  models.InsertTestRequest:
+    properties:
+      test:
+        $ref: '#/definitions/dto.Test'
+    type: object
+  models.InsertTestResponse:
+    properties:
+      test_id:
+        type: integer
+    type: object
+  models.InternalServerErrorResponse:
+    properties:
+      error_msg:
+        type: string
+    type: object
+  models.SendAnswersRequest:
     properties:
       answers:
         items:
-          $ref: '#/definitions/rest_models.Answer'
+          $ref: '#/definitions/models.Answer'
         type: array
       testID:
         type: integer
+      token:
+        type: string
     type: object
-  rest_models.SendAnswersResponse:
+  models.SendAnswersResponse:
     properties:
       result:
         $ref: '#/definitions/dto.Result'
@@ -143,41 +176,48 @@ paths:
         name: AuthUser
         required: true
         schema:
-          $ref: '#/definitions/rest_models.AuthUserRequest'
+          $ref: '#/definitions/models.AuthUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest_models.AuthUserResponse'
+            $ref: '#/definitions/models.AuthUserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.BadRequestResponse'
+            $ref: '#/definitions/models.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.InternalServerErrorResponse'
+            $ref: '#/definitions/models.InternalServerErrorResponse'
       summary: AuthUser
   /check_results:
-    get:
+    post:
       description: CheckResults
+      parameters:
+      - description: CheckResultsRequest
+        in: body
+        name: CheckResultsRequest
+        required: true
+        schema:
+          $ref: '#/definitions/models.CheckResultsRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest_models.CheckResultsResponse'
+            $ref: '#/definitions/models.CheckResultsResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.BadRequestResponse'
+            $ref: '#/definitions/models.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.InternalServerErrorResponse'
+            $ref: '#/definitions/models.InternalServerErrorResponse'
       summary: CheckResults
   /create_user:
     post:
@@ -190,22 +230,22 @@ paths:
         name: CreateUser
         required: true
         schema:
-          $ref: '#/definitions/rest_models.CreateUserRequest'
+          $ref: '#/definitions/models.CreateUserRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest_models.CreateUserResponse'
+            $ref: '#/definitions/models.CreateUserResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.BadRequestResponse'
+            $ref: '#/definitions/models.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.InternalServerErrorResponse'
+            $ref: '#/definitions/models.InternalServerErrorResponse'
       summary: CreateUser
   /get_tasks_from_test:
     post:
@@ -218,22 +258,22 @@ paths:
         name: GetTasksFromTest
         required: true
         schema:
-          $ref: '#/definitions/rest_models.GetTasksFromTestsRequest'
+          $ref: '#/definitions/models.GetTasksFromTestsRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest_models.GetTasksFromTestsResponse'
+            $ref: '#/definitions/models.GetTasksFromTestsResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.BadRequestResponse'
+            $ref: '#/definitions/models.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.InternalServerErrorResponse'
+            $ref: '#/definitions/models.InternalServerErrorResponse'
       summary: GetTasksFromTest
   /get_tests:
     get:
@@ -244,16 +284,72 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest_models.GetTestsResponse'
+            $ref: '#/definitions/models.GetTestsResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.BadRequestResponse'
+            $ref: '#/definitions/models.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.InternalServerErrorResponse'
+            $ref: '#/definitions/models.InternalServerErrorResponse'
       summary: GetTests
+  /insert_task:
+    post:
+      consumes:
+      - application/json
+      description: InsertTask
+      parameters:
+      - description: InsertTest
+        in: body
+        name: InsertTest
+        required: true
+        schema:
+          $ref: '#/definitions/models.InsertTaskRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.InsertTaskResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.InternalServerErrorResponse'
+      summary: InsertTask
+  /insert_test:
+    post:
+      consumes:
+      - application/json
+      description: InsertTest
+      parameters:
+      - description: InsertTest
+        in: body
+        name: InsertTest
+        required: true
+        schema:
+          $ref: '#/definitions/models.InsertTestRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.InsertTestResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.BadRequestResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.InternalServerErrorResponse'
+      summary: InsertTest
   /send_answers:
     post:
       consumes:
@@ -265,22 +361,22 @@ paths:
         name: SendAnswers
         required: true
         schema:
-          $ref: '#/definitions/rest_models.SendAnswersRequest'
+          $ref: '#/definitions/models.SendAnswersRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/rest_models.SendAnswersResponse'
+            $ref: '#/definitions/models.SendAnswersResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/model.BadRequestResponse'
+            $ref: '#/definitions/models.BadRequestResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/model.InternalServerErrorResponse'
+            $ref: '#/definitions/models.InternalServerErrorResponse'
       summary: SendAnswers
 securityDefinitions:
   BasicAuth:

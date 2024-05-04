@@ -6,10 +6,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/heetch/confita"
-	"github.com/heetch/confita/backend/env"
 	"github.com/heetch/confita/backend/file"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	echoSwagger "github.com/swaggo/echo-swagger"
@@ -20,13 +18,10 @@ import (
 	"golang_graphs/internal/handler/common"
 	"golang_graphs/pkg/auth"
 	"golang_graphs/pkg/create_random_string"
-	"html/template"
-	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
 	"time"
 
 	_ "golang_graphs/docs"
@@ -47,6 +42,7 @@ var (
 func main() {
 	rootPath := parseRootPath()
 	cfg, err := setupCfg(rootPath)
+	fmt.Printf("\nCFG %+v \n", cfg)
 	if err != nil {
 		log.Fatalf("failed to parse config: %e\n", err)
 	}
@@ -138,9 +134,7 @@ func setupEcho(authService auth.Service, rootPath string) *echo.Echo {
 
 	e.Use(Logger)
 
-	e.Use(CreateJwtMiddlewareWithService(authService))
-
-	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(10)))
+	// e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(10)))
 
 	return e
 }
@@ -150,10 +144,20 @@ func setupCfg(rootPath string) (config.Config, error) {
 
 	var cfg config.Config
 
+	path := fmt.Sprintf("%s/deploy/default.yaml", rootPath)
+
+	envTesting := os.Getenv("TESTING")
+	if len(envTesting) != 0 {
+		path = fmt.Sprintf("%s/deploy/test_config.yaml", rootPath)
+	}
+
+	fmt.Println("PATH", path)
+
 	err := confita.NewLoader(
-		file.NewBackend(fmt.Sprintf("%s/deploy/default.yaml", rootPath)),
-		env.NewBackend(),
+		file.NewBackend(path),
 	).Load(ctx, &cfg)
+
+	fmt.Printf("\nCFG %+v \n", cfg)
 
 	if err != nil {
 		return config.Config{}, err
@@ -164,22 +168,9 @@ func setupCfg(rootPath string) (config.Config, error) {
 		cfg.Postgres.Host = "localhost"
 	}
 
+	fmt.Println("TESTING =", os.Getenv("TESTING"))
+
 	return cfg, nil
-}
-
-// TemplateRenderer is a custom html/template renderer for Echo framework
-type TemplateRenderer struct {
-	templates *template.Template
-}
-
-// Render renders a template document
-func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
-	// Add global methods if data is a map
-	if viewContext, isMap := data.(map[string]interface{}); isMap {
-		viewContext["reverse"] = c.Echo().Reverse
-	}
-
-	return t.templates.ExecuteTemplate(w, name, data)
 }
 
 func Logger(next echo.HandlerFunc) echo.HandlerFunc {
@@ -190,45 +181,17 @@ func Logger(next echo.HandlerFunc) echo.HandlerFunc {
 			c.Error(err)
 		}
 
+		status := c.Response().Status
+		errMsg := c.Get("error")
+
 		log.Printf(
-			"%s %s",
+			`{"path": "%s", "time": "%s", "status": %d, "error" "%s"}`,
 			c.Path(),
 			time.Since(start),
+			status,
+			errMsg,
 		)
 
 		return nil
-	}
-}
-
-func CreateJwtMiddlewareWithService(service auth.Service) func(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(next echo.HandlerFunc) echo.HandlerFunc {
-		return func(c echo.Context) error {
-			if c.Path() != "/check_results" {
-				if err := next(c); err != nil {
-					c.Error(err)
-				}
-				return nil
-			}
-
-			token := strings.TrimPrefix(c.Request().Header.Get("Authorization"), "Bearer ")
-
-			fmt.Println("Token ", token)
-
-			user, err := service.AuthUser(token)
-			if err != nil {
-				log.Println("couldnt auth user:", err)
-				return err
-			}
-
-			c.Set("user_id", user.Id)
-
-			fmt.Println("token", token, "user_id", user.Id)
-
-			if err := next(c); err != nil {
-				c.Error(err)
-			}
-
-			return nil
-		}
 	}
 }

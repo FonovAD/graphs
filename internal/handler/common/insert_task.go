@@ -7,18 +7,18 @@ import (
 	"net/http"
 )
 
-// SendAnswers godoc
-// @Summary      SendAnswers
-// @Description  SendAnswers
+// InsertTask godoc
+// @Summary      InsertTask
+// @Description  InsertTask
 // @Accept       json
 // @Produce      json
-// @Param        SendAnswers   body      models.SendAnswersRequest  true "SendAnswers"
-// @Success      200  {object}  models.SendAnswersResponse
+// @Param        InsertTest   body      models.InsertTaskRequest  true "InsertTest"
+// @Success      200  {object}  models.InsertTaskResponse
 // @Failure      400  {object}  models.BadRequestResponse
 // @Failure      500  {object}  models.InternalServerErrorResponse
-// @Router       /send_answers [post]
-func (h *handler) SendAnswers(ctx echo.Context) error {
-	var request models.SendAnswersRequest
+// @Router       /insert_task [post]
+func (h *handler) InsertTask(ctx echo.Context) error {
+	var request models.InsertTaskRequest
 
 	if err := ctx.Bind(&request); err != nil {
 		ctx.Set("error", err.Error())
@@ -26,7 +26,7 @@ func (h *handler) SendAnswers(ctx echo.Context) error {
 	}
 
 	ctxBack := context.Background()
-	response, err := h.ctrl.SendAnswers(ctxBack, request)
+	response, err := h.ctrl.InsertTask(ctxBack, request)
 	if err != nil {
 		ctx.Set("error", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, models.InternalServerErrorResponse{ErrorMsg: err.Error()})

@@ -11,6 +11,10 @@ type AuthUserResponse struct {
 	Token string
 }
 
+type CheckResultsRequest struct {
+	Token string
+}
+
 type CheckResultsResponse struct {
 	Results []dto.Result `json:"results"`
 }
@@ -34,6 +38,8 @@ type GetTasksFromTestsResponse struct {
 	Tasks []dto.Task `json:"tasks"`
 }
 
+type GetTestsRequest struct{}
+
 type GetTestsResponse struct {
 	Tests []dto.Test `json:"tests"`
 }
@@ -41,6 +47,7 @@ type GetTestsResponse struct {
 type SendAnswersRequest struct {
 	TestID  int64
 	Answers []Answer `json:"answers"`
+	Token   string
 }
 
 type SendAnswersResponse struct {
@@ -58,4 +65,20 @@ type BadRequestResponse struct {
 
 type InternalServerErrorResponse struct {
 	ErrorMsg string `json:"error_msg"`
+}
+
+type InsertTestRequest struct {
+	Test dto.Test `json:"test"`
+}
+
+type InsertTestResponse struct {
+	TestID int64 `json:"test_id"`
+}
+
+type InsertTaskRequest struct {
+	Task dto.Task `json:"task"`
+}
+
+type InsertTaskResponse struct {
+	TaskID int64 `json:"task_id"`
 }

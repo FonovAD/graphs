@@ -20,6 +20,7 @@ func (h *handler) GetTests(ctx echo.Context) error {
 
 	response, err := h.ctrl.GetTests(ctxBack)
 	if err != nil {
+		ctx.Set("error", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, models.InternalServerErrorResponse{ErrorMsg: err.Error()})
 	}
 

@@ -5,6 +5,7 @@ import (
 	"github.com/golang-jwt/jwt"
 	"github.com/pkg/errors"
 	"golang_graphs/internal/dto"
+	"log"
 	"strconv"
 )
 
@@ -33,6 +34,7 @@ func (s *service) CreateToken(user dto.User) (string, error) {
 }
 
 func (s *service) AuthUser(tokenString string) (dto.User, error) {
+	log.Printf("Token string %s", tokenString)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return s.secret, nil
 	})

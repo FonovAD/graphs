@@ -9,4 +9,5 @@ type Result struct {
 	Grade     int64
 	StudentID int64
 	TestID    int64
+	MaxGrade  int64
 }

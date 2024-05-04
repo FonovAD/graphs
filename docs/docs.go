@@ -47,25 +47,36 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
             }
         },
         "/check_results": {
-            "get": {
+            "post": {
                 "description": "CheckResults",
                 "produces": [
                     "application/json"
                 ],
                 "summary": "CheckResults",
+                "parameters": [
+                    {
+                        "description": "CheckResultsRequest",
+                        "name": "CheckResultsRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.CheckResultsRequest"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -76,13 +87,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -119,13 +130,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -162,13 +173,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -191,13 +202,99 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/insert_task": {
+            "post": {
+                "description": "InsertTask",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "InsertTask",
+                "parameters": [
+                    {
+                        "description": "InsertTest",
+                        "name": "InsertTest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.InsertTaskRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.InsertTaskResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/insert_test": {
+            "post": {
+                "description": "InsertTest",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "InsertTest",
+                "parameters": [
+                    {
+                        "description": "InsertTest",
+                        "name": "InsertTest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.InsertTestRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.InsertTestResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.BadRequestResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -234,13 +331,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.BadRequestResponse"
+                            "$ref": "#/definitions/models.BadRequestResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/model_deprecated.InternalServerErrorResponse"
+                            "$ref": "#/definitions/models.InternalServerErrorResponse"
                         }
                     }
                 }
@@ -258,6 +355,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "id": {
+                    "type": "integer"
+                },
+                "maxGrade": {
                     "type": "integer"
                 },
                 "start": {
@@ -280,6 +380,9 @@ const docTemplate = `{
                 "data": {
                     "type": "string"
                 },
+                "description": {
+                    "type": "string"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -288,41 +391,28 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                },
+                "testID": {
+                    "type": "integer"
                 }
             }
         },
         "dto.Test": {
             "type": "object",
             "properties": {
+                "description": {
+                    "type": "string"
+                },
                 "end": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "interval": {
-                    "type": "string"
-                },
                 "name": {
                     "type": "string"
                 },
                 "start": {
-                    "type": "string"
-                }
-            }
-        },
-        "model_deprecated.BadRequestResponse": {
-            "type": "object",
-            "properties": {
-                "error_msg": {
-                    "type": "string"
-                }
-            }
-        },
-        "model_deprecated.InternalServerErrorResponse": {
-            "type": "object",
-            "properties": {
-                "error_msg": {
                     "type": "string"
                 }
             }
@@ -350,6 +440,22 @@ const docTemplate = `{
             }
         },
         "models.AuthUserResponse": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.BadRequestResponse": {
+            "type": "object",
+            "properties": {
+                "error_msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CheckResultsRequest": {
             "type": "object",
             "properties": {
                 "token": {
@@ -423,6 +529,46 @@ const docTemplate = `{
                 }
             }
         },
+        "models.InsertTaskRequest": {
+            "type": "object",
+            "properties": {
+                "task": {
+                    "$ref": "#/definitions/dto.Task"
+                }
+            }
+        },
+        "models.InsertTaskResponse": {
+            "type": "object",
+            "properties": {
+                "task_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.InsertTestRequest": {
+            "type": "object",
+            "properties": {
+                "test": {
+                    "$ref": "#/definitions/dto.Test"
+                }
+            }
+        },
+        "models.InsertTestResponse": {
+            "type": "object",
+            "properties": {
+                "test_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.InternalServerErrorResponse": {
+            "type": "object",
+            "properties": {
+                "error_msg": {
+                    "type": "string"
+                }
+            }
+        },
         "models.SendAnswersRequest": {
             "type": "object",
             "properties": {
@@ -434,6 +580,9 @@ const docTemplate = `{
                 },
                 "testID": {
                     "type": "integer"
+                },
+                "token": {
+                    "type": "string"
                 }
             }
         },

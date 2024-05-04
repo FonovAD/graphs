@@ -10,6 +10,7 @@ import (
 	"golang_graphs/internal/models"
 	"golang_graphs/pkg/auth"
 	"golang_graphs/pkg/create_random_string"
+	"log"
 	"time"
 )
 
@@ -28,8 +29,26 @@ type Controller interface {
 	AuthUser(ctx context.Context, request models.AuthUserRequest) (models.AuthUserResponse, error)
 	GetTests(ctx context.Context) (models.GetTestsResponse, error)
 	GetTasksFromTest(ctx context.Context, request models.GetTasksFromTestsRequest) (models.GetTasksFromTestsResponse, error)
-	CheckResults(ctx context.Context, userID int64) (models.CheckResultsResponse, error)
+	CheckResults(ctx context.Context, request models.CheckResultsRequest) (models.CheckResultsResponse, error)
 	SendAnswers(ctx context.Context, request models.SendAnswersRequest) (models.SendAnswersResponse, error)
+	InsertTest(ctx context.Context, request models.InsertTestRequest) (models.InsertTestResponse, error)
+	InsertTask(ctx context.Context, request models.InsertTaskRequest) (models.InsertTaskResponse, error)
+}
+
+func (c *controller) InsertTest(ctx context.Context, request models.InsertTestRequest) (models.InsertTestResponse, error) {
+	id, err := c.db.InsertTest(ctx, request.Test)
+	if err != nil {
+		return models.InsertTestResponse{}, errors.Wrap(err, "error inserting test into database")
+	}
+	return models.InsertTestResponse{TestID: id}, nil
+}
+
+func (c *controller) InsertTask(ctx context.Context, request models.InsertTaskRequest) (models.InsertTaskResponse, error) {
+	id, err := c.db.InsertTask(ctx, request.Task)
+	if err != nil {
+		return models.InsertTaskResponse{}, errors.Wrap(err, "error inserting task into database")
+	}
+	return models.InsertTaskResponse{TaskID: id}, nil
 }
 
 func (c *controller) SendAnswers(ctx context.Context, request models.SendAnswersRequest) (models.SendAnswersResponse, error) {
@@ -43,19 +62,38 @@ func (c *controller) SendAnswers(ctx context.Context, request models.SendAnswers
 		grade += c.checkResult(answer, c.findAnswerByID(tasksWithAnswers, answer.TaskID))
 	}
 
+	maxGrade := int64(0)
+	for _, answer := range tasksWithAnswers {
+		maxGrade += answer.MaxGrade
+	}
+
+	user, err := c.authService.AuthUser(request.Token)
+	if err != nil {
+		return models.SendAnswersResponse{}, errors.Wrap(err, "error getting user")
+	}
+
 	result := dto.Result{
 		Start:     time.Time{},
 		End:       time.Now(),
 		Grade:     grade,
-		StudentID: 0,
+		StudentID: user.Id,
 		TestID:    request.TestID,
+		MaxGrade:  maxGrade,
 	}
+
 	err = c.db.InsertResult(ctx, result)
 	if err != nil {
 		return models.SendAnswersResponse{}, err
 	}
 
 	return models.SendAnswersResponse{Result: result}, nil
+}
+
+func (c *controller) checkResult(answer models.Answer, taskWithAnswer dto.Task) int64 {
+	if answer.Answer == taskWithAnswer.Answer {
+		return int64(taskWithAnswer.MaxGrade)
+	}
+	return 0
 }
 
 func (c *controller) findAnswerByID(tasksWithAnswer []dto.Task, taskID int64) dto.Task {
@@ -67,18 +105,18 @@ func (c *controller) findAnswerByID(tasksWithAnswer []dto.Task, taskID int64) dt
 	return dto.Task{}
 }
 
-func (c *controller) checkResult(answer models.Answer, taskWithAnswer dto.Task) int64 {
-	if answer.Answer == taskWithAnswer.Answer {
-		return int64(taskWithAnswer.MaxGrade)
-	}
-	return 0
-}
-
-func (c *controller) CheckResults(ctx context.Context, userID int64) (models.CheckResultsResponse, error) {
+func (c *controller) CheckResults(ctx context.Context, request models.CheckResultsRequest) (models.CheckResultsResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
-	results, err := c.db.GetResultsByUserID(ctx, userID)
+	log.Printf("Check Result request %s", request)
+
+	user, err := c.authService.AuthUser(request.Token)
+	if err != nil {
+		return models.CheckResultsResponse{}, errors.Wrap(err, "error getting user")
+	}
+
+	results, err := c.db.GetResultsByUserID(ctx, user.Id)
 	if err != nil {
 		return models.CheckResultsResponse{}, errors.Wrap(err, "error getting results from DB")
 	}
@@ -132,6 +170,7 @@ func (c *controller) GetTests(ctx context.Context) (models.GetTestsResponse, err
 	return models.GetTestsResponse{Tests: tests}, nil
 }
 
+// TODO
 func (c *controller) GetTasksFromTest(ctx context.Context, request models.GetTasksFromTestsRequest) (models.GetTasksFromTestsResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
