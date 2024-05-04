@@ -61,6 +61,11 @@ func (db *database) SelectUserByEmail(ctx context.Context, email string) (dto.Us
 }
 
 func (db *database) GetTests(ctx context.Context) ([]dto.Test, error) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+	if db.cacheGetTests != nil {
+		return db.cacheGetTests, nil
+	}
 	log.Info("GetTests")
 	rows, err := db.client.QueryContext(ctx, SelectAllAvailableTests)
 	if err != nil {
@@ -81,6 +86,8 @@ func (db *database) GetTests(ctx context.Context) ([]dto.Test, error) {
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("get tests rows err %w", err)
 	}
+
+	db.cacheGetTests = tests
 
 	return tests, nil
 }
@@ -150,6 +157,10 @@ func (db *database) InsertResult(ctx context.Context, result dto.Result) error {
 }
 
 func (db *database) InsertTest(ctx context.Context, test dto.Test) (int64, error) {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+	db.cacheGetTests = nil
+
 	log.Info("InsertTest", test)
 	var id int64
 

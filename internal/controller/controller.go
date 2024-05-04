@@ -170,7 +170,6 @@ func (c *controller) GetTests(ctx context.Context) (models.GetTestsResponse, err
 	return models.GetTestsResponse{Tests: tests}, nil
 }
 
-// TODO
 func (c *controller) GetTasksFromTest(ctx context.Context, request models.GetTasksFromTestsRequest) (models.GetTasksFromTestsResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()

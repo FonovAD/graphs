@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/lib/pq"
+	"golang_graphs/internal/dto"
+	"sync"
 )
 
 var (
@@ -11,7 +13,9 @@ var (
 )
 
 type database struct {
-	client *sql.DB
+	client        *sql.DB
+	cacheGetTests []dto.Test
+	mu            *sync.Mutex
 }
 
 func NewDatabase(config Config) (Database, error) {
@@ -25,5 +29,5 @@ func NewDatabase(config Config) (Database, error) {
 		return nil, err
 	}
 
-	return &database{client: client}, nil
+	return &database{client: client, cacheGetTests: nil, mu: &sync.Mutex{}}, nil
 }
