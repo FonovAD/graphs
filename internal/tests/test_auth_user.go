@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-resty/resty/v2"
 )
 
@@ -38,6 +39,8 @@ func getTestsSend() error {
 		return err
 	}
 	if res.StatusCode() != 200 {
+		fmt.Println(res.StatusCode())
+		fmt.Println(res.String())
 		return errors.New("code not 200")
 	}
 	return nil
