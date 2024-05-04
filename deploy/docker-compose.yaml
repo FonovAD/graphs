@@ -75,9 +75,9 @@ services:
       - "9091:9091"
     networks:
       - graphs
-    depends_on:
-      graphs_db:
-        condition: service_healthy
+#    depends_on:
+#      graphs_db:
+#        condition: service_healthy
 
   graphs_db:
     image: postgres
