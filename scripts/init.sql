@@ -28,16 +28,6 @@ CREATE TABLE IF NOT EXISTS groups
     PRIMARY KEY (groupsid)
 );
 
-CREATE TABLE IF NOT EXISTS student
-(
-    studentid SERIAL NOT NULL,
-    usersid INT NOT NULL,
-    groupsid INT NOT NULL,
-    PRIMARY KEY (studentid),
-    FOREIGN KEY (usersid) REFERENCES users(usersid),
-    FOREIGN KEY (groupsid) REFERENCES groups(groupsid)
-);
-
 CREATE TABLE IF NOT EXISTS tests
 (
     testsid SERIAL NOT NULL,
@@ -65,10 +55,11 @@ CREATE TABLE IF NOT EXISTS result
     time_end  TIMESTAMP NOT NULL,
     resultid SERIAL NOT NULL,
     sum_grade INT NOT NULL,
-    studentid INT NOT NULL,
+    max_grade INT NOT NULL,
+    usersid INT NOT NULL,
     testsid INT NOT NULL,
     PRIMARY KEY (resultid),
-    FOREIGN KEY (studentid) REFERENCES student(studentid),
+    FOREIGN KEY (usersid) REFERENCES users(usersid),
     FOREIGN KEY (testsid) REFERENCES tests(testsid)
 );
 

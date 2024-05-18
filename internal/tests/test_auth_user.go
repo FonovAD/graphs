@@ -6,7 +6,11 @@ import (
 	"github.com/go-resty/resty/v2"
 )
 
-const response = `{"Token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdF9uYW1lIjoic3RyaW5nIiwiaWQiOiIwIiwibGFzdF9uYW1lIjoic3RyaW5nIiwicm9sZSI6InN0dWRlbnQifQ.Oaoy0IN8QIMbvPb_8Kfhmn1MJTcWRajPFhGENv8zmIg"}`
+const (
+	response = `{"Token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdF9uYW1lIjoic3RyaW5nIiwiaWQiOiIwIiwibGFzdF9uYW1lIjoic3RyaW5nIiwicm9sZSI6InN0dWRlbnQifQ.Oaoy0IN8QIMbvPb_8Kfhmn1MJTcWRajPFhGENv8zmIg"}`
+	host     = "http://localhost:8080/"
+	token    = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmaXJzdF9uYW1lIjoic3RyaW5nIiwiaWQiOiIwIiwibGFzdF9uYW1lIjoic3RyaW5nIiwicm9sZSI6InN0dWRlbnQifQ.Oaoy0IN8QIMbvPb_8Kfhmn1MJTcWRajPFhGENv8zmIg"
+)
 
 func main() {
 	// Получить токен нужно в случае сброса базы данных
@@ -32,7 +36,7 @@ func checkToken() error {
 }
 
 func getTestsSend() error {
-	client := resty.New().SetBaseURL("http://localhost:8080/get_tests")
+	client := resty.New().SetBaseURL(host + "get_tests")
 
 	res, err := client.R().Get("")
 	if err != nil {
@@ -46,8 +50,44 @@ func getTestsSend() error {
 	return nil
 }
 
+func checkResult() error {
+	client := resty.New().SetBaseURL(host + "check_results")
+	res, err := client.R().SetHeader("Content-Type", "application/json").SetBody(
+		fmt.Sprintf(
+			`{
+  "token": "%s"
+}`, token)).Post("")
+	if err != nil {
+		return err
+	}
+	if res.StatusCode() != 200 {
+		fmt.Println(res.StatusCode())
+		fmt.Println(res.String())
+		return errors.New("code not 200")
+	}
+	return nil
+}
+
+func getTasksFromTest() error {
+	client := resty.New().SetBaseURL(host + "get_tasks_from_test")
+	res, err := client.
+		R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(`{"test_id": 0}`).
+		Post("")
+	if err != nil {
+		return err
+	}
+	if res.StatusCode() != 200 {
+		fmt.Println(res.StatusCode())
+		fmt.Println(res.String())
+		return errors.New("code not 200")
+	}
+	return nil
+}
+
 func auth() (string, error) {
-	client := resty.New().SetBaseURL("http://localhost:8080/auth_user").SetHeader("Content-Type", "application/json")
+	client := resty.New().SetBaseURL(host+"auth_user").SetHeader("Content-Type", "application/json")
 
 	res, err := client.R().SetBody(`{
   "email": "b@b.b",
@@ -61,7 +101,7 @@ func auth() (string, error) {
 }
 
 func GetToken() (string, error) {
-	client := resty.New().SetBaseURL("http://localhost:8080/create_user").SetHeader("Content-Type", "application/json")
+	client := resty.New().SetBaseURL(host+"create_user").SetHeader("Content-Type", "application/json")
 
 	res, err := client.R().SetBody(`{
   "email": "b@b.b",
