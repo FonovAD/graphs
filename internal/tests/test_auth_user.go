@@ -35,6 +35,56 @@ func checkToken() error {
 	return nil
 }
 
+func insertTest() error {
+	client := resty.New().SetBaseURL(host + "insert_test")
+	res, err := client.R().SetHeader("Content-Type", "application/json").SetBody(`{
+  "test": {
+    "description": "string",
+    "end": "2022-01-02T00:00:00Z",
+    "id": 0,
+    "name": "string",
+    "start": "2022-01-02T00:00:00Z"
+  }
+}
+`).Post("")
+	if err != nil {
+		return err
+	}
+	if res.StatusCode() != 200 {
+		fmt.Println(res.StatusCode())
+		fmt.Println(res.String())
+		return errors.New("code not 200")
+	}
+	return nil
+}
+
+func insertTask() error {
+	client := resty.New().SetBaseURL(host + "insert_task")
+	res, err := client.R().SetHeader("Content-Type", "application/json").SetBody(`
+{
+  "task": {
+    "answer": "string",
+    "data": "string",
+    "description": "string",
+    "id": 0,
+    "maxGrade": 0,
+    "name": "string",
+    "testID": 1
+  }
+}
+
+`).Post("")
+	if err != nil {
+		return err
+	}
+	if res.StatusCode() != 200 {
+		fmt.Println(res.StatusCode())
+		fmt.Println(res.String())
+		return errors.New("code not 200")
+	}
+	return nil
+}
+
 func getTestsSend() error {
 	client := resty.New().SetBaseURL(host + "get_tests")
 

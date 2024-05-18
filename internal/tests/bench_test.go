@@ -39,3 +39,21 @@ func BenchmarkGetTasksFromTest(b *testing.B) {
 		}
 	}
 }
+
+func BenchmarkInsertTest(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		err := insertTest()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func BenchmarkInsertTask(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		err := insertTask()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
