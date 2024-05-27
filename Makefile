@@ -20,9 +20,6 @@ run:  ##@Application Run application server
 run_test:  ##@Application Run application server
 	TESTING="testing" go run $(ROOT_FOLDER)/cmd/golang_graphs --rootPath $(ROOT_FOLDER)
 
-create_swagger:
-	swag init -g cmd/golang_graphs/main.go
-
 # Это просто пример того как запускать бенчмарки, если запустить из makefile, то он не отработает
 bench:
 	go test -bench=BenchmarkSimplest -benchmem -benchtime=1x

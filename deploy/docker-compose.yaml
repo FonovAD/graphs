@@ -59,8 +59,8 @@ services:
     networks:
       - graphs
 
-  graphs_back:
-    container_name: graphs_back
+  graphs_back_1:
+    container_name: graphs_back_1
     build:
       context: ..
       dockerfile: deploy/Dockerfile
@@ -69,14 +69,43 @@ services:
       - POSTGRES_DB=graphs
       - POSTGRES_PASSWORD=password
       - ENV=docker
+      - METRICS_PORT=9091
+      - PORT=8081
     ports:
-      - "8080:8080"
+      - "8081:8081"
       - "9091:9091"
     networks:
       - graphs
-#    depends_on:
-#      graphs_db:
-#        condition: service_healthy
+
+  graphs_back_2:
+    container_name: graphs_back_2
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_DB=graphs
+      - POSTGRES_PASSWORD=password
+      - ENV=docker
+      - METRICS_PORT=9092
+      - PORT=8082
+    ports:
+      - "8082:8082"
+      - "9092:9092"
+    networks:
+      - graphs
+
+  balancer:
+    container_name: balancer
+    build:
+      context: ..
+      dockerfile: balancer/Dockerfile
+    environment:
+      - BACKENDS=graphs_back_1:8081,graphs_back_2:8082
+    ports:
+      - "8080:8080"
+    networks:
+      - graphs
 
   graphs_db:
     image: postgres
@@ -96,23 +125,3 @@ services:
       - ../scripts/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
     networks:
       - graphs
-
-
-#  graphs_db_test:
-#    image: postgres
-#    container_name: database_test
-#    ports:
-#      - '${POSTGRES_PORT}:${POSTGRES_PORT}'
-#    environment:
-#      - POSTGRES_USER=${POSTGRES_USER}
-#      - POSTGRES_DB=${POSTGRES_DB}
-#      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-#    healthcheck:
-#      test: [ "CMD-SHELL", "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER} -h localhost -p 5432" ]
-#      interval: 5s
-#      timeout: 5s
-#      retries: 5
-#    volumes:
-#      - ../scripts/setup_test_db.sql:/docker-entrypoint-initdb.d/create_tables.sql
-#    networks:
-#      - graphs
