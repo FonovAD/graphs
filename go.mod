@@ -16,6 +16,7 @@ require (
 	github.com/swaggo/swag v1.16.1
 	github.com/yourbasic/graph v0.0.0-20210606180040-8ecfec1c2869
 	golang.org/x/crypto v0.21.0
+	golang.org/x/sync v0.3.0
 )
 
 require (

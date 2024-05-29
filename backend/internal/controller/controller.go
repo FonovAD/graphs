@@ -106,9 +106,6 @@ func (c *controller) findAnswerByID(tasksWithAnswer []dto.Task, taskID int64) dt
 }
 
 func (c *controller) CheckResults(ctx context.Context, request models.CheckResultsRequest) (models.CheckResultsResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
-	defer cancel()
-
 	log.Printf("Check Result request %s", request)
 
 	user, err := c.authService.AuthUser(request.Token)
@@ -125,9 +122,6 @@ func (c *controller) CheckResults(ctx context.Context, request models.CheckResul
 }
 
 func (c *controller) CreateUser(ctx context.Context, user models.CreateUserRequest) (models.CreateUserResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
-	defer cancel()
-
 	salt := c.creator.RandomString()
 
 	hash, err := hashPassword(user.Password, salt)
@@ -159,9 +153,6 @@ func (c *controller) CreateUser(ctx context.Context, user models.CreateUserReque
 }
 
 func (c *controller) GetTests(ctx context.Context) (models.GetTestsResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
-	defer cancel()
-
 	tests, err := c.db.GetTests(ctx)
 	if err != nil {
 		return models.GetTestsResponse{}, err
@@ -171,9 +162,6 @@ func (c *controller) GetTests(ctx context.Context) (models.GetTestsResponse, err
 }
 
 func (c *controller) GetTasksFromTest(ctx context.Context, request models.GetTasksFromTestsRequest) (models.GetTasksFromTestsResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
-	defer cancel()
-
 	tasks, err := c.db.GetTasksFromTest(ctx, request.TestID)
 	if err != nil {
 		return models.GetTasksFromTestsResponse{}, err
@@ -188,9 +176,6 @@ func (c *controller) GetTasksFromTest(ctx context.Context, request models.GetTas
 }
 
 func (c *controller) AuthUser(ctx context.Context, request models.AuthUserRequest) (models.AuthUserResponse, error) {
-	ctx, cancel := context.WithTimeout(ctx, time.Second)
-	defer cancel()
-
 	user, err := c.db.SelectUserByEmail(ctx, request.Email)
 	if err != nil {
 		return models.AuthUserResponse{}, err
