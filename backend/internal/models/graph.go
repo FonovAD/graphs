@@ -1,6 +1,8 @@
 package models
 
-import "math"
+import (
+	"math"
+)
 
 // type Node struct {
 // 	Id int `json:"id"`
@@ -28,9 +30,8 @@ type Node struct {
 	Label  string
 	Color  string
 	Weight int
-
-	x float64
-	y float64
+	X      float64
+	Y      float64
 }
 
 type Edge struct {
@@ -38,7 +39,7 @@ type Edge struct {
 	Source Node
 	Target Node
 	Label  string
-	Color string
+	Color  string
 	Weight int
 }
 
@@ -51,6 +52,7 @@ type Graph struct {
 func (g *Graph) NodeLabelAdjacentMatrix() map[string]map[string]int {
 	matrix := make(map[string]map[string]int)
 	for _, node1 := range g.Nodes {
+		matrix[node1.Label] = make(map[string]int)
 		for _, node2 := range g.Nodes {
 			matrix[node1.Label][node2.Label] = 0
 		}
@@ -66,6 +68,7 @@ func (g *Graph) NodeLabelAdjacentMatrix() map[string]map[string]int {
 func (g *Graph) NodeIdAdjacentMatrix() map[int]map[int]int {
 	matrix := make(map[int]map[int]int)
 	for _, node1 := range g.Nodes {
+		matrix[node1.Id] = make(map[int]int)
 		for _, node2 := range g.Nodes {
 			matrix[node1.Id][node2.Id] = 0
 		}
@@ -81,6 +84,7 @@ func (g *Graph) NodeIdAdjacentMatrix() map[int]map[int]int {
 func (g *Graph) EdgeLabelAdjacentMatrix() map[string]map[string]int {
 	matrix := make(map[string]map[string]int)
 	for _, edge1 := range g.Edges {
+		matrix[edge1.Label] = make(map[string]int)
 		for _, edge2 := range g.Edges {
 			matrix[edge1.Label][edge2.Label] = 0
 		}
@@ -100,6 +104,7 @@ func (g *Graph) EdgeLabelAdjacentMatrix() map[string]map[string]int {
 func (g *Graph) EdgeIdAdjacentMatrix() map[int]map[int]int {
 	matrix := make(map[int]map[int]int)
 	for _, edge1 := range g.Edges {
+		matrix[edge1.Id] = make(map[int]int)
 		for _, edge2 := range g.Edges {
 			matrix[edge1.Id][edge2.Id] = 0
 		}
@@ -127,6 +132,7 @@ func (g *Graph) MinPath(source Node, target Node, edges_have_weights bool) (int,
 	weights_path[source.Label] = 0
 	weights_matrix := make(map[string]map[string]int)
 	for _, node1 := range g.Nodes {
+		weights_matrix[node1.Label] = make(map[string]int)
 		for _, node2 := range g.Nodes {
 			weights_matrix[node1.Label][node2.Label] = 0
 		}
@@ -165,7 +171,7 @@ func (g *Graph) MinPath(source Node, target Node, edges_have_weights bool) (int,
 	return weights_path[target.Label], weights_path
 }
 
-// Возвращает матрицу кратчайших расстояний между каждой парой вершин, на диагонали MaxInt
+// Возвращает матрицу кратчайших расстояний между каждой парой вершин, на диагонали 0
 func (g *Graph) DistanceMatrix(edges_have_weights bool) map[string]map[string]int {
 	matrix := make(map[string]map[string]int)
 	for _, node := range g.Nodes {
@@ -173,4 +179,11 @@ func (g *Graph) DistanceMatrix(edges_have_weights bool) map[string]map[string]in
 		matrix[node.Label][node.Label] = 0
 	}
 	return matrix
+}
+
+func (g *Graph) IsEdgesAdjacent(edge1 Edge, edge2 Edge) bool {
+	if edge1.Source.Id == edge2.Source.Id || edge1.Source.Id == edge2.Target.Id || edge1.Target.Id == edge2.Source.Id || edge1.Target.Id == edge2.Target.Id {
+		return true
+	}
+	return false
 }

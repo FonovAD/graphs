@@ -43,12 +43,16 @@ type Checker interface {
 	CheckLinearFromLine(task models.Graph, answer models.Graph) int
 	CheckRadiusAndDiameter(task models.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int
 	CheckAdjacentMatrix(task models.Graph, answer map[string]map[string]int) int
-	CheckEulerGraph(task models.Graph, answer_quest bool, answer_graph models.Graph) int
+	CheckEulerGraph(task models.Graph, is_euler_ans bool, answer_graph models.Graph) int
 	CheckMinPath(task models.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer models.Graph) int
 	CheckPlanarGraph(answer models.Graph) int
 }
 
-func max_(a int, b int) int {
+func NewChecker() Checker {
+	return &checker{}
+}
+
+func Max_(a int, b int) int {
 	if a > b {
 		return a
 	}
@@ -72,7 +76,7 @@ func (ch *checker) CheckLinearToLine(task models.Graph, answer models.Graph) int
 			}
 		}
 	}
-	return max_(0, 100-err_count*LINEAR_MODULE_COEFF)
+	return Max_(0, 100-err_count*LINEAR_MODULE_COEFF)
 }
 
 // Проверка модуля "Реберный граф" (из реберного в граф)
@@ -92,7 +96,7 @@ func (ch *checker) CheckLinearFromLine(task models.Graph, answer models.Graph) i
 			}
 		}
 	}
-	return max_(0, 100-err_count*LINEAR_MODULE_COEFF)
+	return Max_(0, 100-err_count*LINEAR_MODULE_COEFF)
 }
 
 // Проверки модуля "Радиус и диметр"
@@ -126,7 +130,7 @@ func (ch *checker) CheckRadiusAndDiameter(task models.Graph, radius_ans int, dia
 	if radius != radius_ans || diameter != diameter_ans {
 		return 0
 	}
-	return max_(0, 100-err_count*RADIUS_AND_DIAMETER_MODULE_COEFF)
+	return Max_(0, 100-err_count*RADIUS_AND_DIAMETER_MODULE_COEFF)
 }
 
 func (ch *checker) CheckAdjacentMatrix(task models.Graph, answer map[string]map[string]int) int {
@@ -143,7 +147,7 @@ func (ch *checker) CheckAdjacentMatrix(task models.Graph, answer map[string]map[
 			}
 		}
 	}
-	return max_(0, 100-err_count*ADJACENT_MATRIX_MODULE_COEFF)
+	return Max_(0, 100-err_count*ADJACENT_MATRIX_MODULE_COEFF)
 }
 
 // Проыерка модуля "Эйлеров граф"
@@ -235,13 +239,40 @@ func (ch *checker) CheckMinPath(task models.Graph, source string, target string,
 	if min_path_check != min_path {
 		return 0
 	}
-	return max_(0, 100-err_count*MIN_PATH_MODULE_COEFF)
+	return Max_(0, 100-err_count*MIN_PATH_MODULE_COEFF)
 }
 
-// func (ch *checker) CheckPlanarGraph(answer models.Graph) int {
-// 	for _, edge1 := range answer.Edges {
-// 		for edge2 := range answer.Edges {
+func boundingBox(x1, x2, x3, x4 float64) bool {
+	if x1 > x2 {
+		x1, x2 = x2, x1
+	}
+	if x3 > x4 {
+		x3, x4 = x4, x3
+	}
+	return math.Max(x1, x3) > math.Max(x2, x4)
+}
 
-// 		}
-// 	}
-// }
+func pseudoScalar(node1, node2, node3 models.Node) float64 {
+	return (node2.X-node1.X)*(node3.Y-node1.Y) - (node2.Y-node1.Y)*(node3.X-node1.X)
+}
+
+func isIntersect(edge1, edge2 models.Edge) bool {
+	b1 := boundingBox(edge1.Source.X, edge1.Target.X, edge2.Source.X, edge2.Target.X)
+	b2 := boundingBox(edge1.Source.Y, edge1.Target.Y, edge2.Source.Y, edge2.Target.Y)
+	b3 := pseudoScalar(edge1.Source, edge1.Target, edge2.Source)*pseudoScalar(edge1.Source, edge1.Target, edge2.Target) <= 0
+	b4 := pseudoScalar(edge2.Source, edge2.Target, edge1.Source)*pseudoScalar(edge2.Source, edge2.Target, edge1.Target) <= 0
+	return b1 && b2 && b3 && b4
+}
+
+func (ch *checker) CheckPlanarGraph(answer models.Graph) int {
+	for _, edge1 := range answer.Edges {
+		for _, edge2 := range answer.Edges {
+			if edge1.Id != edge2.Id && !answer.IsEdgesAdjacent(edge1, edge2) {
+				if isIntersect(edge1, edge2) {
+					return 0
+				}
+			}
+		}
+	}
+	return 100
+}
