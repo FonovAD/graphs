@@ -38,6 +38,7 @@ type Edge struct {
 	Source Node
 	Target Node
 	Label  string
+	Color string
 	Weight int
 }
 
@@ -116,7 +117,7 @@ func (g *Graph) EdgeIdAdjacentMatrix() map[int]map[int]int {
 
 // Реализация алгоритма Дейкстры, возвращает (минимальный путь, матрицу расстояний)
 // Все вершины должны быть достижимы, расстояния не меньше 0
-func (g *Graph) MinPath(source Node, target Node, edges_have_costs bool) (int, map[string]int) {
+func (g *Graph) MinPath(source Node, target Node, edges_have_weights bool) (int, map[string]int) {
 	visited := make(map[string]bool)
 	weights_path := make(map[string]int)
 	for _, node := range g.Nodes {
@@ -131,7 +132,7 @@ func (g *Graph) MinPath(source Node, target Node, edges_have_costs bool) (int, m
 		}
 	}
 	for _, edge := range g.Edges {
-		if edges_have_costs {
+		if edges_have_weights {
 			weights_matrix[edge.Source.Label][edge.Target.Label] = edge.Weight
 			weights_matrix[edge.Target.Label][edge.Source.Label] = edge.Weight
 		} else {
@@ -165,11 +166,11 @@ func (g *Graph) MinPath(source Node, target Node, edges_have_costs bool) (int, m
 }
 
 // Возвращает матрицу кратчайших расстояний между каждой парой вершин, на диагонали MaxInt
-func (g *Graph) DistanceMatrix() map[string]map[string]int {
+func (g *Graph) DistanceMatrix(edges_have_weights bool) map[string]map[string]int {
 	matrix := make(map[string]map[string]int)
 	for _, node := range g.Nodes {
-		_, matrix[node.Label] = g.MinPath(node, node, false)
-		matrix[node.Label][node.Label] = math.MaxInt
+		_, matrix[node.Label] = g.MinPath(node, node, edges_have_weights)
+		matrix[node.Label][node.Label] = 0
 	}
 	return matrix
 }
