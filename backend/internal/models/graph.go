@@ -1,7 +1,12 @@
 package models
 
 import (
+	"errors"
 	"math"
+)
+
+var (
+	ErrDataConsistency = errors.New("Data consistency violated (such data exists or cannot be made)")
 )
 
 // type Node struct {
@@ -43,9 +48,84 @@ type Edge struct {
 	Weight int
 }
 
+// по умолчанию граф неориентированный
 type Graph struct {
 	Nodes []Node
 	Edges []Edge
+	oriented bool
+}
+
+func (g *Graph) MakeOriented() {
+	g.oriented = true
+}
+
+func (g *Graph) Oriented() bool {
+	return g.oriented
+}
+
+func (g *Graph) AddNode(new_node Node) error {
+	for _, node := range g.Nodes {
+		if new_node.Id == node.Id || new_node.Label == node.Label {
+			return ErrDataConsistency
+		}
+	}
+	g.Nodes = append(g.Nodes, new_node)
+	return nil
+}
+
+func (g *Graph) AddNodeByInfo(id int, label string, color string, weight int, x float64, y float64) error {
+	new_node := Node{Id: id, Label: label, Color: color, Weight: weight, X: x, Y: y}
+	return g.AddNode(new_node)
+}
+
+func (g *Graph) IsNodeById(id int) bool {
+	for _, node := range g.Nodes {
+		if node.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *Graph) IsNodeByLabel(label string) bool {
+	for _, node := range g.Nodes {
+		if node.Label == label {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *Graph) IsEdgeById(id int) bool {
+	for _, edge := range g.Edges {
+		if edge.Id == id {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *Graph) IsEdgeByLable(label string) bool {
+	for _, edge := range g.Edges {
+		if edge.Label == label {
+			return true
+		}
+	}
+	return false
+}
+
+func (g *Graph) AddEdge(source Node, target Node, id int, label string, color string, weight int) {
+	if g.IsEdgeById(id) {
+		return
+	}
+	if !g.IsNodeById(source.Id) {
+		g.AddNode(source)
+	}
+	if !g.IsNodeById(target.Id) {
+		g.AddNode(target)
+	}
+	
+
 }
 
 // Матрица смежности вершин, но вместо индексов - Label
@@ -186,4 +266,8 @@ func (g *Graph) IsEdgesAdjacent(edge1 Edge, edge2 Edge) bool {
 		return true
 	}
 	return false
+}
+
+func (g *Graph) Intersect(grapg Graph) *Graph {
+
 }

@@ -16,7 +16,7 @@ const (
 	DEFAULT_COLOR                    string = ""
 )
 
-func createGographWithouInfo(graph models.Graph) *gograph.Mutable {
+func createGographWithoutInfo(graph models.Graph) *gograph.Mutable {
 	if len(graph.Nodes) == 0 {
 		return gograph.New(0)
 	}
@@ -46,6 +46,12 @@ type Checker interface {
 	CheckEulerGraph(task models.Graph, is_euler_ans bool, answer_graph models.Graph) int
 	CheckMinPath(task models.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer models.Graph) int
 	CheckPlanarGraph(answer models.Graph) int
+	CheckIntersection(answer models.Graph, graph1 models.Graph, graph2 models.Graph) int
+	// CheckUnion(answer models.Graph, graph1_task models.Graph, graph2_task models.Graph) int
+	// CheckJoin(answer models.Graph, graph1_task models.Graph, graph2_task models.Graph) int
+	// Harary definition
+	// CheckCartesianProduct(answer models.Graph, graph1_task models.Graph, graph2_task models.Graph) int
+	//
 }
 
 func NewChecker() Checker {
@@ -150,10 +156,10 @@ func (ch *checker) CheckAdjacentMatrix(task models.Graph, answer map[string]map[
 	return Max_(0, 100-err_count*ADJACENT_MATRIX_MODULE_COEFF)
 }
 
-// Проыерка модуля "Эйлеров граф"
+// Проверка модуля "Эйлеров граф"
 // Должно быть больше 2 ребер
 func (ch *checker) CheckEulerGraph(task models.Graph, is_euler_ans bool, answer_graph models.Graph) int {
-	task_gograph := createGographWithouInfo(task)
+	task_gograph := createGographWithoutInfo(task)
 	_, is_euler := gograph.EulerUndirected(task_gograph)
 	if is_euler != is_euler_ans {
 		return 0
@@ -275,4 +281,8 @@ func (ch *checker) CheckPlanarGraph(answer models.Graph) int {
 		}
 	}
 	return 100
+}
+
+func (ch *checker) CheckIntersection(answer, graph1, graph2 models.Graph) int {
+
 }
