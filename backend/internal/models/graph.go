@@ -7,6 +7,7 @@ import (
 
 var (
 	ErrDataConsistency = errors.New("Data consistency violated (such data exists or cannot be made)")
+	EmptyValue         = errors.New("Object is not found or value is empty")
 )
 
 // type Node struct {
@@ -50,8 +51,8 @@ type Edge struct {
 
 // по умолчанию граф неориентированный
 type Graph struct {
-	Nodes []Node
-	Edges []Edge
+	Nodes    []Node
+	Edges    []Edge
 	oriented bool
 }
 
@@ -59,7 +60,7 @@ func (g *Graph) MakeOriented() {
 	g.oriented = true
 }
 
-func (g *Graph) Oriented() bool {
+func (g *Graph) IsOriented() bool {
 	return g.oriented
 }
 
@@ -114,18 +115,32 @@ func (g *Graph) IsEdgeByLable(label string) bool {
 	return false
 }
 
-func (g *Graph) AddEdge(source Node, target Node, id int, label string, color string, weight int) {
-	if g.IsEdgeById(id) {
-		return
+func (g *Graph) AddEdge(new_edge Edge) error {
+	// if g.IsEdgeById(new_edge.Id) {
+	// 	return ErrDataConsistency
+	// }
+	if !g.IsNodeByLabel(new_edge.Source.Label) {
+		g.AddNode(new_edge.Source)
 	}
-	if !g.IsNodeById(source.Id) {
-		g.AddNode(source)
+	if !g.IsNodeByLabel(new_edge.Target.Label) {
+		g.AddNode(new_edge.Target)
 	}
-	if !g.IsNodeById(target.Id) {
-		g.AddNode(target)
-	}
-	
+	g.Edges = append(g.Edges, new_edge)
+	return nil
+}
 
+func (g *Graph) AddEdgeByInfo(source Node, target Node, id int, label string, color string, weight int) error {
+	new_edge := Edge{Source: source, Target: target, Id: id, Label: label, Color: color, Weight: weight}
+	return g.AddEdge(new_edge)
+}
+
+func (g *Graph) FindNodeByLabel(label string) (Node, error) {
+	for _, node := range g.Nodes {
+		if node.Label == label {
+			return node, nil
+		}
+	}
+	return Node{}, EmptyValue
 }
 
 // Матрица смежности вершин, но вместо индексов - Label
@@ -268,6 +283,113 @@ func (g *Graph) IsEdgesAdjacent(edge1 Edge, edge2 Edge) bool {
 	return false
 }
 
-func (g *Graph) Intersect(grapg Graph) *Graph {
-
+func Max_(a int, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
+
+func (g *Graph) Intersect(graph *Graph) *Graph {
+	nodes_g_set := make(map[string]Node)
+	for _, node_g := range g.Nodes {
+		nodes_g_set[node_g.Label] = node_g
+	}
+	nodes_answer := make(map[string]Node)
+	for _, node_graph := range graph.Nodes {
+		_, exist := nodes_g_set[node_graph.Label]
+		if exist {
+			nodes_answer[node_graph.Label] = nodes_g_set[node_graph.Label]
+		}
+	}
+	edges_g := make(map[int]Edge)
+	edges_final := make(map[int]Edge)
+	for _, edge := range g.Edges {
+		edges_g[edge.Id] = edge
+		edges_final[edge.Id] = edge
+	}
+	flag := false
+	for id, edge_g := range edges_g {
+		for _, edge_graph := range graph.Edges {
+			if edge_graph.Source.Label == edge_g.Source.Label && edge_graph.Target.Label == edge_g.Target.Label || edge_graph.Source.Label == edge_g.Target.Label && edge_graph.Target.Label == edge_g.Source.Label {
+				flag = true
+			}
+		}
+		if !flag {
+			delete(edges_final, id)
+		}
+	}
+	answer := new(Graph)
+	for _, node := range nodes_g_set {
+		answer.AddNode(node)
+	}
+	for _, edge := range edges_final {
+		answer.AddEdge(edge) // ребра соединяются по label, не по id
+	}
+	return answer
+}
+
+func (g *Graph) Union(graph *Graph) *Graph {
+	nodes_set := make(map[string]Node)
+	for _, node := range g.Nodes {
+		nodes_set[node.Label] = node
+	}
+	for _, node := range graph.Nodes {
+		nodes_set[node.Label] = node
+	}
+	edges_set := make(map[string]Edge)
+	for _, edge := range g.Edges {
+		edges_set[edge.Label] = edge
+	}
+	for _, edge := range graph.Edges {
+		edges_set[edge.Label] = edge
+	}
+	answer := new(Graph)
+	for _, node := range nodes_set {
+		answer.AddNode(node)
+	}
+	for _, edge := range edges_set {
+		answer.AddEdge(edge)
+	}
+	return answer
+}
+
+func (g *Graph) Join(graph *Graph) *Graph {
+	unioned_graphs := g.Union(graph)
+	nodes_g := make(map[string]struct{})
+	flag := false
+	for _, node := range g.Nodes {
+		for _, node1 := range graph.Nodes {
+			if node.Label == node1.Label {
+				flag = true
+			}
+		}
+		if !flag {
+			nodes_g[node.Label] = struct{}{}
+		}
+	}
+	nodes_graph := make(map[string]struct{})
+	for _, node := range graph.Nodes {
+		for _, node1 := range g.Nodes {
+			if node.Label == node1.Label {
+				flag = true
+			}
+		}
+		if !flag {
+			nodes_graph[node.Label] = struct{}{}
+		}
+	}
+	for node_src_l := range nodes_g {
+		for node_trg_l := range nodes_graph {
+			node_src, _ := g.FindNodeByLabel(node_src_l)
+			node_trg, _ := g.FindNodeByLabel(node_trg_l)
+			unioned_graphs.AddEdgeByInfo(node_src, node_trg, 0, "", "", 0)
+		}
+	}
+	return unioned_graphs
+}
+
+// func MakeGraphFromAdjLabelMatrix(matrix map[string]map[string]int) *Graph {
+// 	new_graph := new(Graph)
+
+// }
