@@ -115,6 +115,21 @@ func (g *Graph) IsEdgeByLable(label string) bool {
 	return false
 }
 
+func (g *Graph) FindEdge(source, target string) bool {
+	for _, edge := range g.Edges {
+		if g.oriented {
+			if source == edge.Source.Label && target == edge.Target.Label {
+				return true
+			}
+		} else {
+			if source == edge.Source.Label && target == edge.Target.Label || source == edge.Target.Label && target == edge.Source.Label {
+				return true
+			}
+		}
+	}
+	return false
+}
+
 func (g *Graph) AddEdge(new_edge Edge) error {
 	// if g.IsEdgeById(new_edge.Id) {
 	// 	return ErrDataConsistency
@@ -389,7 +404,27 @@ func (g *Graph) Join(graph *Graph) *Graph {
 	return unioned_graphs
 }
 
-// func MakeGraphFromAdjLabelMatrix(matrix map[string]map[string]int) *Graph {
-// 	new_graph := new(Graph)
-
-// }
+func MakeGraphFromAdjLabelMatrix(matrix map[string]map[string]int) *Graph {
+	new_graph := new(Graph)
+	id := 1
+	node_map := make(map[string]int)
+	for node_label := range matrix {
+		new_graph.AddNodeByInfo(id, node_label, "", 0, 0, 0)
+		node_map[node_label] = id
+		id++
+	}
+	for node_src_l, node_list := range matrix {
+		for node_trg_l, val := range node_list {
+			if val != 0 {
+				if !new_graph.FindEdge(node_src_l, node_trg_l) {
+					new_graph.AddEdgeByInfo(
+						Node{Id: node_map[node_src_l], Label: node_src_l},
+						Node{Id: node_map[node_trg_l], Label: node_trg_l},
+						id, "", "", 0)
+					id++
+				}
+			}
+		}
+	}
+	return new_graph
+}

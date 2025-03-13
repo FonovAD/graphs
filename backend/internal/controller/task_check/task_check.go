@@ -46,9 +46,9 @@ type Checker interface {
 	CheckEulerGraph(task models.Graph, is_euler_ans bool, answer_graph models.Graph) int
 	CheckMinPath(task models.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer models.Graph) int
 	CheckPlanarGraph(answer models.Graph) int
-	CheckIntersection(answer models.Graph, graph1 models.Graph, graph2 models.Graph) int
-	// CheckUnion(answer models.Graph, graph1_task models.Graph, graph2_task models.Graph) int
-	// CheckJoin(answer models.Graph, graph1_task models.Graph, graph2_task models.Graph) int
+	CheckIntersectionGraphs(answer *models.Graph, graph1 *models.Graph, graph2 *models.Graph) int
+	CheckUnionGraphs(answer *models.Graph, graph1 *models.Graph, graph2 *models.Graph) int
+	CheckJoinGraphs(answer *models.Graph, graph1 *models.Graph, graph2 *models.Graph) int
 	// Harary definition
 	// CheckCartesianProduct(answer models.Graph, graph1_task models.Graph, graph2_task models.Graph) int
 	//
@@ -283,6 +283,56 @@ func (ch *checker) CheckPlanarGraph(answer models.Graph) int {
 	return 100
 }
 
-func (ch *checker) CheckIntersection(answer, graph1, graph2 models.Graph) int {
+func (ch *checker) checkBinaryOperations(answer, true_answer *models.Graph) (int, int) {
+	true_node_set := make(map[string]struct{})
+	answer_node_set := make(map[string]struct{})
+	for _, node := range true_answer.Nodes {
+		true_node_set[node.Label] = struct{}{}
+	}
+	for _, node := range answer.Nodes {
+		answer_node_set[node.Label] = struct{}{}
+	}
+	for label := range true_node_set {
+		_, ok := answer_node_set[label]
+		if !ok {
+			return 0, 0
+		}
+	}
+	for label := range answer_node_set {
+		_, ok := true_node_set[label]
+		if !ok {
+			return 0, 0
+		}
+	}
+	correct_edges := 0
+	odd_edges := 0
+	for _, edge_answer := range answer.Edges {
+		if true_answer.FindEdge(edge_answer.Source.Label, edge_answer.Target.Label) {
+			correct_edges++
+		} else {
+			odd_edges++
+		}
+	}
+	return correct_edges, odd_edges
+}
 
+func (ch *checker) CheckIntersectionGraphs(answer, graph1, graph2 *models.Graph) int {
+	true_answer := graph1.Intersect(graph2)
+	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
+	true_edges_count := len(true_answer.Edges)
+	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
+}
+
+func (ch *checker) CheckUnionGraphs(answer, graph1, graph2 *models.Graph) int {
+	true_answer := graph1.Union(graph2)
+	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
+	true_edges_count := len(true_answer.Edges)
+	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
+}
+
+func (ch *checker) CheckJoinGraphs(answer, graph1, graph2 *models.Graph) int {
+	true_answer := graph1.Union(graph2)
+	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
+	true_edges_count := len(true_answer.Edges)
+	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
 }
