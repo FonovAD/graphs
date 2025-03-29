@@ -11,9 +11,7 @@ type AuthUserResponse struct {
 	Token string
 }
 
-type CheckResultsRequest struct {
-	Token string
-}
+type CheckResultsRequest struct{}
 
 type CheckResultsResponse struct {
 	Results []dto.Result `json:"results"`
@@ -47,7 +45,6 @@ type GetTestsResponse struct {
 type SendAnswersRequest struct {
 	TestID  int64
 	Answers []Answer `json:"answers"`
-	// Token   string
 }
 
 type SendAnswersResponse struct {
