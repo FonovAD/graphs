@@ -5,17 +5,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/heetch/confita"
-	"github.com/heetch/confita/backend/file"
-	"github.com/labstack/echo/v4"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	echoSwagger "github.com/swaggo/echo-swagger"
 	"golang_graphs/backend/internal/config"
 	"golang_graphs/backend/internal/controller"
 	"golang_graphs/backend/internal/database"
+
 	"golang_graphs/backend/internal/handler"
-	"golang_graphs/backend/internal/handler/common"
 	"golang_graphs/backend/pkg/auth"
 	"golang_graphs/backend/pkg/create_random_string"
 	"log"
@@ -23,6 +17,13 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/heetch/confita"
+	"github.com/heetch/confita/backend/file"
+	"github.com/labstack/echo/v4"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	echoSwagger "github.com/swaggo/echo-swagger"
 
 	_ "golang_graphs/backend/docs"
 )
@@ -58,7 +59,7 @@ func main() {
 
 	userCtrl := controller.NewController(db, creator, authService)
 
-	commonHandler := common.New(userCtrl)
+	commonHandler := handler.New(userCtrl)
 
 	e := setupEcho(authService, rootPath)
 
@@ -148,6 +149,7 @@ func setupCfg(rootPath string) (config.Config, error) {
 	var cfg config.Config
 
 	path := fmt.Sprintf("%s/deploy/default.yaml", rootPath)
+	fmt.Println(rootPath)
 
 	envTesting := os.Getenv("TESTING")
 	if len(envTesting) != 0 {

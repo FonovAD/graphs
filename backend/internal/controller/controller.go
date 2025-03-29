@@ -3,8 +3,6 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/pkg/errors"
-	"golang.org/x/crypto/bcrypt"
 	"golang_graphs/backend/internal/database"
 	"golang_graphs/backend/internal/dto"
 	"golang_graphs/backend/internal/models"
@@ -12,6 +10,9 @@ import (
 	"golang_graphs/backend/pkg/create_random_string"
 	"log"
 	"time"
+
+	"github.com/pkg/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type controller struct {
@@ -29,10 +30,20 @@ type Controller interface {
 	AuthUser(ctx context.Context, request models.AuthUserRequest) (models.AuthUserResponse, error)
 	GetTests(ctx context.Context) (models.GetTestsResponse, error)
 	GetTasksFromTest(ctx context.Context, request models.GetTasksFromTestsRequest) (models.GetTasksFromTestsResponse, error)
-	CheckResults(ctx context.Context, request models.CheckResultsRequest) (models.CheckResultsResponse, error)
-	SendAnswers(ctx context.Context, request models.SendAnswersRequest) (models.SendAnswersResponse, error)
+	CheckResults(ctx context.Context, user dto.User, request models.CheckResultsRequest) (models.CheckResultsResponse, error)
+	SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendAnswersResponse, error)
 	InsertTest(ctx context.Context, request models.InsertTestRequest) (models.InsertTestResponse, error)
 	InsertTask(ctx context.Context, request models.InsertTaskRequest) (models.InsertTaskResponse, error)
+	AuthToken(ctx context.Context, token string) (dto.User, error)
+}
+
+func (c *controller) AuthToken(ctx context.Context, token string) (dto.User, error) {
+	user, err := c.authService.ParseToken(token)
+	if err != nil {
+		return dto.User{}, err
+	}
+
+	return user, nil
 }
 
 func (c *controller) InsertTest(ctx context.Context, request models.InsertTestRequest) (models.InsertTestResponse, error) {
@@ -51,7 +62,7 @@ func (c *controller) InsertTask(ctx context.Context, request models.InsertTaskRe
 	return models.InsertTaskResponse{TaskID: id}, nil
 }
 
-func (c *controller) SendAnswers(ctx context.Context, request models.SendAnswersRequest) (models.SendAnswersResponse, error) {
+func (c *controller) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendAnswersResponse, error) {
 	tasksWithAnswers, err := c.db.GetTasksFromTest(ctx, request.TestID)
 	if err != nil {
 		return models.SendAnswersResponse{}, errors.Wrap(err, "error getting tasks from test ID")
@@ -65,11 +76,6 @@ func (c *controller) SendAnswers(ctx context.Context, request models.SendAnswers
 	maxGrade := int64(0)
 	for _, answer := range tasksWithAnswers {
 		maxGrade += answer.MaxGrade
-	}
-
-	user, err := c.authService.AuthUser(request.Token)
-	if err != nil {
-		return models.SendAnswersResponse{}, errors.Wrap(err, "error getting user")
 	}
 
 	result := dto.Result{
@@ -105,13 +111,8 @@ func (c *controller) findAnswerByID(tasksWithAnswer []dto.Task, taskID int64) dt
 	return dto.Task{}
 }
 
-func (c *controller) CheckResults(ctx context.Context, request models.CheckResultsRequest) (models.CheckResultsResponse, error) {
+func (c *controller) CheckResults(ctx context.Context, user dto.User, request models.CheckResultsRequest) (models.CheckResultsResponse, error) {
 	log.Printf("Check Result request %s", request)
-
-	user, err := c.authService.AuthUser(request.Token)
-	if err != nil {
-		return models.CheckResultsResponse{}, errors.Wrap(err, "error getting user")
-	}
 
 	results, err := c.db.GetResultsByUserID(ctx, user.Id)
 	if err != nil {
@@ -122,6 +123,10 @@ func (c *controller) CheckResults(ctx context.Context, request models.CheckResul
 }
 
 func (c *controller) CreateUser(ctx context.Context, user models.CreateUserRequest) (models.CreateUserResponse, error) {
+	if err := ValidateCreateUser(user); err != nil {
+		return models.CreateUserResponse{}, err
+	}
+
 	salt := c.creator.RandomString()
 
 	hash, err := hashPassword(user.Password, salt)

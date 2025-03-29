@@ -2,18 +2,18 @@ package handler
 
 import (
 	"github.com/labstack/echo/v4"
-	"golang_graphs/backend/internal/handler/common"
 )
 
-func SetupRoutes(e *echo.Echo, com common.Handler) {
-	e.POST("check_results", com.CheckResults)
-	e.POST("auth_user", com.AuthUser)
-	e.POST("create_user", com.CreateUser)
-	e.POST("get_tasks_from_test", com.GetTasksFromTest)
-	e.GET("get_tests", com.GetTests)
-	e.POST("send_answers", com.SendAnswers)
-	e.POST("insert_test", com.InsertTest)
-	e.POST("insert_task", com.InsertTask)
+func SetupRoutes(e *echo.Echo, com Handler) {
+	router := e.Group("")
+	router.POST("create_user", com.CreateUser)
+	router.POST("auth_user", com.AuthUser)
 
-	e.GET("ping", com.Ping)
+	authorizedRouter := e.Group("", com.AuthMiddleware())
+	authorizedRouter.POST("check_results", com.CheckResults)
+	authorizedRouter.POST("get_tasks_from_test", com.GetTasksFromTest)
+	authorizedRouter.GET("get_tests", com.GetTests)
+	authorizedRouter.POST("send_answers", com.SendAnswers)
+	authorizedRouter.POST("insert_test", com.InsertTest)
+	authorizedRouter.POST("insert_task", com.InsertTask)
 }

@@ -47,7 +47,7 @@ type GetTestsResponse struct {
 type SendAnswersRequest struct {
 	TestID  int64
 	Answers []Answer `json:"answers"`
-	Token   string
+	// Token   string
 }
 
 type SendAnswersResponse struct {

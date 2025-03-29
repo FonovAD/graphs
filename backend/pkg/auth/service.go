@@ -2,16 +2,17 @@ package auth
 
 import (
 	"fmt"
-	"github.com/golang-jwt/jwt"
-	"github.com/pkg/errors"
 	"golang_graphs/backend/internal/dto"
 	"log"
 	"strconv"
+
+	"github.com/golang-jwt/jwt"
+	"github.com/pkg/errors"
 )
 
 type Service interface {
 	CreateToken(user dto.User) (string, error)
-	AuthUser(tokenString string) (dto.User, error)
+	ParseToken(tokenString string) (dto.User, error)
 }
 
 type service struct {
@@ -33,7 +34,7 @@ func (s *service) CreateToken(user dto.User) (string, error) {
 	return token.SignedString(s.secret)
 }
 
-func (s *service) AuthUser(tokenString string) (dto.User, error) {
+func (s *service) ParseToken(tokenString string) (dto.User, error) {
 	log.Printf("Token string %s", tokenString)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return s.secret, nil
