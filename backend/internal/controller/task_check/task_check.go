@@ -46,13 +46,23 @@ type Checker interface {
 	CheckEulerGraph(task models.Graph, is_euler_ans bool, answer_graph models.Graph) int
 	CheckMinPath(task models.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer models.Graph) int
 	CheckPlanarGraph(answer models.Graph) int
-	CheckIntersectionGraphs(answer *models.Graph, graph1 *models.Graph, graph2 *models.Graph) int
-	CheckUnionGraphs(answer *models.Graph, graph1 *models.Graph, graph2 *models.Graph) int
-	CheckJoinGraphs(answer *models.Graph, graph1 *models.Graph, graph2 *models.Graph) int
+	CheckIntersectionGraphs(answer, graph1, graph2 *models.Graph) int
+	CheckUnionGraphs(answer, graph1, graph2 *models.Graph) int
+	CheckJoinGraphs(answer, graph1, graph2 *models.Graph) int
 	// Harary definition
-	// CheckCartesianProduct(answer models.Graph, graph1_task models.Graph, graph2_task models.Graph) int
-	//
+	// CheckCartesianProduct(answer, graph1, graph2 *models.Graph) int
+	// Gorbatov definition
+	// CheckTensorProduct(answer, graph1, graph2 *models.Graph) int
+	// Composition
+	// CheckLexicographical(answer, graph1, graph2 *models.Graph) int
+	CheckIntersectionMatrices(answer *models.Graph, matrix1, matrix2 map[string]map[string]int) int
+	CheckUnionMatrices(answer *models.Graph, matrix1, matrix2 map[string]map[string]int) int
+	CheckJoinMatrices(answer *models.Graph, matrix1, matrix2 map[string]map[string]int) int
 }
+
+// Харари - декартово, cartesian, box product
+// Горбатов - тензорное, tensor, kroneker, categorial
+// Композиция - лексикографическое, lexicographical
 
 func NewChecker() Checker {
 	return &checker{}
@@ -335,4 +345,22 @@ func (ch *checker) CheckJoinGraphs(answer, graph1, graph2 *models.Graph) int {
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
 	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
+}
+
+func (ch *checker) CheckIntersectionMatrices(answer *models.Graph, matrix1, matrix2 map[string]map[string]int) int {
+	graph1 := models.MakeGraphFromAdjLabelMatrix(matrix1)
+	graph2 := models.MakeGraphFromAdjLabelMatrix(matrix2)
+	return ch.CheckIntersectionGraphs(answer, graph1, graph2)
+}
+
+func (ch *checker) CheckUnionMatrices(answer *models.Graph, matrix1, matrix2 map[string]map[string]int) int {
+	graph1 := models.MakeGraphFromAdjLabelMatrix(matrix1)
+	graph2 := models.MakeGraphFromAdjLabelMatrix(matrix2)
+	return ch.CheckUnionGraphs(answer, graph1, graph2)
+}
+
+func (ch *checker) CheckJoinMatrices(answer *models.Graph, matrix1, matrix2 map[string]map[string]int) int {
+	graph1 := models.MakeGraphFromAdjLabelMatrix(matrix1)
+	graph2 := models.MakeGraphFromAdjLabelMatrix(matrix2)
+	return ch.CheckJoinGraphs(answer, graph1, graph2)
 }

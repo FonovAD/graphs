@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 	"math"
 )
 
@@ -402,6 +403,21 @@ func (g *Graph) Join(graph *Graph) *Graph {
 		}
 	}
 	return unioned_graphs
+}
+
+func (g *Graph) CartesianProduct(graph *Graph) *Graph {
+	answer := new(Graph)
+	id := 1
+	for _, node1 := range g.Nodes {
+		for _, node2 := range graph.Nodes {
+			new_node_label := fmt.Sprintf("(%s,%s)", node1.Label, node2.Label)
+			answer.AddNode(Node{Id: id, Label: new_node_label})
+			id++
+		}
+	}
+	/////////////////
+
+	return answer
 }
 
 func MakeGraphFromAdjLabelMatrix(matrix map[string]map[string]int) *Graph {
