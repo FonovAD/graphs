@@ -68,8 +68,8 @@ func createGograph(graph models.Graph) *gograph.Mutable {
 
 	g := gograph.New(len(graph.Nodes))
 
-	for _, link := range graph.Links {
-		g.AddBoth(m[link.Source.Id], m[link.Target.Id])
+	for _, edge := range graph.Edges {
+		g.AddBoth(m[edge.Source.Id], m[edge.Target.Id])
 	}
 
 	return g
