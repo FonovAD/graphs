@@ -38,7 +38,7 @@ func (h *handler) SendAnswers(ctx echo.Context) error {
 
 	if err != nil && response.TaskType == -1 {
 		ctx.Set("error", err.Error())
-		return ctx.JSON(http.StatusBadRequest, models.BadRequestResponse{ErrorMsg: ErrInternalServer.Error()})
+		return ctx.JSON(http.StatusBadRequest, response)
 	}
 	if err != nil {
 		ctx.Set("error", err.Error())
