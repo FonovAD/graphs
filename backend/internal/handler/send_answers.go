@@ -35,6 +35,11 @@ func (h *handler) SendAnswers(ctx echo.Context) error {
 
 	ctxBack := context.Background()
 	response, err := h.ctrl.SendAnswers(ctxBack, user, request)
+
+	if err != nil && response.TaskType == -1 {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, models.BadRequestResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
 	if err != nil {
 		ctx.Set("error", err.Error())
 		return ctx.JSON(http.StatusInternalServerError, models.InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})

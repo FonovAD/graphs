@@ -2,6 +2,8 @@ package database
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"golang_graphs/backend/internal/dto"
 
@@ -19,6 +21,7 @@ type Database interface {
 	InsertResult(ctx context.Context, result dto.Result) error
 	InsertTest(ctx context.Context, test dto.Test) (int64, error)
 	InsertTask(ctx context.Context, task dto.Task) (int64, error)
+	InsertTaskResult(ctx context.Context, result dto.TaskResult) (int64, error)
 }
 
 func (db *database) Ping(ctx context.Context) error {
@@ -155,6 +158,25 @@ func (db *database) InsertResult(ctx context.Context, result dto.Result) error {
 	}
 
 	return nil
+}
+
+func (db *database) InsertTaskResult(ctx context.Context, result dto.TaskResult) (int64, error) {
+	log.Info("InsertTaskResult", result)
+	var id int64
+
+	row := db.client.QueryRowContext(ctx, InsertIntoTaskResult,
+		result.Type, result.UserID, result.Grade)
+
+	err := row.Scan(&id)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return -1, fmt.Errorf("conflict on composite key (task_type, usersid)")
+		}
+		return 0, fmt.Errorf("insert task result error %w", err)
+	}
+
+	return id, nil
 }
 
 func (db *database) InsertTest(ctx context.Context, test dto.Test) (int64, error) {

@@ -84,3 +84,12 @@ CREATE TABLE IF NOT EXISTS grade
     PRIMARY KEY (gradeid),
     FOREIGN KEY (resultid) REFERENCES result(resultid)
 );
+
+CREATE TABLE IF NOT EXISTS taskresult
+(
+    task_type INT NOT NULL,
+    usersid INT NOT NULL,
+    grade INT NOT NULL,
+    PRIMARY KEY (task_type, usersid),
+    FOREIGN KEY (usersid) REFERENCES users(usersid)
+);

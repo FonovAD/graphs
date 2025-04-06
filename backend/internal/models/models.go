@@ -50,8 +50,12 @@ type SendAnswersResponse struct {
 	Result dto.Result `json:"result"`
 }
 
+type SendTaskResultResponse struct {
+	TaskType int64 `json:"result"`
+}
+
 type Module struct {
-	TaskID int64 `json:"type"`
+	TaskID     int64      `json:"type"`
 	DataModule DataAnswer `json:"data"`
 }
 

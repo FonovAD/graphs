@@ -18,6 +18,9 @@ FROM tests;
 	InsertIntoResult = `INSERT INTO result (time_start, time_end, sum_grade, max_grade, usersid, testsid)
 VALUES ($1, $2, $3, $4, $5, $6) RETURNING resultid;
 `
+	InsertIntoTaskResult = `INSERT INTO taskresult (task_type, usersid, grade)
+VALUES ($1, $2, $3) ON CONFLICT DO NOTHING RETURNING task_type;
+`
 
 	SelectResultsByUserID = `
 SELECT resultid, time_start, time_end, sum_grade, max_grade, usersid, testsid FROM result WHERE usersid=$1; 

@@ -35,7 +35,7 @@ type Controller interface {
 	GetTests(ctx context.Context) (models.GetTestsResponse, error)
 	GetTasksFromTest(ctx context.Context, request models.GetTasksFromTestsRequest) (models.GetTasksFromTestsResponse, error)
 	CheckResults(ctx context.Context, user dto.User, request models.CheckResultsRequest) (models.CheckResultsResponse, error)
-	SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendAnswersResponse, error)
+	SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendTaskResultResponse, error)
 	InsertTest(ctx context.Context, request models.InsertTestRequest) (models.InsertTestResponse, error)
 	InsertTask(ctx context.Context, request models.InsertTaskRequest) (models.InsertTaskResponse, error)
 	AuthToken(ctx context.Context, token string) (dto.User, error)
@@ -142,36 +142,49 @@ func (c *controller) convertJSONStructsToGraph(ctx context.Context, nodes_json *
 // узнать структуру всего json, приходящего с фронта, чтобы вытащить всю инфу по заданию
 // в зависимости от задания (модуля) вызывать нужную функцию
 
-func (c *controller) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendAnswersResponse, error) {
+func (c *controller) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendTaskResultResponse, error) {
 
 	grade := int64(0)
+	moduleType := int64(0)
 	for _, module := range request.Modules {
 		if len(module.DataModule.Nodes) > 0 && len(module.DataModule.Edges) > 0 {
 			grade = 100
 		}
+		moduleType = module.TaskID
 		// grade += c.checkResult(answer, c.findAnswerByID(tasksWithAnswers, answer.TaskID))
 	}
 
-	maxGrade := int64(100)
+	// maxGrade := int64(100)
 	// for _, answer := range tasksWithAnswers {
 	// 	maxGrade += answer.MaxGrade
 	// }
 
-	result := dto.Result{
-		Start:     time.Time{},
-		End:       time.Now(),
-		Grade:     grade,
-		StudentID: user.Id,
-		TestID:    1,
-		MaxGrade:  maxGrade,
+	// result := dto.Result{
+	// 	Start:     time.Time{},
+	// 	End:       time.Now(),
+	// 	Grade:     grade,
+	// 	StudentID: user.Id,
+	// 	TestID:    1,
+	// 	MaxGrade:  maxGrade,
+	// }
+
+	// err := c.db.InsertResult(ctx, result)
+	result := dto.TaskResult{
+		Type:   moduleType,
+		UserID: user.Id,
+		Grade:  grade,
 	}
 
-	err := c.db.InsertResult(ctx, result)
+	id, err := c.db.InsertTaskResult(ctx, result)
+	if err != nil && id == -1 {
+		return models.SendTaskResultResponse{TaskType: id}, err
+	}
+
 	if err != nil {
-		return models.SendAnswersResponse{}, err
+		return models.SendTaskResultResponse{}, err
 	}
 
-	return models.SendAnswersResponse{Result: result}, nil
+	return models.SendTaskResultResponse{TaskType: id}, nil
 }
 
 // func (c *controller) checkResult(answer models.Answer, taskWithAnswer dto.Task) int64 {
