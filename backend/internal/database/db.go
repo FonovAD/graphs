@@ -3,9 +3,10 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	_ "github.com/lib/pq"
 	"golang_graphs/backend/internal/dto"
 	"sync"
+
+	_ "github.com/lib/pq"
 )
 
 var (

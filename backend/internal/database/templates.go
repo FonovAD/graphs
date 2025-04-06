@@ -6,7 +6,7 @@ VALUES ($1, $2, $3, $4, $5, $6, $7, $8)  RETURNING usersid;
 `
 
 	SelectUserByEmail = `
-SELECT role, first_name, last_name, email, father_name, password, passwordsalt, date_registration
+SELECT usersid, role, first_name, last_name, email, father_name, password, passwordsalt, date_registration
 FROM users
 WHERE users.email = $1;
 `

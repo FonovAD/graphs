@@ -49,6 +49,7 @@ func (s *service) ParseToken(tokenString string) (dto.User, error) {
 			return dto.User{}, fmt.Errorf("claim parsing id failed")
 		}
 		userID, err := strconv.ParseInt(str, 10, 64)
+		log.Printf("userID %d", userID)
 		if err != nil {
 			return dto.User{}, fmt.Errorf("claim parsing failed")
 		}

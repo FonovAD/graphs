@@ -3,8 +3,9 @@ package database
 import (
 	"context"
 	"fmt"
-	"github.com/labstack/gommon/log"
 	"golang_graphs/backend/internal/dto"
+
+	"github.com/labstack/gommon/log"
 )
 
 type Database interface {
@@ -52,7 +53,7 @@ func (db *database) SelectUserByEmail(ctx context.Context, email string) (dto.Us
 
 	fatherName := ""
 
-	err := row.Scan(&user.Role, &user.FirstName, &user.LastName, &user.Email, &fatherName, &user.Password, &user.PasswordSalt, &user.DateRegistration)
+	err := row.Scan(&user.Id, &user.Role, &user.FirstName, &user.LastName, &user.Email, &fatherName, &user.Password, &user.PasswordSalt, &user.DateRegistration)
 	if err != nil {
 		return dto.User{}, fmt.Errorf("select user by email error %w", err)
 	}
