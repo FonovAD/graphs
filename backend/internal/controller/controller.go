@@ -4,14 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"strconv"
+	"golang_graphs/backend/internal/controller/task_check"
 	"golang_graphs/backend/internal/database"
 	"golang_graphs/backend/internal/dto"
 	"golang_graphs/backend/internal/models"
 	"golang_graphs/backend/pkg/auth"
 	"golang_graphs/backend/pkg/create_random_string"
-	"golang_graphs/backend/internal/controller/task_check"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/pkg/errors"
@@ -104,7 +104,7 @@ func (c *controller) convertJSONStructsToGraph(ctx context.Context, nodes_json *
 			node_json.Position.X,
 			node_json.Position.Y)
 	}
-	
+
 	for _, edge := range edges_json.EdgeArr {
 		src, err := graph.FindNodeById(node_id_map[edge.EdgeData.Source])
 		if err != nil {
@@ -260,6 +260,9 @@ func (c *controller) GetTasksFromTest(ctx context.Context, request models.GetTas
 }
 
 func (c *controller) AuthUser(ctx context.Context, request models.AuthUserRequest) (models.AuthUserResponse, error) {
+	if err := ValidateAuthUser(request); err != nil {
+		return models.AuthUserResponse{}, err
+	}
 	user, err := c.db.SelectUserByEmail(ctx, request.Email)
 	if err != nil {
 		return models.AuthUserResponse{}, err

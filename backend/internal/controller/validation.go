@@ -15,5 +15,33 @@ func ValidateCreateUser(request models.CreateUserRequest) error {
 		return ErrShortPassword
 	}
 
+	if len(request.Email) < 4 {
+		return ErrShortEmail
+	}
+
+	if len(request.Email) > 100 {
+		return ErrLongEmail
+	}
+
+	return nil
+}
+
+func ValidateAuthUser(request models.AuthUserRequest) error {
+	if len(request.Password) < 8 {
+		return ErrShortPassword
+	}
+
+	if len(request.Password) > 50 {
+		return ErrLongPassword
+	}
+
+	if len(request.Email) < 4 {
+		return ErrShortEmail
+	}
+
+	if len(request.Email) > 100 {
+		return ErrLongEmail
+	}
+
 	return nil
 }
