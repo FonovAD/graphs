@@ -289,7 +289,7 @@ func TestChecker_CheckLinearToLine(t *testing.T) {
 	}
 
 	checker := task_check.NewChecker()
-	score := checker.CheckLinearToLine(task, answer)
+	score := checker.CheckLinearToLine(&task, &answer)
 	if score == 0 {
 		t.Errorf("Linear to Line check failed: expected non-zero score, got %d", score)
 	}

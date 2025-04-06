@@ -2,7 +2,9 @@ package controller
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strconv"
 	"golang_graphs/backend/internal/database"
 	"golang_graphs/backend/internal/dto"
 	"golang_graphs/backend/internal/models"
@@ -62,32 +64,107 @@ func (c *controller) InsertTask(ctx context.Context, request models.InsertTaskRe
 	return models.InsertTaskResponse{TaskID: id}, nil
 }
 
-func (c *controller) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendAnswersResponse, error) {
-	tasksWithAnswers, err := c.db.GetTasksFromTest(ctx, request.TestID)
-	if err != nil {
-		return models.SendAnswersResponse{}, errors.Wrap(err, "error getting tasks from test ID")
+func (c *controller) parserNodeStruct(ctx context.Context, json_str string) (*models.NodesJSON, error) {
+	ans := new(models.NodesJSON)
+	var parser_ans []models.NodeJSON
+	if err := json.Unmarshal([]byte(json_str), &parser_ans); err != nil {
+		return nil, err
 	}
+	ans.NodeArr = parser_ans
+	return ans, nil
+}
+
+func (c *controller) parserEdgeStruct(ctx context.Context, json_str string) (*models.EdgesJSON, error) {
+	ans := new(models.EdgesJSON)
+	var parser_ans []models.EdgeJSON
+	if err := json.Unmarshal([]byte(json_str), &parser_ans); err != nil {
+		return nil, err
+	}
+	ans.EdgeArr = parser_ans
+	return ans, nil
+}
+
+func (c *controller) convertJSONStructsToGraph(ctx context.Context, nodes_json *models.NodesJSON, edges_json *models.EdgesJSON) (*models.Graph, error) {
+	graph := new(models.Graph)
+	node_id_map := make(map[string]int)
+	curr_id := 0
+	for _, node_json := range nodes_json.NodeArr {
+		node_id_map[node_json.NodeData.Id] = curr_id
+		curr_id++
+		weight, err := strconv.Atoi(node_json.NodeData.Weight)
+		if err != nil {
+			weight = 0
+		}
+		graph.AddNodeByInfo(curr_id,
+			node_json.NodeData.Label,
+			node_json.NodeData.Color,
+			weight,
+			node_json.Position.X,
+			node_json.Position.Y)
+	}
+	
+	for _, edge := range edges_json.EdgeArr {
+		src, err := graph.FindNodeById(node_id_map[edge.EdgeData.Source])
+		if err != nil {
+			return graph, err
+		}
+		trg, _ := graph.FindNodeById(node_id_map[edge.EdgeData.Target])
+		if err != nil {
+			return graph, err
+		}
+		graph.AddEdgeByInfo(
+			src,
+			trg,
+			edge.EdgeData.Id,
+			edge.EdgeData.Label,
+			edge.EdgeData.Color,
+			0)
+	}
+	return graph, nil
+}
+
+// func (c *controller) parserGraphStruct(ctx context.Context, request models.SendAnswersRequest) (*models.Graph, error) {
+// 	graph := new(models.Graph)
+// 	var json_struct
+// 	// пробегаться по циклу request.Answers?
+// 	if err := json.Unmarshal([]byte(request.Answers[0].Answer), &json_struct); err != nil {
+// 		return nil, err
+// 	}
+// 	for _, data := range json_struct {
+// 		if data.source == nil {
+
+// 		}
+// 	}
+// }
+// нужны парсеры для разных заданий
+// узнать структуру всего json, приходящего с фронта, чтобы вытащить всю инфу по заданию
+// в зависимости от задания (модуля) вызывать нужную функцию
+
+func (c *controller) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendAnswersResponse, error) {
 
 	grade := int64(0)
-	for _, answer := range request.Answers {
-		grade += c.checkResult(answer, c.findAnswerByID(tasksWithAnswers, answer.TaskID))
+	for _, module := range request.Modules {
+		if len(module.DataModule.Nodes) > 0 && len(module.DataModule.Edges) > 0 {
+			grade = 100
+		}
+		// grade += c.checkResult(answer, c.findAnswerByID(tasksWithAnswers, answer.TaskID))
 	}
 
-	maxGrade := int64(0)
-	for _, answer := range tasksWithAnswers {
-		maxGrade += answer.MaxGrade
-	}
+	maxGrade := int64(100)
+	// for _, answer := range tasksWithAnswers {
+	// 	maxGrade += answer.MaxGrade
+	// }
 
 	result := dto.Result{
 		Start:     time.Time{},
 		End:       time.Now(),
 		Grade:     grade,
 		StudentID: user.Id,
-		TestID:    request.TestID,
+		TestID:    1,
 		MaxGrade:  maxGrade,
 	}
 
-	err = c.db.InsertResult(ctx, result)
+	err := c.db.InsertResult(ctx, result)
 	if err != nil {
 		return models.SendAnswersResponse{}, err
 	}
@@ -95,12 +172,12 @@ func (c *controller) SendAnswers(ctx context.Context, user dto.User, request mod
 	return models.SendAnswersResponse{Result: result}, nil
 }
 
-func (c *controller) checkResult(answer models.Answer, taskWithAnswer dto.Task) int64 {
-	if answer.Answer == taskWithAnswer.Answer {
-		return int64(taskWithAnswer.MaxGrade)
-	}
-	return 0
-}
+// func (c *controller) checkResult(answer models.Answer, taskWithAnswer dto.Task) int64 {
+// 	if answer.Answer == taskWithAnswer.Answer {
+// 		return int64(taskWithAnswer.MaxGrade)
+// 	}
+// 	return 0
+// }
 
 func (c *controller) findAnswerByID(tasksWithAnswer []dto.Task, taskID int64) dto.Task {
 	for _, task := range tasksWithAnswer {

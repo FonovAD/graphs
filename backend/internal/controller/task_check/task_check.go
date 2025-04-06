@@ -39,7 +39,7 @@ type checker struct {
 }
 
 type Checker interface {
-	CheckLinearToLine(task models.Graph, answer models.Graph) int
+	CheckLinearToLine(task, answer *models.Graph) int
 	CheckLinearFromLine(task models.Graph, answer models.Graph) int
 	CheckRadiusAndDiameter(task models.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int
 	CheckAdjacentMatrix(task models.Graph, answer map[string]map[string]int) int
@@ -76,7 +76,7 @@ func Max_(a int, b int) int {
 }
 
 // Проверка модуля "Реберный граф" (из графа в реберный)
-func (ch *checker) CheckLinearToLine(task models.Graph, answer models.Graph) int {
+func (ch *checker) CheckLinearToLine(task *models.Graph, answer *models.Graph) int {
 	task_adj := task.EdgeLabelAdjacentMatrix()
 	answer_adj := answer.NodeLabelAdjacentMatrix()
 

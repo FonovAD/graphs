@@ -43,17 +43,21 @@ type GetTestsResponse struct {
 }
 
 type SendAnswersRequest struct {
-	TestID  int64
-	Answers []Answer `json:"answers"`
+	Modules []Module `json:"modules"`
 }
 
 type SendAnswersResponse struct {
 	Result dto.Result `json:"result"`
 }
 
-type Answer struct {
-	TaskID int64
-	Answer string
+type Module struct {
+	TaskID int64 `json:"type"`
+	DataModule DataAnswer `json:"data"`
+}
+
+type DataAnswer struct {
+	Nodes []NodeJSON `json:"nodes"`
+	Edges []EdgeJSON `json:"edges"`
 }
 
 type BadRequestResponse struct {

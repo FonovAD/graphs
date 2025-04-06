@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"strconv"
 )
 
 var (
@@ -42,7 +43,7 @@ type Node struct {
 }
 
 type Edge struct {
-	Id     int
+	Id     string
 	Source Node
 	Target Node
 	Label  string
@@ -98,7 +99,7 @@ func (g *Graph) IsNodeByLabel(label string) bool {
 	return false
 }
 
-func (g *Graph) IsEdgeById(id int) bool {
+func (g *Graph) IsEdgeById(id string) bool {
 	for _, edge := range g.Edges {
 		if edge.Id == id {
 			return true
@@ -145,7 +146,7 @@ func (g *Graph) AddEdge(new_edge Edge) error {
 	return nil
 }
 
-func (g *Graph) AddEdgeByInfo(source Node, target Node, id int, label string, color string, weight int) error {
+func (g *Graph) AddEdgeByInfo(source Node, target Node, id string, label string, color string, weight int) error {
 	new_edge := Edge{Source: source, Target: target, Id: id, Label: label, Color: color, Weight: weight}
 	return g.AddEdge(new_edge)
 }
@@ -153,6 +154,15 @@ func (g *Graph) AddEdgeByInfo(source Node, target Node, id int, label string, co
 func (g *Graph) FindNodeByLabel(label string) (Node, error) {
 	for _, node := range g.Nodes {
 		if node.Label == label {
+			return node, nil
+		}
+	}
+	return Node{}, EmptyValue
+}
+
+func (g *Graph) FindNodeById(id int) (Node, error) {
+	for _, node := range g.Nodes {
+		if node.Id == id {
 			return node, nil
 		}
 	}
@@ -212,10 +222,10 @@ func (g *Graph) EdgeLabelAdjacentMatrix() map[string]map[string]int {
 }
 
 // Матрица смежности ребер, но вместо индексов - Id
-func (g *Graph) EdgeIdAdjacentMatrix() map[int]map[int]int {
-	matrix := make(map[int]map[int]int)
+func (g *Graph) EdgeIdAdjacentMatrix() map[string]map[string]int {
+	matrix := make(map[string]map[string]int)
 	for _, edge1 := range g.Edges {
-		matrix[edge1.Id] = make(map[int]int)
+		matrix[edge1.Id] = make(map[string]int)
 		for _, edge2 := range g.Edges {
 			matrix[edge1.Id][edge2.Id] = 0
 		}
@@ -318,8 +328,8 @@ func (g *Graph) Intersect(graph *Graph) *Graph {
 			nodes_answer[node_graph.Label] = nodes_g_set[node_graph.Label]
 		}
 	}
-	edges_g := make(map[int]Edge)
-	edges_final := make(map[int]Edge)
+	edges_g := make(map[string]Edge)
+	edges_final := make(map[string]Edge)
 	for _, edge := range g.Edges {
 		edges_g[edge.Id] = edge
 		edges_final[edge.Id] = edge
@@ -395,11 +405,13 @@ func (g *Graph) Join(graph *Graph) *Graph {
 			nodes_graph[node.Label] = struct{}{}
 		}
 	}
+	edge_id := 0
 	for node_src_l := range nodes_g {
 		for node_trg_l := range nodes_graph {
 			node_src, _ := g.FindNodeByLabel(node_src_l)
 			node_trg, _ := g.FindNodeByLabel(node_trg_l)
-			unioned_graphs.AddEdgeByInfo(node_src, node_trg, 0, "", "", 0)
+			unioned_graphs.AddEdgeByInfo(node_src, node_trg, strconv.Itoa(edge_id), "", "", 0)
+			edge_id++
 		}
 	}
 	return unioned_graphs
@@ -429,6 +441,7 @@ func MakeGraphFromAdjLabelMatrix(matrix map[string]map[string]int) *Graph {
 		node_map[node_label] = id
 		id++
 	}
+	edge_id := 0
 	for node_src_l, node_list := range matrix {
 		for node_trg_l, val := range node_list {
 			if val != 0 {
@@ -436,8 +449,8 @@ func MakeGraphFromAdjLabelMatrix(matrix map[string]map[string]int) *Graph {
 					new_graph.AddEdgeByInfo(
 						Node{Id: node_map[node_src_l], Label: node_src_l},
 						Node{Id: node_map[node_trg_l], Label: node_trg_l},
-						id, "", "", 0)
-					id++
+						strconv.Itoa(edge_id), "", "", 0)
+					edge_id++
 				}
 			}
 		}
