@@ -10,6 +10,7 @@ import (
 	"golang_graphs/backend/internal/models"
 	"golang_graphs/backend/pkg/auth"
 	"golang_graphs/backend/pkg/create_random_string"
+	"golang_graphs/backend/internal/controller/task_check"
 	"log"
 	"time"
 
@@ -21,10 +22,11 @@ type controller struct {
 	db          database.Database
 	creator     create_random_string.Creator
 	authService auth.Service
+	ansChecker  task_check.Checker
 }
 
-func NewController(db database.Database, creator create_random_string.Creator, authService auth.Service) Controller {
-	return &controller{db: db, creator: creator, authService: authService}
+func NewController(db database.Database, creator create_random_string.Creator, authService auth.Service, ansChecker task_check.Checker) Controller {
+	return &controller{db: db, creator: creator, authService: authService, ansChecker: ansChecker}
 }
 
 type Controller interface {

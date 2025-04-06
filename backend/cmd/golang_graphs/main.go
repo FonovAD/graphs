@@ -8,6 +8,7 @@ import (
 	"golang_graphs/backend/internal/config"
 	"golang_graphs/backend/internal/controller"
 	"golang_graphs/backend/internal/database"
+	"golang_graphs/backend/internal/controller/task_check"
 
 	"golang_graphs/backend/internal/handler"
 	"golang_graphs/backend/pkg/auth"
@@ -57,7 +58,9 @@ func main() {
 
 	authService := auth.New("your-256-bit-secret")
 
-	userCtrl := controller.NewController(db, creator, authService)
+	checker := task_check.NewChecker()
+
+	userCtrl := controller.NewController(db, creator, authService, checker)
 
 	commonHandler := handler.New(userCtrl)
 
