@@ -21,22 +21,99 @@ CREATE TABLE IF NOT EXISTS teacher
     FOREIGN KEY (usersid) REFERENCES users(usersid)
 );
 
+CREATE TABLE IF NOT EXISTS students
+(
+    student_id SERIAL NOT NULL,
+    usersid INT NOT NULL,
+    groupsid INT NOT NULL,
+    PRIMARY KEY (student_id),
+    FOREIGN KEY (usersid) REFERENCES users(usersid),
+    FOREIGN KEY (groupsid) REFERENCES groups(groupsid)
+);
+
+CREATE TABLE IF NOT EXISTS admins
+(
+    admin_id SERIAL NOT NULL,
+    usersid INT NOT NULL,
+    PRIMARY KEY (admin_id),
+    FOREIGN KEY (usersid) REFERENCES users(usersid)
+);
+
 CREATE TABLE IF NOT EXISTS groups
 (
-    groupsid SERIAL NOT NULL,
-    groupsname VARCHAR(10),
+    groups_id SERIAL NOT NULL,
+    groupsname VARCHAR(10) NOT NULL,
     PRIMARY KEY (groupsid)
 );
 
-CREATE TABLE IF NOT EXISTS tests
+CREATE TABLE IF NOT EXISTS labs
 (
-    testsid SERIAL NOT NULL,
-    test_name varchar (100) NOT NULL,
+    lab_id SERIAL NOT NULL,
+    name varchar (100) NOT NULL,
     description text,
-    date_start DATE NOT NULL,
-    time INTERVAL HOUR TO SECOND NOT NULL,
-    date_end DATE NOT NULL,
-    PRIMARY KEY (testsid)
+    duration INTERVAL HOUR TO SECOND NOT NULL,
+    registration_date DATE NOT NULL,
+    teacher_id INT NOT NULL,
+    PRIMARY KEY (lab_id),
+    FOREIGN KEY (teacher_id) REFERENCES teacher(teacherid)
+);
+
+CREATE TABLE IF NOT EXISTS user_lab
+(
+    user_lab_id SERIAL NOT NULL,
+    user_id INT NOT NULL,
+    lab_id INT NOT NULL,
+    assignment_date DATE NOT NULL,
+    start_time TIMESTAMP NOT NULL,
+    teacher_id INT NOT NULL,
+    deadline TIMESTAMP NOT NULL,
+    score INT NOT NULL,
+    PRIMARY KEY (user_lab_id),
+    FOREIGN KEY (teacher_id) REFERENCES teacher(teacherid),
+    FOREIGN KEY (user_id) REFERENCES users(usersid),
+    FOREIGN KEY (lab_id) REFERENCES labs(lab_id)
+);
+
+CREATE TABLE IF NOT EXISTS modules
+(
+    module_id SERIAL NOT NULL,
+    type varchar (100) NOT NULL,
+    description text,
+    PRIMARY KEY (module_id)
+);
+
+CREATE TABLE IF NOT EXISTS module_lab
+(
+    module_lab_id SERIAL NOT NULL,
+    weight NUMERIC(3, 2) NOT NULL,
+    lab_id INT NOT NULL,
+    module_id INT NOT NULL,
+    PRIMARY KEY (module_lab_id),
+    FOREIGN KEY (lab_id) REFERENCES labs(lab_id),
+    FOREIGN KEY (module_id) REFERENCES modules(module_id)
+);
+
+CREATE TABLE IF NOT EXISTS tasks
+(
+    task_id SERIAL NOT NULL,
+    user_lab_id INT NOT NULL,
+    module_id INT NOT NULL,
+    payload TEXT NOT NULL,
+    PRIMARY KEY (task_id),
+    FOREIGN KEY (user_lab_id) REFERENCES user_lab(user_lab_id),
+    FOREIGN KEY (module_id) REFERENCES modules(module_id)
+);
+
+CREATE TABLE IF NOT EXISTS user_answer
+(
+    user_answer_id SERIAL NOT NULL,
+    user_lab_id INT NOT NULL,
+    task_id INT NOT NULL,
+    answer TEXT NOT NULL,
+    score INT NOT NULL,
+    PRIMARY KEY (user_answer_id),
+    FOREIGN KEY (user_lab_id) REFERENCES user_lab(user_lab_id),
+    FOREIGN KEY (task_id) REFERENCES tasks(task_id)
 );
 
 CREATE TABLE IF NOT EXISTS teachergroup
@@ -49,47 +126,4 @@ CREATE TABLE IF NOT EXISTS teachergroup
     FOREIGN KEY (groupsid) REFERENCES groups(groupsid)
 );
 
-CREATE TABLE IF NOT EXISTS result
-(
-    time_start TIMESTAMP NOT NULL,
-    time_end  TIMESTAMP NOT NULL,
-    resultid SERIAL NOT NULL,
-    sum_grade INT NOT NULL,
-    max_grade INT NOT NULL,
-    usersid INT NOT NULL,
-    testsid INT NOT NULL,
-    PRIMARY KEY (resultid),
-    FOREIGN KEY (usersid) REFERENCES users(usersid),
-    FOREIGN KEY (testsid) REFERENCES tests(testsid)
-);
 
-CREATE TABLE IF NOT EXISTS task
-(
-    testsid INT NOT NULL,
-    taskid SERIAL NOT NULL,
-    task_name VARCHAR(100) NOT NULL,
-    answer TEXT NOT NULL,
-    data TEXT NOT NULL,
-    max_grade INT NOT NULL,
-    description TEXT NOT NULL,
-    PRIMARY KEY (taskid),
-    FOREIGN KEY (testsid) REFERENCES tests(testsid)
-);
-
-CREATE TABLE IF NOT EXISTS grade
-(
-    gradeid SERIAL NOT NULL,
-    grade INT NOT NULL,
-    resultid INT NOT NULL,
-    PRIMARY KEY (gradeid),
-    FOREIGN KEY (resultid) REFERENCES result(resultid)
-);
-
-CREATE TABLE IF NOT EXISTS taskresult
-(
-    task_type INT NOT NULL,
-    usersid INT NOT NULL,
-    grade INT NOT NULL,
-    PRIMARY KEY (task_type, usersid),
-    FOREIGN KEY (usersid) REFERENCES users(usersid)
-);
