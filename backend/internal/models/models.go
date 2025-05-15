@@ -1,89 +1,47 @@
-package models
+package z
 
-import "golang_graphs/backend/internal/dto"
+// // import "golang_graphs/backend/internal/dto"
 
-type AuthUserRequest struct {
-	Email    string
-	Password string
-}
+// type CheckResultsRequest struct{}
 
-type AuthUserResponse struct {
-	Token string
-}
+// type CheckResultsResponse struct {
+// 	Results []dto.Result `json:"results"`
+// }
 
-type CheckResultsRequest struct{}
+// type GetTasksFromTestsRequest struct {
+// 	TestID int64 `json:"test_id"`
+// }
 
-type CheckResultsResponse struct {
-	Results []dto.Result `json:"results"`
-}
+// type GetTasksFromTestsResponse struct {
+// 	Tasks []dto.Task `json:"tasks"`
+// }
 
-type CreateUserRequest struct {
-	Email     string
-	Password  string
-	FirstName string
-	LastName  string
-}
+// type GetTestsRequest struct{}
 
-type CreateUserResponse struct {
-	Token string
-}
+// type GetTestsResponse struct {
+// 	Tests []dto.Test `json:"tests"`
+// }
 
-type GetTasksFromTestsRequest struct {
-	TestID int64 `json:"test_id"`
-}
+// type SendAnswersResponse struct {
+// 	Result dto.Result `json:"result"`
+// }
 
-type GetTasksFromTestsResponse struct {
-	Tasks []dto.Task `json:"tasks"`
-}
+// type SendTaskResultResponse struct {
+// 	TaskType int64 `json:"result"`
+// }
 
-type GetTestsRequest struct{}
+// type InsertTestRequest struct {
+// 	Test dto.Test `json:"test"`
+// }
 
-type GetTestsResponse struct {
-	Tests []dto.Test `json:"tests"`
-}
+// type InsertTestResponse struct {
+// 	TestID int64 `json:"test_id"`
+// }
 
-type SendAnswersRequest struct {
-	Modules []Module `json:"modules"`
-}
+// type InsertTaskRequest struct {
+// 	Task dto.Task `json:"task"`
+// }
 
-type SendAnswersResponse struct {
-	Result dto.Result `json:"result"`
-}
-
-type SendTaskResultResponse struct {
-	TaskType int64 `json:"result"`
-}
-
-type Module struct {
-	TaskID     int64      `json:"type"`
-	DataModule DataAnswer `json:"data"`
-}
-
-type DataAnswer struct {
-	Nodes []NodeJSON `json:"nodes"`
-	Edges []EdgeJSON `json:"edges"`
-}
-
-type BadRequestResponse struct {
-	ErrorMsg string `json:"error_msg"`
-}
-
-type InternalServerErrorResponse struct {
-	ErrorMsg string `json:"error_msg"`
-}
-
-type InsertTestRequest struct {
-	Test dto.Test `json:"test"`
-}
-
-type InsertTestResponse struct {
-	TestID int64 `json:"test_id"`
-}
-
-type InsertTaskRequest struct {
-	Task dto.Task `json:"task"`
-}
-
-type InsertTaskResponse struct {
-	TaskID int64 `json:"task_id"`
-}
+// type InsertTaskResponse struct {
+// 	TaskID int64 `json:"task_id"`
+// }

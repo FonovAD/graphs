@@ -1,29 +1,29 @@
 package main
 
 import (
-	"golang_graphs/backend/internal/controller/task_check"
-	"golang_graphs/backend/internal/models"
+	model "golang_graphs/backend/internal/domain/model/graph"
+	"golang_graphs/backend/internal/domain/student/service/taskcheck"
 	"math"
 	"testing"
 )
 
 // Тест для MinPath
 func TestGraph_MinPath(t *testing.T) {
-	graph := models.Graph{
-		Nodes: []models.Node{
+	graph := model.Graph{
+		Nodes: []model.Node{
 			{Id: 1, Label: "A"},
 			{Id: 2, Label: "B"},
 			{Id: 3, Label: "C"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Id: 1, Label: "A"}, Target: models.Node{Id: 2, Label: "B"}, Weight: 2},
-			{Source: models.Node{Id: 2, Label: "B"}, Target: models.Node{Id: 3, Label: "C"}, Weight: 3},
-			{Source: models.Node{Id: 1, Label: "A"}, Target: models.Node{Id: 3, Label: "C"}, Weight: 5},
+		Edges: []model.Edge{
+			{Source: model.Node{Id: 1, Label: "A"}, Target: model.Node{Id: 2, Label: "B"}, Weight: 2},
+			{Source: model.Node{Id: 2, Label: "B"}, Target: model.Node{Id: 3, Label: "C"}, Weight: 3},
+			{Source: model.Node{Id: 1, Label: "A"}, Target: model.Node{Id: 3, Label: "C"}, Weight: 5},
 		},
 	}
 
 	// Positive case
-	minPath, weightsPath := graph.MinPath(models.Node{Id: 1, Label: "A"}, models.Node{Id: 3, Label: "C"}, true)
+	minPath, weightsPath := graph.MinPath(model.Node{Id: 1, Label: "A"}, model.Node{Id: 3, Label: "C"}, true)
 	expectedMinPath := 5
 	expectedWeights := map[string]int{"A": 0, "B": 2, "C": 5}
 
@@ -38,15 +38,15 @@ func TestGraph_MinPath(t *testing.T) {
 	}
 
 	// Negative case (unreachable nodes)
-	graph2 := models.Graph{
-		Nodes: []models.Node{
+	graph2 := model.Graph{
+		Nodes: []model.Node{
 			{Id: 1, Label: "A"},
 			{Id: 2, Label: "B"},
 		},
-		Edges: []models.Edge{},
+		Edges: []model.Edge{},
 	}
 
-	minPath2, _ := graph2.MinPath(models.Node{Id: 1, Label: "A"}, models.Node{Id: 2, Label: "B"}, true)
+	minPath2, _ := graph2.MinPath(model.Node{Id: 1, Label: "A"}, model.Node{Id: 2, Label: "B"}, true)
 	if minPath2 != math.MaxInt {
 		t.Errorf("expected unreachable path, got %d", minPath2)
 	}
@@ -54,13 +54,13 @@ func TestGraph_MinPath(t *testing.T) {
 
 // Тест для NodeLabelAdjacentMatrix
 func TestGraph_NodeLabelAdjacentMatrix(t *testing.T) {
-	graph := models.Graph{
-		Nodes: []models.Node{
+	graph := model.Graph{
+		Nodes: []model.Node{
 			{Label: "A"},
 			{Label: "B"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "A"}, Target: models.Node{Label: "B"}},
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "A"}, Target: model.Node{Label: "B"}},
 		},
 	}
 
@@ -81,13 +81,13 @@ func TestGraph_NodeLabelAdjacentMatrix(t *testing.T) {
 
 // Тест для NodeIdAdjacentMatrix
 func TestGraph_NodeIdAdjacentMatrix(t *testing.T) {
-	graph := models.Graph{
-		Nodes: []models.Node{
+	graph := model.Graph{
+		Nodes: []model.Node{
 			{Id: 1},
 			{Id: 2},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Id: 1}, Target: models.Node{Id: 2}},
+		Edges: []model.Edge{
+			{Source: model.Node{Id: 1}, Target: model.Node{Id: 2}},
 		},
 	}
 	adjMatrix := graph.NodeIdAdjacentMatrix()
@@ -107,15 +107,15 @@ func TestGraph_NodeIdAdjacentMatrix(t *testing.T) {
 
 // Тест для DistanceMatrix
 func TestGraph_DistanceMatrix(t *testing.T) {
-	graph := models.Graph{
-		Nodes: []models.Node{
+	graph := model.Graph{
+		Nodes: []model.Node{
 			{Label: "A"},
 			{Label: "B"},
 			{Label: "C"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "A"}, Target: models.Node{Label: "B"}, Weight: 1},
-			{Source: models.Node{Label: "B"}, Target: models.Node{Label: "C"}, Weight: 2},
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "A"}, Target: model.Node{Label: "B"}, Weight: 1},
+			{Source: model.Node{Label: "B"}, Target: model.Node{Label: "C"}, Weight: 2},
 		},
 	}
 
@@ -136,16 +136,16 @@ func TestGraph_DistanceMatrix(t *testing.T) {
 }
 
 func TestCheckAdjacentMatrix(t *testing.T) {
-	checker := task_check.NewChecker()
-	task := models.Graph{
-		Nodes: []models.Node{
+	checker := taskcheck.NewChecker()
+	task := model.Graph{
+		Nodes: []model.Node{
 			{Label: "A"},
 			{Label: "B"},
 			{Label: "C"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "A"}, Target: models.Node{Label: "B"}},
-			{Source: models.Node{Label: "B"}, Target: models.Node{Label: "C"}},
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "A"}, Target: model.Node{Label: "B"}},
+			{Source: model.Node{Label: "B"}, Target: model.Node{Label: "C"}},
 		},
 	}
 
@@ -193,19 +193,19 @@ func TestCheckAdjacentMatrix(t *testing.T) {
 
 // Тест для CheckRadiusAndDiameter
 func TestChecker_CheckRadiusAndDiameter(t *testing.T) {
-	graph := models.Graph{
-		Nodes: []models.Node{
+	graph := model.Graph{
+		Nodes: []model.Node{
 			{Label: "A"},
 			{Label: "B"},
 			{Label: "C"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "A"}, Target: models.Node{Label: "B"}, Weight: 1},
-			{Source: models.Node{Label: "B"}, Target: models.Node{Label: "C"}, Weight: 1},
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "A"}, Target: model.Node{Label: "B"}, Weight: 1},
+			{Source: model.Node{Label: "B"}, Target: model.Node{Label: "C"}, Weight: 1},
 		},
 	}
 
-	checker := task_check.NewChecker()
+	checker := taskcheck.NewChecker()
 
 	distMatrixAns := map[string]map[string]int{
 		"A": {"A": 0, "B": 1, "C": 2},
@@ -224,19 +224,19 @@ func TestChecker_CheckRadiusAndDiameter(t *testing.T) {
 
 // Тест для CheckMinPath
 func TestChecker_CheckMinPath(t *testing.T) {
-	graph := models.Graph{
-		Nodes: []models.Node{
+	graph := model.Graph{
+		Nodes: []model.Node{
 			{Label: "A"},
 			{Label: "B"},
 			{Label: "C"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "A"}, Target: models.Node{Label: "B"}, Weight: 1},
-			{Source: models.Node{Label: "B"}, Target: models.Node{Label: "C"}, Weight: 2},
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "A"}, Target: model.Node{Label: "B"}, Weight: 1},
+			{Source: model.Node{Label: "B"}, Target: model.Node{Label: "C"}, Weight: 2},
 		},
 	}
 
-	checker := task_check.NewChecker()
+	checker := taskcheck.NewChecker()
 
 	source := "A"
 	target := "C"
@@ -247,10 +247,10 @@ func TestChecker_CheckMinPath(t *testing.T) {
 		"C": 3,
 	}
 
-	answer := models.Graph{
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "A"}, Target: models.Node{Label: "B"}, Weight: 1, Color: "red"},
-			{Source: models.Node{Label: "B"}, Target: models.Node{Label: "C"}, Weight: 2, Color: "red"},
+	answer := model.Graph{
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "A"}, Target: model.Node{Label: "B"}, Weight: 1, Color: "red"},
+			{Source: model.Node{Label: "B"}, Target: model.Node{Label: "C"}, Weight: 2, Color: "red"},
 		},
 	}
 
@@ -262,33 +262,33 @@ func TestChecker_CheckMinPath(t *testing.T) {
 
 // Тест для CheckLinearToLine
 func TestChecker_CheckLinearToLine(t *testing.T) {
-	task := models.Graph{
-		Nodes: []models.Node{
+	task := model.Graph{
+		Nodes: []model.Node{
 			{Label: "A"},
 			{Label: "B"},
 			{Label: "C"},
 			{Label: "D"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "A"}, Target: models.Node{Label: "B"}, Label: "1"},
-			{Source: models.Node{Label: "B"}, Target: models.Node{Label: "C"}, Label: "2"},
-			{Source: models.Node{Label: "C"}, Target: models.Node{Label: "D"}, Label: "3"},
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "A"}, Target: model.Node{Label: "B"}, Label: "1"},
+			{Source: model.Node{Label: "B"}, Target: model.Node{Label: "C"}, Label: "2"},
+			{Source: model.Node{Label: "C"}, Target: model.Node{Label: "D"}, Label: "3"},
 		},
 	}
 
-	answer := models.Graph{
-		Nodes: []models.Node{
+	answer := model.Graph{
+		Nodes: []model.Node{
 			{Label: "1"},
 			{Label: "2"},
 			{Label: "3"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "1"}, Target: models.Node{Label: "2"}},
-			{Source: models.Node{Label: "2"}, Target: models.Node{Label: "3"}},
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "1"}, Target: model.Node{Label: "2"}},
+			{Source: model.Node{Label: "2"}, Target: model.Node{Label: "3"}},
 		},
 	}
 
-	checker := task_check.NewChecker()
+	checker := taskcheck.NewChecker()
 	score := checker.CheckLinearToLine(&task, &answer)
 	if score == 0 {
 		t.Errorf("Linear to Line check failed: expected non-zero score, got %d", score)
@@ -297,33 +297,33 @@ func TestChecker_CheckLinearToLine(t *testing.T) {
 
 // Тест для CheckLinearFromLine
 func TestChecker_CheckLinearFromLine(t *testing.T) {
-	task := models.Graph{
-		Nodes: []models.Node{
+	task := model.Graph{
+		Nodes: []model.Node{
 			{Label: "1"},
 			{Label: "2"},
 			{Label: "3"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "1"}, Target: models.Node{Label: "2"}, Label: "a"},
-			{Source: models.Node{Label: "2"}, Target: models.Node{Label: "3"}, Label: "b"},
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "1"}, Target: model.Node{Label: "2"}, Label: "a"},
+			{Source: model.Node{Label: "2"}, Target: model.Node{Label: "3"}, Label: "b"},
 		},
 	}
 
-	answer := models.Graph{
-		Nodes: []models.Node{
+	answer := model.Graph{
+		Nodes: []model.Node{
 			{Label: "A"},
 			{Label: "B"},
 			{Label: "C"},
 			{Label: "D"},
 		},
-		Edges: []models.Edge{
-			{Source: models.Node{Label: "A"}, Target: models.Node{Label: "B"}, Label: "1"},
-			{Source: models.Node{Label: "B"}, Target: models.Node{Label: "C"}, Label: "2"},
-			{Source: models.Node{Label: "C"}, Target: models.Node{Label: "D"}, Label: "3"},
+		Edges: []model.Edge{
+			{Source: model.Node{Label: "A"}, Target: model.Node{Label: "B"}, Label: "1"},
+			{Source: model.Node{Label: "B"}, Target: model.Node{Label: "C"}, Label: "2"},
+			{Source: model.Node{Label: "C"}, Target: model.Node{Label: "D"}, Label: "3"},
 		},
 	}
 
-	checker := task_check.NewChecker()
+	checker := taskcheck.NewChecker()
 	score := checker.CheckLinearFromLine(task, answer)
 	if score == 0 {
 		t.Errorf("Linear from Line check failed: expected non-zero score, got %d", score)
@@ -332,13 +332,13 @@ func TestChecker_CheckLinearFromLine(t *testing.T) {
 
 // Тест для max_
 func TestMax_(t *testing.T) {
-	if result := task_check.Max_(5, 10); result != 10 {
+	if result := taskcheck.Max_(5, 10); result != 10 {
 		t.Errorf("Expected 10, got %d", result)
 	}
-	if result := task_check.Max_(10, 5); result != 10 {
+	if result := taskcheck.Max_(10, 5); result != 10 {
 		t.Errorf("Expected 10, got %d", result)
 	}
-	if result := task_check.Max_(7, 7); result != 7 {
+	if result := taskcheck.Max_(7, 7); result != 7 {
 		t.Errorf("Expected 7, got %d", result)
 	}
 }

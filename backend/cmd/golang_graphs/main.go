@@ -6,13 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"golang_graphs/backend/internal/config"
-	"golang_graphs/backend/internal/controller"
-	"golang_graphs/backend/internal/database"
-	"golang_graphs/backend/internal/controller/task_check"
 
-	"golang_graphs/backend/internal/handler"
-	"golang_graphs/backend/pkg/auth"
-	"golang_graphs/backend/pkg/create_random_string"
 	"log"
 	"net/http"
 	"os"
