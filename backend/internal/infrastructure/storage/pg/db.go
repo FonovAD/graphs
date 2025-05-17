@@ -1,4 +1,4 @@
-package pg
+package storage
 
 import (
 	"fmt"
@@ -7,12 +7,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type PGConnection struct {
-	conn   *sqlx.DB
-	config DBConfig
-}
-
-func (pg *PGConnection) NewDBConnection(config DBConfig) (*PGConnection, error) {
+func NewPGConnection(config PGConfig) (*sqlx.DB, error) {
 	connInfo := fmt.Sprintf(
 		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.Host, config.Port, config.User, config.Password, config.Database,
@@ -27,16 +22,5 @@ func (pg *PGConnection) NewDBConnection(config DBConfig) (*PGConnection, error) 
 		return nil, err
 	}
 
-	return &PGConnection{
-		conn:   conn,
-		config: config,
-	}, nil
-}
-
-func (pg *PGConnection) Close() error {
-	return pg.conn.Close()
-}
-
-func (pg *PGConnection) GetPGConnection() *sqlx.DB {
-	return pg.conn
+	return conn, nil
 }

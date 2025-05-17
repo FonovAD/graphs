@@ -1,4 +1,4 @@
-package studenthandler
+package handler
 
 // import (
 // 	"net/http"

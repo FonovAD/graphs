@@ -1,4 +1,4 @@
-package userservice
+package service
 
 import (
 	"context"
@@ -11,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+const secret = "your-256-bit-secret"
+
 type UserService interface {
 	CreateToken(user *model.User) (string, error)
 	ParseToken(tokenString string) (*model.User, error)
@@ -20,7 +22,7 @@ type userService struct {
 	secret []byte
 }
 
-func NewUserService(secret string) UserService {
+func NewUserService() UserService {
 	return &userService{secret: []byte(secret)}
 }
 

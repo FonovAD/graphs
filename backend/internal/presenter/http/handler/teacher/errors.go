@@ -1,4 +1,4 @@
-package teacherhandler
+package handler
 
 import (
 	"errors"

@@ -1,4 +1,4 @@
-package teacherhandler
+package handler
 
 type CreateUserRequest struct {
 	Email      string `json:"email"`

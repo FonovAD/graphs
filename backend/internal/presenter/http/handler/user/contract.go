@@ -1,4 +1,4 @@
-package userhandler
+package handler
 
 type AuthUserRequest struct {
 	Email    string `json:"email"`

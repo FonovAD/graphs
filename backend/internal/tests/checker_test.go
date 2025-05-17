@@ -2,7 +2,7 @@ package main
 
 import (
 	model "golang_graphs/backend/internal/domain/model/graph"
-	"golang_graphs/backend/internal/domain/student/service/taskcheck"
+	service "golang_graphs/backend/internal/domain/student/service/taskcheck"
 	"math"
 	"testing"
 )
@@ -136,7 +136,7 @@ func TestGraph_DistanceMatrix(t *testing.T) {
 }
 
 func TestCheckAdjacentMatrix(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := service.NewChecker()
 	task := model.Graph{
 		Nodes: []model.Node{
 			{Label: "A"},
@@ -205,7 +205,7 @@ func TestChecker_CheckRadiusAndDiameter(t *testing.T) {
 		},
 	}
 
-	checker := taskcheck.NewChecker()
+	checker := service.NewChecker()
 
 	distMatrixAns := map[string]map[string]int{
 		"A": {"A": 0, "B": 1, "C": 2},
@@ -236,7 +236,7 @@ func TestChecker_CheckMinPath(t *testing.T) {
 		},
 	}
 
-	checker := taskcheck.NewChecker()
+	checker := service.NewChecker()
 
 	source := "A"
 	target := "C"
@@ -288,7 +288,7 @@ func TestChecker_CheckLinearToLine(t *testing.T) {
 		},
 	}
 
-	checker := taskcheck.NewChecker()
+	checker := service.NewChecker()
 	score := checker.CheckLinearToLine(&task, &answer)
 	if score == 0 {
 		t.Errorf("Linear to Line check failed: expected non-zero score, got %d", score)
@@ -323,7 +323,7 @@ func TestChecker_CheckLinearFromLine(t *testing.T) {
 		},
 	}
 
-	checker := taskcheck.NewChecker()
+	checker := service.NewChecker()
 	score := checker.CheckLinearFromLine(task, answer)
 	if score == 0 {
 		t.Errorf("Linear from Line check failed: expected non-zero score, got %d", score)
@@ -332,13 +332,13 @@ func TestChecker_CheckLinearFromLine(t *testing.T) {
 
 // Тест для max_
 func TestMax_(t *testing.T) {
-	if result := taskcheck.Max_(5, 10); result != 10 {
+	if result := service.Max_(5, 10); result != 10 {
 		t.Errorf("Expected 10, got %d", result)
 	}
-	if result := taskcheck.Max_(10, 5); result != 10 {
+	if result := service.Max_(10, 5); result != 10 {
 		t.Errorf("Expected 10, got %d", result)
 	}
-	if result := taskcheck.Max_(7, 7); result != 7 {
+	if result := service.Max_(7, 7); result != 7 {
 		t.Errorf("Expected 7, got %d", result)
 	}
 }

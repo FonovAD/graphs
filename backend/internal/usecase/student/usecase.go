@@ -1,10 +1,10 @@
 package usecase
 
 import (
-	studentrepository "golang_graphs/backend/internal/domain/student/repository"
+	repository "golang_graphs/backend/internal/domain/student/repository"
 	studentservice "golang_graphs/backend/internal/domain/student/service"
-	"golang_graphs/backend/internal/domain/student/service/graphconverter"
-	"golang_graphs/backend/internal/domain/student/service/taskcheck"
+	graphconverter "golang_graphs/backend/internal/domain/student/service/graphconverter"
+	taskcheck "golang_graphs/backend/internal/domain/student/service/taskcheck"
 	userservice "golang_graphs/backend/internal/domain/user/service"
 )
 
@@ -13,7 +13,7 @@ type StudentUseCase interface {
 }
 
 type studentUseCase struct {
-	studentRepo    studentrepository.StudentRepository
+	studentRepo    repository.StudentRepository
 	studentService studentservice.StudentService
 	taskChecker    taskcheck.Checker
 	graphConverter graphconverter.GraphConverter
@@ -21,7 +21,7 @@ type studentUseCase struct {
 }
 
 func NewStudentUseCase(
-	repo studentrepository.StudentRepository,
+	repo repository.StudentRepository,
 	studentService studentservice.StudentService,
 	taskChecker taskcheck.Checker,
 	graphConverter graphconverter.GraphConverter,

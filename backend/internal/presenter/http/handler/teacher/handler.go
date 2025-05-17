@@ -1,4 +1,4 @@
-package teacherhandler
+package handler
 
 import (
 	"context"
@@ -17,7 +17,7 @@ type teacherHandler struct {
 	teacherUseCase usecase.TeacherUseCase
 }
 
-func NewUserHandler(u usecase.TeacherUseCase) TeacherHandler {
+func NewTeacherHandler(u usecase.TeacherUseCase) TeacherHandler {
 	return &teacherHandler{u}
 }
 

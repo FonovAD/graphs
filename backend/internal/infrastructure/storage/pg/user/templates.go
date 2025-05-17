@@ -1,4 +1,4 @@
-package pg
+package storage
 
 const (
 	SelectUserByEmail = `

@@ -1,4 +1,4 @@
-package studentrepository
+package repository
 
 type StudentRepository interface {
 }

@@ -6,6 +6,9 @@ import (
 	"flag"
 	"fmt"
 	"golang_graphs/backend/internal/config"
+	storage "golang_graphs/backend/internal/infrastructure/storage/pg"
+	"golang_graphs/backend/internal/interactor"
+	"golang_graphs/backend/internal/presenter/http/router"
 
 	"log"
 	"net/http"
@@ -43,24 +46,16 @@ func main() {
 		log.Fatalf("failed to parse config: %e\n", err)
 	}
 
-	db, err := setupDb(cfg)
+	conn, err := storage.NewPGConnection(cfg.Postgres)
 	if err != nil {
 		log.Fatalf("db error %e\n", err)
 	}
+	e := setupEcho()
 
-	creator := create_random_string.New(5)
+	i := interactor.NewInteractor(conn)
+	h := i.NewAppHandler()
 
-	authService := auth.New("your-256-bit-secret")
-
-	checker := task_check.NewChecker()
-
-	userCtrl := controller.NewController(db, creator, authService, checker)
-
-	commonHandler := handler.New(userCtrl)
-
-	e := setupEcho(authService, rootPath)
-
-	handler.SetupRoutes(e, commonHandler)
+	router.NewRouter(e, h)
 
 	log.Println("prometheus setup start")
 
@@ -82,6 +77,12 @@ func main() {
 	if err := e.Shutdown(ctx); err != nil {
 		e.Logger.Fatal(err)
 	}
+
+	defer func() {
+		if err := conn.Close(); err != nil {
+			e.Logger.Fatal(fmt.Sprintf("failed to close db: %v", err))
+		}
+	}()
 }
 
 func setupPrometheus() {
@@ -106,18 +107,7 @@ func parseRootPath() string {
 	return rootPath
 }
 
-func setupDb(cfg config.Config) (database.Database, error) {
-	// create a database connection
-	db, err := database.NewDatabase(cfg.Postgres)
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to create database conn %e\n", err)
-	}
-
-	return db, nil
-}
-
-func setupEcho(authService auth.Service, rootPath string) *echo.Echo {
+func setupEcho() *echo.Echo {
 	e := echo.New()
 
 	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {

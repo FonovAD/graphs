@@ -1,6 +1,6 @@
-package pg
+package storage
 
-type DBConfig struct {
+type PGConfig struct {
 	Database string `config:"POSTGRES_DB" yaml:"database"`
 	User     string `config:"POSTGRES_USER" yaml:"user"`
 	Password string `config:"POSTGRES_PASSWORD" yaml:"password"`

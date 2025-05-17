@@ -1,4 +1,4 @@
-package graphconverter
+package service
 
 import (
 	"context"

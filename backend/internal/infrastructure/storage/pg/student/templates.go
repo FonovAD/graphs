@@ -1,4 +1,4 @@
-package pg
+package storage
 
 const (
 	InsertIntoTaskResult = `INSERT INTO taskresult (task_type, usersid, grade)

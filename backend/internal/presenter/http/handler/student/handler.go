@@ -1,4 +1,4 @@
-package studenthandler
+package handler
 
 import usecase "golang_graphs/backend/internal/usecase/student"
 
@@ -8,7 +8,7 @@ type studentHandler struct {
 	studentUseCase usecase.StudentUseCase
 }
 
-func NewUserHandler(u usecase.StudentUseCase) StudentHandler {
+func NewStudentHandler(u usecase.StudentUseCase) StudentHandler {
 	return &studentHandler{u}
 }
 

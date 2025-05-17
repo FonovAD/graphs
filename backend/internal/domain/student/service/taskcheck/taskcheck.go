@@ -1,4 +1,4 @@
-package taskcheck
+package service
 
 import (
 	model "golang_graphs/backend/internal/domain/model/graph"

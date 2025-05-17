@@ -1,4 +1,4 @@
-package graphconverter
+package service
 
 type NodeDataJSON struct {
 	Id     string `json:"id"`
