@@ -8,6 +8,7 @@ import (
 	"golang_graphs/backend/internal/config"
 	storage "golang_graphs/backend/internal/infrastructure/storage/pg"
 	"golang_graphs/backend/internal/interactor"
+	"golang_graphs/backend/internal/logger"
 	"golang_graphs/backend/internal/presenter/http/router"
 
 	"log"
@@ -46,13 +47,15 @@ func main() {
 		log.Fatalf("failed to parse config: %e\n", err)
 	}
 
+	logger := logger.NewLogger()
+
 	conn, err := storage.NewPGConnection(cfg.Postgres)
 	if err != nil {
 		log.Fatalf("db error %e\n", err)
 	}
 	e := setupEcho()
 
-	i := interactor.NewInteractor(conn)
+	i := interactor.NewInteractor(conn, logger)
 	h := i.NewAppHandler()
 
 	router.NewRouter(e, h)
@@ -64,7 +67,7 @@ func main() {
 	log.Println("prometheus setup end")
 
 	go func() {
-		if err := e.Start(":" + os.Getenv("PORT")); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := e.Start(":8081"); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			e.Logger.Fatal("shutting down the server")
 		}
 	}()

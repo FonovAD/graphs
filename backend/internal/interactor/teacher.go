@@ -9,7 +9,7 @@ import (
 )
 
 func (i *interactor) NewTeacherRepository() repository.TeacherRepository {
-	return storage.NewTeacherRepository(i.conn)
+	return storage.NewTeacherRepository(i.conn, i.logger)
 }
 
 func (i *interactor) NewTeacherService() service.TeacherService {

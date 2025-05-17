@@ -49,6 +49,7 @@ func (u *teacherUseCase) CreateUser(ctx context.Context, userDTO CreateUserDTO) 
 		Password:         hash,
 		FirstName:        userDTO.FirstName,
 		LastName:         userDTO.LastName,
+		FatherName:       userDTO.FatherName,
 		Role:             "student",
 		PasswordSalt:     salt,
 	}

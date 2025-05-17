@@ -10,11 +10,13 @@ import (
 func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	e.GET("/ping", Ping)
 
-	userRouter := e.Group("/api/v1")
+	userRouter := e.Group("/api/v1/user")
 	userRouter.POST("/auth_user", h.AuthUser)
 
-	teacherRouter := e.Group("/api/v1")
+	teacherRouter := e.Group("/api/v1/teacher")
 	teacherRouter.POST("/create_user", h.CreateUser)
+
+	// studentRouter := e.Group("/api/v1/student")
 }
 
 func Ping(ctx echo.Context) error {

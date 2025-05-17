@@ -37,16 +37,16 @@ func (h *teacherHandler) CreateUser(ctx echo.Context) error {
 		LastName:   request.LastName,
 		FatherName: request.FatherName,
 	}
+
 	response, err := h.teacherUseCase.CreateUser(ctxBack, createUserDTO)
-	if err != nil && (errors.Is(err, usecase.ErrShortPassword) ||
-		errors.Is(err, usecase.ErrShortFirstname) ||
-		errors.Is(err, usecase.ErrShortLastname)) {
-		ctx.Set("error", err.Error())
-
-		return ctx.JSON(http.StatusInternalServerError, BadRequestResponse{ErrorMsg: err.Error()})
-	}
-
 	if err != nil {
+		if errors.Is(err, usecase.ErrShortPassword) || errors.Is(err, usecase.ErrShortFirstname) || errors.Is(err, usecase.ErrShortLastname) {
+
+			ctx.Set("error", err.Error())
+
+			return ctx.JSON(http.StatusInternalServerError, BadRequestResponse{ErrorMsg: err.Error()})
+		}
+
 		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 

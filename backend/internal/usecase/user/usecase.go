@@ -38,7 +38,7 @@ func (u *userUseCase) AuthUser(ctx context.Context, userDTO AuthUserDTO) (string
 
 	passwd := userDTO.Password + user.PasswordSalt
 
-	if err := bcrypt.CompareHashAndPassword([]byte(userDTO.Password), []byte(passwd)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(passwd)); err != nil {
 		return "", fmt.Errorf("incorrect nick or password %w", err)
 	}
 

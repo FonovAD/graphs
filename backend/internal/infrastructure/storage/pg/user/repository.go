@@ -6,26 +6,27 @@ import (
 	"errors"
 	model "golang_graphs/backend/internal/domain/model/user"
 	userrepository "golang_graphs/backend/internal/domain/user/repository"
+	"golang_graphs/backend/internal/logger"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/sirupsen/logrus"
 )
 
 type userRepository struct {
-	conn *sqlx.DB
+	conn   *sqlx.DB
+	logger logger.Logger
 }
 
-func NewUserRepository(conn *sqlx.DB) userrepository.UserRepository {
-	return &userRepository{conn}
+func NewUserRepository(conn *sqlx.DB, logger logger.Logger) userrepository.UserRepository {
+	return &userRepository{conn: conn, logger: logger}
 }
 
 func (r *userRepository) SelectUserByEmail(ctx context.Context, email string) (*model.User, error) {
 	var user model.User
-	logrus.WithFields(logrus.Fields{"op": "infra.user.repo.SelectUserByEmail"}).Info("email: ", email)
 	err := r.conn.QueryRowxContext(ctx, SelectUserByEmail, email).StructScan(&user)
 
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
+			r.logger.LogInfo("infra.user.repo.SelectUserByEmail", err, email)
 			return nil, ErrUserNotFound
 		}
 

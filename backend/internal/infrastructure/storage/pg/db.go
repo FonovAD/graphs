@@ -9,8 +9,8 @@ import (
 
 func NewPGConnection(config PGConfig) (*sqlx.DB, error) {
 	connInfo := fmt.Sprintf(
-		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		config.Host, config.Port, config.User, config.Password, config.Database,
+		"postgresql://%s:%s@%s:%s/%s?sslmode=disable",
+		config.User, config.Password, config.Host, config.Port, config.Database,
 	)
 	conn, err := sqlx.Open("postgres", connInfo)
 	if err != nil {
