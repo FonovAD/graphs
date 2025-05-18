@@ -13,6 +13,14 @@ CREATE TABLE IF NOT EXISTS users
     UNIQUE (email)
 );
 
+CREATE TABLE IF NOT EXISTS groups
+(
+    groups_id SERIAL NOT NULL,
+    groupsname VARCHAR(10) NOT NULL,
+    PRIMARY KEY (groups_id)
+);
+
+
 CREATE TABLE IF NOT EXISTS teacher
 (
     teacherid SERIAL NOT NULL,
@@ -28,7 +36,7 @@ CREATE TABLE IF NOT EXISTS students
     groupsid INT NOT NULL,
     PRIMARY KEY (student_id),
     FOREIGN KEY (usersid) REFERENCES users(usersid),
-    FOREIGN KEY (groupsid) REFERENCES groups(groupsid)
+    FOREIGN KEY (groupsid) REFERENCES groups(groups_id)
 );
 
 CREATE TABLE IF NOT EXISTS admins
@@ -37,13 +45,6 @@ CREATE TABLE IF NOT EXISTS admins
     usersid INT NOT NULL,
     PRIMARY KEY (admin_id),
     FOREIGN KEY (usersid) REFERENCES users(usersid)
-);
-
-CREATE TABLE IF NOT EXISTS groups
-(
-    groups_id SERIAL NOT NULL,
-    groupsname VARCHAR(10) NOT NULL,
-    PRIMARY KEY (groupsid)
 );
 
 CREATE TABLE IF NOT EXISTS labs
@@ -67,7 +68,7 @@ CREATE TABLE IF NOT EXISTS user_lab
     start_time TIMESTAMP NOT NULL,
     teacher_id INT NOT NULL,
     deadline TIMESTAMP NOT NULL,
-    score INT NOT NULL,
+    score INT,
     PRIMARY KEY (user_lab_id),
     FOREIGN KEY (teacher_id) REFERENCES teacher(teacherid),
     FOREIGN KEY (user_id) REFERENCES users(usersid),
@@ -123,7 +124,7 @@ CREATE TABLE IF NOT EXISTS teachergroup
     groupsid INT NOT NULL,
     PRIMARY KEY (teachergroupid),
     FOREIGN KEY (teacherid) REFERENCES teacher(teacherid),
-    FOREIGN KEY (groupsid) REFERENCES groups(groupsid)
+    FOREIGN KEY (groupsid) REFERENCES groups(groups_id)
 );
 
 
