@@ -1,7 +1,90 @@
 package storage
 
 const (
-	insertIntoUsers = `INSERT INTO users (role, first_name, last_name, email, father_name, password, passwordsalt, date_registration)
+	insertIntoUsers = `
+	INSERT INTO users (role, first_name, last_name, email, father_name, password, passwordsalt, date_registration)
 	VALUES (:role, :first_name, :last_name, :email, :father_name, :password, :passwordsalt, :date_registration)  RETURNING usersid;
+	`
+
+	selectAllModules = `SELECT module_id, type FROM modules;`
+
+	createLab = `
+	INSERT INTO labs(name, description, duration, registration_date, teacher_id) 
+	VALUES (:name, :description, :duration, :registration_date, :teacher_id) RETURNING lab_id;
+	`
+
+	addModuleToLab = `
+	INSERT INTO module_lab(weight, lab_id, module_id) 
+	VALUES (:weight, :lab_id, :module_id) RETURNING module_lab_id;
+	`
+
+	selectModulesFromLab = `
+	SELECT l.lab_id, ml.module_lab_id, m.module_id, m.type
+	FROM labs l 
+	INNER JOIN module_lab ml ON l.lab_id = ml.lab_id
+	INNER JOIN modules m ON ml.module_id = m.module_id;
+	`
+
+	removeModuleFromLab = `
+	DELETE FROM module_lab 
+	WHERE module_lab_id = :module_lab_id;
+	`
+
+	selectLabInfo = `
+	SELECT 
+    l.lab_id, 
+    l.name, 
+    l.description, 
+    l.duration, 
+    l.registration_date, 
+    CONCAT_WS(' ', u.first_name, u.last_name, u.father_name) AS assigne
+	FROM labs l 
+	INNER JOIN teacher t ON t.teacherid = l.teacher_id 
+	INNER JOIN users u ON u.usersid = t.usersid;
+	`
+
+	removeLabFromUserLab = `
+	DELETE FROM user_lab 
+	WHERE user_id = :user_id;
+	`
+
+	updateLabInfo = `
+	UPDATE labs 
+	SET name = :name, description = :description, duration = :duration
+	WHERE lab_id = :lab_id;
+	`
+
+	insertLabToStudent = `
+	INSERT INTO user_lab(user_id, lab_id, assignment_date, start_time, teacher_id, deadline) 
+	VALUES (:user_id, :lab_id, :assignment_date, :start_time, :teacher_id, :deadline) RETURNING user_lab_id;
+	`
+
+	insertLabToStudentGroup = `
+	INSERT INTO user_lab (
+    user_id, 
+    lab_id, 
+    assignment_date, 
+    start_time, 
+    teacher_id, 
+    deadline,
+    score
+	)
+	SELECT s.usersid, :lab_id, :assignment_date, :start_time, :teacher_id, :deadline, NULL                       
+	FROM students s  
+	);
+	`
+
+	selectNonExistingUserLabs = `
+	SELECT l.lab_id, l.name 
+	FROM labs l 
+	LEFT OUTER JOIN user_lab ul ON l.lab_id = ul.lab_id 
+	LIMIT :limit OFFSET :offset;
+	`
+
+	selectExistingUserLabs = `
+	SELECT l.lab_id, l.name 
+	FROM labs l 
+	INNER JOIN user_lab ul ON l.lab_id = ul.lab_id 
+	LIMIT :limit OFFSET :offset;
 	`
 )
