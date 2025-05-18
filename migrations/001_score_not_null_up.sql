@@ -1,0 +1,1 @@
+ALTER TABLE user_lab ALTER COLUMN score DROP NOT NULL;
