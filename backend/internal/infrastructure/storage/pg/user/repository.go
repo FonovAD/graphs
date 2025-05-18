@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	model "golang_graphs/backend/internal/domain/model/user"
+	model "golang_graphs/backend/internal/domain/model"
 	userrepository "golang_graphs/backend/internal/domain/user/repository"
 	"golang_graphs/backend/internal/logger"
 

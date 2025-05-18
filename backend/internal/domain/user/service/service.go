@@ -1,9 +1,8 @@
 package service
 
 import (
-	"context"
 	"fmt"
-	model "golang_graphs/backend/internal/domain/model/user"
+	model "golang_graphs/backend/internal/domain/model"
 	"log"
 	"strconv"
 
@@ -28,7 +27,7 @@ func NewUserService() UserService {
 
 func (us *userService) CreateToken(user *model.User) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":          strconv.FormatInt(user.Id, 10),
+		"id":          strconv.FormatInt(user.ID, 10),
 		"first_name":  user.FirstName,
 		"last_name":   user.LastName,
 		"father_name": user.FatherName,
@@ -75,7 +74,7 @@ func (us *userService) ParseToken(tokenString string) (*model.User, error) {
 		}
 
 		return &model.User{
-			Id:         userID,
+			ID:         userID,
 			FirstName:  firtsName,
 			LastName:   lastName,
 			FatherName: fatherName,
@@ -84,13 +83,4 @@ func (us *userService) ParseToken(tokenString string) (*model.User, error) {
 	}
 
 	return nil, fmt.Errorf("claim missing")
-}
-
-func (us *userService) AuthToken(ctx context.Context, token string) (*model.User, error) {
-	user, err := us.ParseToken(token)
-	if err != nil {
-		return nil, err
-	}
-
-	return user, nil
 }

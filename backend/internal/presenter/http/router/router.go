@@ -13,10 +13,21 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	userRouter := e.Group("/api/v1/user")
 	userRouter.POST("/auth_user", h.AuthUser)
 
-	teacherRouter := e.Group("/api/v1/teacher")
-	teacherRouter.POST("/create_user", h.CreateUser)
+	teacherRouter := e.Group("/api/v1/teacher", h.TeacherMiddleware())
+	teacherRouter.POST("/create_student", h.CreateStudent)
+	teacherRouter.GET("/modules", h.GetModules)
+	teacherRouter.POST("/create_lab", h.CreateLab)
+	teacherRouter.POST("/lab_info", h.GetLabInfo)
+	teacherRouter.POST("/remove_user_lab", h.RemoveUserLab)
+	teacherRouter.PATCH("/update_lab_info", h.UpdateLabInfo)
+	teacherRouter.POST("/assigne_lab", h.AssignLab)
+	teacherRouter.POST("/assigne_lab_group", h.AssignLabGroup)
+	teacherRouter.POST("/module_lab", h.AddModuleLab)
+	teacherRouter.POST("/remove_module_lab", h.RemoveModuleLab)
+	teacherRouter.POST("/not_assigned_labs", h.GetNonAssignedLabs)
+	teacherRouter.POST("/assigned_labs", h.GetAssignedLabs)
+	teacherRouter.POST("/lab_modules", h.GetLabModules)
 
-	// studentRouter := e.Group("/api/v1/student")
 }
 
 func Ping(ctx echo.Context) error {

@@ -3,7 +3,7 @@ package model
 import "time"
 
 type User struct {
-	Id               int64     `db:"usersid"`
+	ID               int64     `db:"usersid"`
 	DateRegistration time.Time `db:"date_registration"`
 	Email            string    `db:"email"`
 	Password         string    `db:"password"`

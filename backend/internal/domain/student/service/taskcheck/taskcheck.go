@@ -1,7 +1,7 @@
 package service
 
 import (
-	model "golang_graphs/backend/internal/domain/model/graph"
+	model "golang_graphs/backend/internal/domain/model"
 	"math"
 	"strconv"
 

@@ -1,7 +1,7 @@
 package main
 
 import (
-	model "golang_graphs/backend/internal/domain/model/graph"
+	model "golang_graphs/backend/internal/domain/model"
 	service "golang_graphs/backend/internal/domain/student/service/taskcheck"
 	"math"
 	"testing"

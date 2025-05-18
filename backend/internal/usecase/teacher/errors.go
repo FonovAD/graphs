@@ -21,3 +21,7 @@ var ErrLongPassword = errors.New("password is too long")
 var ErrShortEmail = errors.New("email is too short")
 
 var ErrLongEmail = errors.New("email is too long")
+
+var ErrParseToken = errors.New("parse token error")
+
+var ErrNoPermissions = errors.New("no permissions")

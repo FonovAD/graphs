@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
-	model "golang_graphs/backend/internal/domain/model/graph"
+	model "golang_graphs/backend/internal/domain/model"
 	"strconv"
 )
 

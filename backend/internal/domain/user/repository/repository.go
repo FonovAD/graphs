@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	model "golang_graphs/backend/internal/domain/model/user"
+	model "golang_graphs/backend/internal/domain/model"
 )
 
 type UserRepository interface {

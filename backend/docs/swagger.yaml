@@ -1,384 +1,620 @@
-definitions:
-  dto.Result:
-    properties:
-      end:
-        type: string
-      grade:
-        type: integer
-      id:
-        type: integer
-      maxGrade:
-        type: integer
-      start:
-        type: string
-      studentID:
-        type: integer
-      testID:
-        type: integer
-    type: object
-  dto.Task:
-    properties:
-      answer:
-        type: string
-      data:
-        type: string
-      description:
-        type: string
-      id:
-        type: integer
-      maxGrade:
-        type: integer
-      name:
-        type: string
-      testID:
-        type: integer
-    type: object
-  dto.Test:
-    properties:
-      description:
-        type: string
-      end:
-        type: string
-      id:
-        type: integer
-      name:
-        type: string
-      start:
-        type: string
-    type: object
-  models.Answer:
-    properties:
-      answer:
-        type: string
-      taskID:
-        type: integer
-    type: object
-  models.AuthUserRequest:
-    properties:
-      email:
-        type: string
-      password:
-        type: string
-    type: object
-  models.AuthUserResponse:
-    properties:
-      token:
-        type: string
-    type: object
-  models.BadRequestResponse:
-    properties:
-      error_msg:
-        type: string
-    type: object
-  models.CheckResultsRequest:
-    properties:
-      token:
-        type: string
-    type: object
-  models.CheckResultsResponse:
-    properties:
-      results:
-        items:
-          $ref: '#/definitions/dto.Result'
-        type: array
-    type: object
-  models.CreateUserRequest:
-    properties:
-      email:
-        type: string
-      firstName:
-        type: string
-      lastName:
-        type: string
-      password:
-        type: string
-    type: object
-  models.CreateUserResponse:
-    properties:
-      token:
-        type: string
-    type: object
-  models.GetTasksFromTestsRequest:
-    properties:
-      test_id:
-        type: integer
-    type: object
-  models.GetTasksFromTestsResponse:
-    properties:
-      tasks:
-        items:
-          $ref: '#/definitions/dto.Task'
-        type: array
-    type: object
-  models.GetTestsResponse:
-    properties:
-      tests:
-        items:
-          $ref: '#/definitions/dto.Test'
-        type: array
-    type: object
-  models.InsertTaskRequest:
-    properties:
-      task:
-        $ref: '#/definitions/dto.Task'
-    type: object
-  models.InsertTaskResponse:
-    properties:
-      task_id:
-        type: integer
-    type: object
-  models.InsertTestRequest:
-    properties:
-      test:
-        $ref: '#/definitions/dto.Test'
-    type: object
-  models.InsertTestResponse:
-    properties:
-      test_id:
-        type: integer
-    type: object
-  models.InternalServerErrorResponse:
-    properties:
-      error_msg:
-        type: string
-    type: object
-  models.SendAnswersRequest:
-    properties:
-      answers:
-        items:
-          $ref: '#/definitions/models.Answer'
-        type: array
-      testID:
-        type: integer
-      token:
-        type: string
-    type: object
-  models.SendAnswersResponse:
-    properties:
-      result:
-        $ref: '#/definitions/dto.Result'
-    type: object
-host: localhost:8080
+openapi: 3.0.0
 info:
-  contact: {}
-  description: This is a sample server celler server.
-  title: Swagger Example API
-  version: "1.0"
+  title: GraphLans API
+  description: API for GraphLabs
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Main API server
+tags:
+  - name: user
+    description: User operations
+  - name: teacher
+    description: Teacher operations
 paths:
-  /auth_user:
-    post:
-      consumes:
-      - application/json
-      description: AuthUser
-      parameters:
-      - description: AuthUser
-        in: body
-        name: AuthUser
-        required: true
-        schema:
-          $ref: '#/definitions/models.AuthUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.AuthUserResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.BadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.InternalServerErrorResponse'
-      summary: AuthUser
-  /check_results:
-    post:
-      description: CheckResults
-      parameters:
-      - description: CheckResultsRequest
-        in: body
-        name: CheckResultsRequest
-        required: true
-        schema:
-          $ref: '#/definitions/models.CheckResultsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.CheckResultsResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.BadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.InternalServerErrorResponse'
-      summary: CheckResults
-  /create_user:
-    post:
-      consumes:
-      - application/json
-      description: CreateUser
-      parameters:
-      - description: CreateUser
-        in: body
-        name: CreateUser
-        required: true
-        schema:
-          $ref: '#/definitions/models.CreateUserRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.CreateUserResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.BadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.InternalServerErrorResponse'
-      summary: CreateUser
-  /get_tasks_from_test:
-    post:
-      consumes:
-      - application/json
-      description: GetTasksFromTest
-      parameters:
-      - description: GetTasksFromTest
-        in: body
-        name: GetTasksFromTest
-        required: true
-        schema:
-          $ref: '#/definitions/models.GetTasksFromTestsRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.GetTasksFromTestsResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.BadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.InternalServerErrorResponse'
-      summary: GetTasksFromTest
-  /get_tests:
+  /ping:
     get:
-      description: GetTests
-      produces:
-      - application/json
+      summary: Ping service
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.GetTestsResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.BadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.InternalServerErrorResponse'
-      summary: GetTests
-  /insert_task:
+        '200':
+          description: Successful ping response
+          content:
+            text/plain:
+              example: pong
+
+  /api/v1/user/auth_user:
     post:
-      consumes:
-      - application/json
-      description: InsertTask
-      parameters:
-      - description: InsertTest
-        in: body
-        name: InsertTest
-        required: true
-        schema:
-          $ref: '#/definitions/models.InsertTaskRequest'
-      produces:
-      - application/json
+      tags: [user]
+      summary: Authenticate user
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.InsertTaskResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.BadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.InternalServerErrorResponse'
-      summary: InsertTask
-  /insert_test:
+        '200':
+          description: Successful authentication
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/create_student:
     post:
-      consumes:
-      - application/json
-      description: InsertTest
-      parameters:
-      - description: InsertTest
-        in: body
-        name: InsertTest
+      tags: [teacher]
+      summary: Create new student
+      requestBody:
         required: true
-        schema:
-          $ref: '#/definitions/models.InsertTestRequest'
-      produces:
-      - application/json
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStudentDTOIn'
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.InsertTestResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.BadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.InternalServerErrorResponse'
-      summary: InsertTest
-  /send_answers:
+        '200':
+          description: Student created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateStudentDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/modules:
+    get:
+      tags: [teacher]
+      summary: Get all modules
+      responses:
+        '200':
+          description: List of modules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetModulesDTOOut'
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/create_lab:
     post:
-      consumes:
-      - application/json
-      description: SendAnswers
-      parameters:
-      - description: SendAnswers
-        in: body
-        name: SendAnswers
+      tags: [teacher]
+      summary: Create new lab
+      requestBody:
         required: true
-        schema:
-          $ref: '#/definitions/models.SendAnswersRequest'
-      produces:
-      - application/json
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateLabDTOIn'
       responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/models.SendAnswersResponse'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/models.BadRequestResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/models.InternalServerErrorResponse'
-      summary: SendAnswers
-securityDefinitions:
-  BasicAuth:
-    type: basic
-swagger: "2.0"
+        '200':
+          description: Lab created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateLabDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/lab_info:
+    post:
+      tags: [teacher]
+      summary: Get lab information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetLabInfoDTOIn'
+      responses:
+        '200':
+          description: Lab information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLabInfoDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/remove_user_lab:
+    post:
+      tags: [teacher]
+      summary: Remove user lab assignment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveUserLabDTOIn'
+      responses:
+        '200':
+          description: User lab removed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoveUserLabDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/update_lab_info:
+    patch:
+      tags: [teacher]
+      summary: Update lab information
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLabInfoDTOIn'
+      responses:
+        '200':
+          description: Lab updated successfully
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/assigne_lab:
+    post:
+      tags: [teacher]
+      summary: Assign lab to student
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignLabDTOIn'
+      responses:
+        '200':
+          description: Lab assigned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignLabDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/assigne_lab_group:
+    post:
+      tags: [teacher]
+      summary: Assign lab to group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignLabGroupDTOIn'
+      responses:
+        '200':
+          description: Lab assigned to group successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssignLabGroupDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/module_lab:
+    post:
+      tags: [teacher]
+      summary: Add module to lab
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddModuleLabDTOIn'
+      responses:
+        '200':
+          description: Module added to lab successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddModuleLabDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/remove_module_lab:
+    post:
+      tags: [teacher]
+      summary: Remove module from lab
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveModuleLabDTOIn'
+      responses:
+        '200':
+          description: Module removed from lab successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RemoveModuleLabDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/not_assigned_labs:
+    post:
+      tags: [teacher]
+      summary: Get non-assigned labs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetNonAssignedLabsDTOIn'
+      responses:
+        '200':
+          description: List of non-assigned labs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetNonAssignedLabsDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/assigned_labs:
+    post:
+      tags: [teacher]
+      summary: Get assigned labs
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetAssignedLabsDTOIn'
+      responses:
+        '200':
+          description: List of assigned labs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetAssignedLabsDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+  /api/v1/teacher/lab_modules:
+    post:
+      tags: [teacher]
+      summary: Get lab modules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GetLabModulesDTOIn'
+      responses:
+        '200':
+          description: List of lab modules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetLabModulesDTOOut'
+        '400':
+          description: Bad request
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    CreateStudentDTOIn:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        fatherName:
+          type: string
+        groupId:
+          type: integer
+          format: int64
+
+    CreateStudentDTOOut:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+
+    GetModulesDTOOut:
+      type: object
+      properties:
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/Module'
+
+    CreateLabDTOIn:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        duration:
+          type: integer
+          format: int64
+        registrationDate:
+          type: string
+          format: date-time
+        teacherId:
+          type: integer
+          format: int64
+
+    CreateLabDTOOut:
+      type: object
+      properties:
+        labId:
+          type: integer
+          format: int64
+
+    GetLabInfoDTOIn:
+      type: object
+      properties:
+        labId:
+          type: integer
+          format: int64
+
+    GetLabInfoDTOOut:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        duration:
+          type: integer
+          format: int64
+        registrationDate:
+          type: string
+          format: date-time
+        teacherId:
+          type: integer
+          format: int64
+        teacherFio:
+          type: string
+
+    RemoveUserLabDTOIn:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        labId:
+          type: integer
+          format: int64
+
+    RemoveUserLabDTOOut:
+      type: object
+      properties:
+        userLabId:
+          type: integer
+          format: int64
+
+    UpdateLabInfoDTOIn:
+      type: object
+      properties:
+        labId:
+          type: integer
+          format: int64
+        labName:
+          type: string
+        description:
+          type: string
+        duration:
+          type: integer
+          format: int64
+
+    AssignLabDTOIn:
+      type: object
+      properties:
+        userId:
+          type: integer
+          format: int64
+        labId:
+          type: integer
+          format: int64
+        assignmentDate:
+          type: string
+          format: date-time
+        startTime:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+
+    AssignLabDTOOut:
+      type: object
+      properties:
+        userLabId:
+          type: integer
+          format: int64
+
+    AssignLabGroupDTOIn:
+      type: object
+      properties:
+        labId:
+          type: integer
+          format: int64
+        assignmentDate:
+          type: string
+          format: date-time
+        startTime:
+          type: string
+          format: date-time
+        deadline:
+          type: string
+          format: date-time
+        groupId:
+          type: integer
+          format: int64
+
+    AssignLabGroupDTOOut:
+      type: object
+      properties:
+        labId:
+          type: integer
+          format: int64
+
+    AddModuleLabDTOIn:
+      type: object
+      properties:
+        labId:
+          type: integer
+          format: int64
+        moduleId:
+          type: integer
+          format: int64
+        weight:
+          type: string
+          format: decimal
+
+    AddModuleLabDTOOut:
+      type: object
+      properties:
+        moduleLabId:
+          type: integer
+          format: int64
+
+    RemoveModuleLabDTOIn:
+      type: object
+      properties:
+        labId:
+          type: integer
+          format: int64
+        moduleId:
+          type: integer
+          format: int64
+
+    RemoveModuleLabDTOOut:
+      type: object
+      properties:
+        moduleLabId:
+          type: integer
+          format: int64
+
+    GetNonAssignedLabsDTOIn:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int64
+
+    GetNonAssignedLabsDTOOut:
+      type: object
+      properties:
+        labs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lab'
+
+    GetAssignedLabsDTOIn:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int64
+
+    GetAssignedLabsDTOOut:
+      type: object
+      properties:
+        labs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserLabWithInfo'
+
+    GetLabModulesDTOIn:
+      type: object
+      properties:
+        labId:
+          type: integer
+          format: int64
+
+    GetLabModulesDTOOut:
+      type: object
+      properties:
+        labId:
+          type: integer
+          format: int64
+        modules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModulesInLab'
+
+    Lab:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        name:
+          type: string
+        description:
+          type: string
+        duration:
+          type: string
+        registrationDate:
+          type: string
+          format: date-time
+        teacherId:
+          type: integer
+          format: int64
+        teacherFio:
+          type: string
+
+    Module:
+      type: object
+      properties:
+        moduleId:
+          type: integer
+          format: int64
+        moduleType:
+          type: string
+        description:
+          type: string
+
+    UserLabWithInfo:
+      type: object
+      properties:
+        userLabId:
+          type: integer
+          format: int64
+        labId:
+          type: integer
+          format: int64
+        labName:
+          type: string
+
+    ModulesInLab:
+      type: object
+      properties:
+        moduleLabId:
+          type: integer
+          format: int64
+        labId:
+          type: integer
+          format: int64
+        moduleId:
+          type: integer
+          format: int64
+        moduleType:
+          type: string
