@@ -24,7 +24,7 @@ const (
 	`
 
 	selectModulesFromLab = `
-	SELECT l.lab_id, ml.module_lab_id, m.weight, m.module_id, m.type
+	SELECT l.lab_id, ml.module_lab_id, ml.weight, m.module_id, m.type
 	FROM labs l 
 	INNER JOIN module_lab ml ON l.lab_id = ml.lab_id
 	INNER JOIN modules m ON ml.module_id = m.module_id
