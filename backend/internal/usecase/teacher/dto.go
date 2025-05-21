@@ -139,3 +139,7 @@ type AuthTokenDTOOut struct {
 	UserID    int64
 	TeacherID int64
 }
+
+type GetGroupsDTOOut struct {
+	Groups []model.Group `json:"groups"`
+}

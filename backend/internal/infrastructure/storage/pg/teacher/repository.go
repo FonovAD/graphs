@@ -252,7 +252,7 @@ func (r *teacherRepository) SelectModulesFromLab(ctx context.Context, lab *model
 
 func (r *teacherRepository) SelectTeacher(ctx context.Context, user *model.User) (*model.Teacher, error) {
 	var teacher model.Teacher
-	rows, err := r.conn.NamedQueryContext(ctx, selectTeacher, user.ID)
+	rows, err := r.conn.NamedQueryContext(ctx, selectTeacher, user)
 	if err != nil {
 		return nil, err
 	}
@@ -266,4 +266,15 @@ func (r *teacherRepository) SelectTeacher(ctx context.Context, user *model.User)
 	}
 
 	return nil, sql.ErrNoRows
+}
+
+func (r *teacherRepository) SelectGroups(ctx context.Context) ([]model.Group, error) {
+	var groups []model.Group
+	err := r.conn.SelectContext(ctx, groups, selectGroups)
+	if err != nil {
+		r.logger.LogWarning(opSelectGroups, err, nil)
+		return nil, err
+	}
+
+	return groups, nil
 }

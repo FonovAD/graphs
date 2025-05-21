@@ -106,4 +106,9 @@ const (
 	INNER JOIN teacher t ON u.usersid = t.usersid;
 	WHERE u.usersid = :usersid
 	`
+
+	selectGroups = `
+	SELECT g.groups_id, groupsname
+	FROM groups g
+	`
 )

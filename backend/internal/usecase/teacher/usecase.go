@@ -29,6 +29,7 @@ type TeacherUseCase interface {
 	GetNonAssignedLabs(ctx context.Context, in *GetNonAssignedLabsDTOIn) (*GetNonAssignedLabsDTOOut, error)
 	GetAssignedLabs(ctx context.Context, in *GetAssignedLabsDTOIn) (*GetAssignedLabsDTOOut, error)
 	GetLabModules(ctx context.Context, in *GetLabModulesDTOIn) (*GetLabModulesDTOOut, error)
+	GetGroups(ctx context.Context) (*GetGroupsDTOOut, error)
 	GetTeacher(ctx context.Context, user *model.User) (*model.Teacher, error)
 	AuthToken(ctx context.Context, token string) (*AuthTokenDTOOut, error)
 }
@@ -300,6 +301,16 @@ func (u *teacherUseCase) GetTeacher(ctx context.Context, user *model.User) (*mod
 		return nil, err
 	}
 	return out, nil
+}
+
+func (u *teacherUseCase) GetGroups(ctx context.Context) (*GetGroupsDTOOut, error) {
+	groups, err := u.teacherRepo.SelectGroups(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return &GetGroupsDTOOut{
+		Groups: groups,
+	}, nil
 }
 
 // Hash password using the bcrypt hashing algorithm

@@ -20,4 +20,5 @@ type TeacherRepository interface {
 	SelectExistingUserLabs(ctx context.Context, pagination model.Pagination) ([]model.UserLabWithInfo, error)
 	SelectModulesFromLab(ctx context.Context, lab *model.Lab) ([]model.ModulesInLab, error)
 	SelectTeacher(ctx context.Context, user *model.User) (*model.Teacher, error)
+	SelectGroups(ctx context.Context) ([]model.Group, error)
 }

@@ -13,5 +13,6 @@ const (
 	opInsertLabStudentGroup     = "infra.storage.pg.teacher.repo.InsertLabToStudentGroup"
 	opSelectNonExistingUserLabs = "infra.storage.pg.teacher.repo.SelectNonExistingUserLabs"
 	opSelectExistingUserLabs    = "infra.storage.pg.teacher.repo.SelectExistingUserLabs"
-	opSelectModulesFromLab      = "infra.storage.pg.teacher.repo.oSelectModulesFromLab"
+	opSelectModulesFromLab      = "infra.storage.pg.teacher.repo.SelectModulesFromLab"
+	opSelectGroups              = "infra.storage.pg.teacher.repo.SelectGroups"
 )

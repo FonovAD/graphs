@@ -24,6 +24,7 @@ type TeacherHandler interface {
 	GetAssignedLabs(ctx echo.Context) error
 	GetLabModules(ctx echo.Context) error
 	TeacherMiddleware() echo.MiddlewareFunc
+	GetGroups(ctx echo.Context) error
 }
 
 type teacherHandler struct {
@@ -65,7 +66,7 @@ func (h *teacherHandler) GetModules(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -83,7 +84,7 @@ func (h *teacherHandler) CreateLab(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -101,7 +102,7 @@ func (h *teacherHandler) GetLabInfo(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -119,7 +120,7 @@ func (h *teacherHandler) RemoveUserLab(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -137,7 +138,7 @@ func (h *teacherHandler) UpdateLabInfo(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, nil)
@@ -156,7 +157,7 @@ func (h *teacherHandler) AssignLab(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -175,7 +176,7 @@ func (h *teacherHandler) AssignLabGroup(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -193,7 +194,7 @@ func (h *teacherHandler) AddModuleLab(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -211,7 +212,7 @@ func (h *teacherHandler) RemoveModuleLab(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -229,7 +230,7 @@ func (h *teacherHandler) GetNonAssignedLabs(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -247,7 +248,7 @@ func (h *teacherHandler) GetAssignedLabs(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
@@ -265,7 +266,20 @@ func (h *teacherHandler) GetLabModules(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: err.Error()})
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (h *teacherHandler) GetGroups(ctx echo.Context) error {
+	ctxBack := context.Background()
+
+	response, err := h.teacherUseCase.GetGroups(ctxBack)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
 	return ctx.JSON(http.StatusOK, response)
