@@ -22,7 +22,7 @@ type UserLabGroup struct {
 	TeacherID      int64     `db:"teacher_id"`
 	Deadline       time.Time `db:"deadline"`
 	Score          *int      `db:"score"`
-	GroupID        int64     `db:"groupsid"`
+	GroupID        int64     `db:"groups_id"`
 }
 
 type UserLabWithInfo struct {
