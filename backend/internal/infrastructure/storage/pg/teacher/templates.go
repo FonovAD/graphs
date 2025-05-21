@@ -19,8 +19,8 @@ const (
 
 	addModuleToLab = `
 	INSERT INTO module_lab(weight, lab_id, module_id) 
-	VALUES (:weight, :lab_id, :module_id) RETURNING module_lab_id
-	ON CONFLICT (lab_id, module_id) DO NOTHING;
+	VALUES (:weight, :lab_id, :module_id) ON CONFLICT (lab_id, module_id) DO NOTHING
+	RETURNING module_lab_id;
 	`
 
 	selectModulesFromLab = `
