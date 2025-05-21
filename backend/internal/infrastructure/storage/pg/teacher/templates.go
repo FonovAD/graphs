@@ -80,8 +80,7 @@ const (
 	)
 	SELECT s.usersid, :lab_id, :assignment_date, :start_time, :teacher_id, :deadline, NULL                       
 	FROM students s
-	WHERE s.groupsid = :groupsid
-	);
+	WHERE s.groups_id = :groups_id;
 	`
 
 	selectNonExistingUserLabs = `
