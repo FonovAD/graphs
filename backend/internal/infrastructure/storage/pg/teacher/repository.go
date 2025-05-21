@@ -254,17 +254,19 @@ func (r *teacherRepository) SelectTeacher(ctx context.Context, user *model.User)
 	var teacher model.Teacher
 	rows, err := r.conn.NamedQueryContext(ctx, selectTeacher, user)
 	if err != nil {
+		r.logger.LogWarning(opSelectTeacher, err, user.ID)
 		return nil, err
 	}
 
 	if rows.Next() {
 		if err := rows.Scan(&teacher.ID); err != nil {
+			r.logger.LogWarning(opSelectTeacher, err, user.ID)
 			return nil, err
 		}
 		teacher.UserID = user.ID
 		return &teacher, nil
 	}
-
+	r.logger.LogDebug(opSelectTeacher, nil, user.ID)
 	return nil, sql.ErrNoRows
 }
 

@@ -15,4 +15,5 @@ const (
 	opSelectExistingUserLabs    = "infra.storage.pg.teacher.repo.SelectExistingUserLabs"
 	opSelectModulesFromLab      = "infra.storage.pg.teacher.repo.SelectModulesFromLab"
 	opSelectGroups              = "infra.storage.pg.teacher.repo.SelectGroups"
+	opSelectTeacher             = "infra.storage.pg.teacher.repo.SelectTeacher"
 )

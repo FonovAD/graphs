@@ -78,6 +78,7 @@ func (h *teacherHandler) CreateLab(ctx echo.Context) error {
 		ctx.Set("error", err.Error())
 		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
 	}
+	request.TeacherID = ctx.Get("teacherID").(int64)
 
 	ctxBack := context.Background()
 	response, err := h.teacherUseCase.CreateLab(ctxBack, &request)
