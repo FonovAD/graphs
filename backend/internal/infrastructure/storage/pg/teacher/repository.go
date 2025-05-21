@@ -218,7 +218,7 @@ func (r *teacherRepository) InsertLabToStudentGroup(ctx context.Context, userLab
 func (r *teacherRepository) SelectNonExistingUserLabs(ctx context.Context, pagination model.Pagination) ([]model.Lab, error) {
 	var labs []model.Lab
 
-	err := r.conn.SelectContext(ctx, &labs, selectNonExistingUserLabs, pagination)
+	err := r.conn.SelectContext(ctx, &labs, selectNonExistingUserLabs, pagination.Limit, pagination.Offset)
 	if err != nil {
 		r.logger.LogDebug(opSelectNonExistingUserLabs, err, nil)
 		return nil, err
@@ -230,7 +230,7 @@ func (r *teacherRepository) SelectNonExistingUserLabs(ctx context.Context, pagin
 func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context, pagination model.Pagination) ([]model.UserLabWithInfo, error) {
 	var userLabs []model.UserLabWithInfo
 
-	err := r.conn.SelectContext(ctx, &userLabs, selectExistingUserLabs, pagination)
+	err := r.conn.SelectContext(ctx, &userLabs, selectExistingUserLabs, pagination.Limit, pagination.Offset)
 	if err != nil {
 		r.logger.LogDebug(opSelectExistingUserLabs, err, pagination)
 		return nil, err

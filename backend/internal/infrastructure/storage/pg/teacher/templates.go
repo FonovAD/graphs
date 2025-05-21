@@ -6,8 +6,8 @@ const (
 	VALUES (:role, :first_name, :last_name, :email, :father_name, :password, :passwordsalt, :date_registration)  RETURNING usersid;`
 
 	insertIntoStudent = `
-	INSERT INTO students (usersid, groupsid) 
-	VALUES (:usersid, :groupsid)  RETURNING student_id;
+	INSERT INTO students (usersid, groups_id) 
+	VALUES (:usersid, :groups_id)  RETURNING student_id;
 	`
 
 	selectAllModules = `SELECT module_id, type FROM modules;`
@@ -28,7 +28,7 @@ const (
 	FROM labs l 
 	INNER JOIN module_lab ml ON l.lab_id = ml.lab_id
 	INNER JOIN modules m ON ml.module_id = m.module_id
-	WHERE l.lab_id = :lab_id;
+	WHERE l.lab_id = $1;
 	`
 
 	removeModuleFromLab = `
@@ -89,14 +89,14 @@ const (
 	FROM labs l 
 	LEFT OUTER JOIN user_lab ul ON l.lab_id = ul.lab_id 
 	WHERE ul.lab_id IS NULL
-	LIMIT :limit OFFSET :offset;
+	LIMIT $1 OFFSET $2;
 	`
 
 	selectExistingUserLabs = `
 	SELECT ul.user_lab_id, l.lab_id, l.name 
 	FROM labs l 
 	INNER JOIN user_lab ul ON l.lab_id = ul.lab_id 
-	LIMIT :limit OFFSET :offset;
+	LIMIT $1 OFFSET $2;
 	`
 
 	selectTeacher = `
