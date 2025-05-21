@@ -90,7 +90,6 @@ const (
 	LEFT OUTER JOIN user_lab ul ON l.lab_id = ul.lab_id 
 	WHERE ul.lab_id IS NULL
 	LIMIT :limit OFFSET :offset;
-
 	`
 
 	selectExistingUserLabs = `
@@ -103,12 +102,12 @@ const (
 	selectTeacher = `
 	SELECT t.teacherid
 	FROM users u
-	INNER JOIN teacher t ON u.usersid = t.usersid;
-	WHERE u.usersid = :usersid
+	INNER JOIN teacher t ON u.usersid = t.usersid
+	WHERE u.usersid = :usersid;
 	`
 
 	selectGroups = `
 	SELECT g.groups_id, groupsname
-	FROM groups g
+	FROM groups g;
 	`
 )
