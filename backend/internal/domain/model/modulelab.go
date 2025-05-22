@@ -15,8 +15,9 @@ type LabWithModules struct {
 }
 
 type ModulesInLab struct {
-	ModuleLabID int64  `db:"module_lab_id" json:"moduleLabId"`
-	LabID       int64  `db:"lab_id" json:"labId"`
-	ModuleId    int64  `db:"module_id" json:"moduleId"`
-	ModuleType  string `db:"type" json:"moduleType"`
+	ModuleLabID int64           `db:"module_lab_id" json:"moduleLabId"`
+	LabID       int64           `db:"lab_id" json:"labId"`
+	ModuleId    int64           `db:"module_id" json:"moduleId"`
+	ModuleType  string          `db:"type" json:"moduleType"`
+	Weight      decimal.Decimal `db:"weight" json:"weight"`
 }

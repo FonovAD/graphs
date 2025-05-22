@@ -1,0 +1,22 @@
+version: '3.5'
+
+networks:
+  graphs:
+
+services:
+  graphs_back_1:
+    container_name: graphs_back
+    build:
+      context: ..
+      dockerfile: prod/Dockerfile
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_DB=graphs
+      - POSTGRES_PASSWORD=password
+      - ENV=docker
+      - METRICS_PORT=9091
+      - PORT=8081
+    ports:
+      - "8080:8080"
+    networks:
+      - graphs

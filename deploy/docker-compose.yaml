@@ -4,60 +4,60 @@ networks:
   graphs:
 
 services:
-  grafana:
-    image: grafana/grafana
-    user: root
-    depends_on:
-      - prometheus
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./grafana:/var/lib/grafana
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
-    container_name: grafana
-    hostname: grafana
-    restart: unless-stopped
-    environment:
-      TZ: "Europe/Moscow"
-    networks:
-      - graphs
+  # grafana:
+  #   image: grafana/grafana
+  #   user: root
+  #   depends_on:
+  #     - prometheus
+  #   ports:
+  #     - "3000:3000"
+  #   volumes:
+  #     - ./grafana:/var/lib/grafana
+  #     - ./grafana/provisioning/:/etc/grafana/provisioning/
+  #   container_name: grafana
+  #   hostname: grafana
+  #   restart: unless-stopped
+  #   environment:
+  #     TZ: "Europe/Moscow"
+  #   networks:
+  #     - graphs
 
-  prometheus:
-    image: prom/prometheus:latest
-    volumes:
-      - ../prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
-    container_name: prometheus
-    hostname: prometheusS
-    command:
-      - --config.file=/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    restart: unless-stopped
-    environment:
-      TZ: "Europe/Moscow"
-    networks:
-      - graphs
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   volumes:
+  #     - ../prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml
+  #   container_name: prometheus
+  #   hostname: prometheusS
+  #   command:
+  #     - --config.file=/etc/prometheus/prometheus.yml
+  #   ports:
+  #     - "9090:9090"
+  #   restart: unless-stopped
+  #   environment:
+  #     TZ: "Europe/Moscow"
+  #   networks:
+  #     - graphs
 
-  node-exporter:
-    image: prom/node-exporter:latest
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    container_name: exporter
-    hostname: exporter
-    command:
-      - --path.procfs=/host/proc
-      - --path.sysfs=/host/sys
-      - --collector.filesystem.ignored-mount-points
-      - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
-    ports:
-      - "9100:9100"
-    restart: unless-stopped
-    environment:
-      TZ: "Europe/Moscow"
-    networks:
-      - graphs
+  # node-exporter:
+  #   image: prom/node-exporter:latest
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #     - /:/rootfs:ro
+  #   container_name: exporter
+  #   hostname: exporter
+  #   command:
+  #     - --path.procfs=/host/proc
+  #     - --path.sysfs=/host/sys
+  #     - --collector.filesystem.ignored-mount-points
+  #     - ^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)
+  #   ports:
+  #     - "9100:9100"
+  #   restart: unless-stopped
+  #   environment:
+  #     TZ: "Europe/Moscow"
+  #   networks:
+  #     - graphs
 
   graphs_back_1:
     container_name: graphs_back_1
@@ -74,38 +74,41 @@ services:
     ports:
       - "8081:8081"
       - "9091:9091"
+    depends_on:
+      graphs_db:
+        condition: service_healthy
     networks:
       - graphs
 
-  graphs_back_2:
-    container_name: graphs_back_2
-    build:
-      context: ..
-      dockerfile: deploy/Dockerfile
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_DB=graphs
-      - POSTGRES_PASSWORD=password
-      - ENV=docker
-      - METRICS_PORT=9092
-      - PORT=8082
-    ports:
-      - "8082:8082"
-      - "9092:9092"
-    networks:
-      - graphs
+  # graphs_back_2:
+  #   container_name: graphs_back_2
+  #   build:
+  #     context: ..
+  #     dockerfile: deploy/Dockerfile
+  #   environment:
+  #     - POSTGRES_USER=user
+  #     - POSTGRES_DB=graphs
+  #     - POSTGRES_PASSWORD=password
+  #     - ENV=docker
+  #     - METRICS_PORT=9092
+  #     - PORT=8082
+  #   ports:
+  #     - "8082:8082"
+  #     - "9092:9092"
+  #   networks:
+  #     - graphs
 
-  balancer:
-    container_name: balancer
-    build:
-      context: ..
-      dockerfile: balancer/Dockerfile
-    environment:
-      - BACKENDS=graphs_back_1:8081,graphs_back_2:8082
-    ports:
-      - "8080:8080"
-    networks:
-      - graphs
+  # balancer:
+  #   container_name: balancer
+  #   build:
+  #     context: ..
+  #     dockerfile: balancer/Dockerfile
+  #   environment:
+  #     - BACKENDS=graphs_back_1:8081,graphs_back_2:8082
+  #   ports:
+  #     - "8080:8080"
+  #   networks:
+  #     - graphs
 
   graphs_db:
     image: postgres
