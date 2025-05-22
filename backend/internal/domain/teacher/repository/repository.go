@@ -6,7 +6,7 @@ import (
 )
 
 type TeacherRepository interface {
-	InsertStudent(ctx context.Context, user *model.User, student *model.Student) (*model.Student, error)
+	InsertUser(ctx context.Context, user *model.User) (*model.User, error)
 	GetModules(ctx context.Context) ([]model.Module, error)
 	CreateLab(ctx context.Context, lab *model.Lab) (*model.Lab, error)
 	GetLabInfo(ctx context.Context, lab *model.Lab) (*model.Lab, error)

@@ -12,9 +12,9 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 
 	userRouter := e.Group("/api/v1/user")
 	userRouter.POST("/auth_user", h.AuthUser)
+	userRouter.POST("/create_user", h.CreateUser)
 
 	teacherRouter := e.Group("/api/v1/teacher", h.TeacherMiddleware())
-	teacherRouter.POST("/create_student", h.CreateStudent)
 	teacherRouter.GET("/modules", h.GetModules)
 	teacherRouter.POST("/create_lab", h.CreateLab)
 	teacherRouter.POST("/lab_info", h.GetLabInfo)

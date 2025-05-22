@@ -10,7 +10,7 @@ import (
 )
 
 type TeacherHandler interface {
-	CreateStudent(ctx echo.Context) error
+	CreateUser(ctx echo.Context) error
 	GetModules(ctx echo.Context) error
 	CreateLab(ctx echo.Context) error
 	GetLabInfo(ctx echo.Context) error
@@ -35,8 +35,8 @@ func NewTeacherHandler(u usecase.TeacherUseCase) TeacherHandler {
 	return &teacherHandler{u}
 }
 
-func (h *teacherHandler) CreateStudent(ctx echo.Context) error {
-	var request usecase.CreateStudentDTOIn
+func (h *teacherHandler) CreateUser(ctx echo.Context) error {
+	var request usecase.CreateUserDTOIn
 	if err := ctx.Bind(&request); err != nil {
 		ctx.Set("error", err.Error())
 		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})

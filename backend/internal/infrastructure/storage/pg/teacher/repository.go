@@ -19,45 +19,23 @@ func NewTeacherRepository(conn *sqlx.DB, logger logger.Logger) teacherrepository
 	return &teacherRepository{conn: conn, logger: logger}
 }
 
-func (r *teacherRepository) InsertStudent(ctx context.Context, user *model.User, student *model.Student) (*model.Student, error) {
-	tx, err := r.conn.BeginTxx(ctx, nil)
-	defer func() {
-		if err := tx.Rollback(); err != nil && err != sql.ErrTxDone {
-			r.logger.LogError(opInsertStudent, err, user)
+func (r *teacherRepository) InsertUser(ctx context.Context, user *model.User) (*model.User, error) {
+	rows, err := r.conn.NamedQueryContext(ctx, insertIntoUsers, user)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		if err := rows.Scan(&user.ID); err != nil {
+			r.logger.LogWarning(opCreateLab, err, user)
+			return nil, err
 		}
-	}()
-	if err != nil {
-		return nil, err
+		return user, nil
 	}
 
-	stmt, err := tx.PrepareNamedContext(ctx, insertIntoUsers)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
+	return nil, sql.ErrNoRows
 
-	if err := stmt.GetContext(ctx, &user.ID, user); err != nil {
-		r.logger.LogDebug(opInsertStudent, err, user)
-		return nil, err
-	}
-
-	student.UserID = user.ID
-
-	stmt, err = tx.PrepareNamedContext(ctx, insertIntoStudent)
-	if err != nil {
-		return nil, err
-	}
-	defer stmt.Close()
-
-	if err := stmt.GetContext(ctx, &student.ID, student); err != nil {
-		r.logger.LogDebug(opInsertStudent, err, student)
-	}
-
-	if err := tx.Commit(); err != nil {
-		return nil, err
-	}
-
-	return student, nil
 }
 
 func (r *teacherRepository) GetModules(ctx context.Context) ([]model.Module, error) {

@@ -16,7 +16,7 @@ import (
 const limit = 20
 
 type TeacherUseCase interface {
-	CreateStudent(ctx context.Context, userDTO *CreateStudentDTOIn) (*CreateStudentDTOOut, error)
+	CreateStudent(ctx context.Context, userDTO *CreateUserDTOIn) (*CreateUserDTOOut, error)
 	GetModules(ctx context.Context) (*GetModulesDTOOut, error)
 	CreateLab(ctx context.Context, in *CreateLabDTOIn) (*CreateLabDTOOut, error)
 	GetLabInfo(ctx context.Context, in *GetLabInfoDTOIn) (*GetLabInfoDTOOut, error)
@@ -48,7 +48,7 @@ func NewTeacherUseCase(repo teacherrepository.TeacherRepository, userService use
 	}
 }
 
-func (u *teacherUseCase) CreateStudent(ctx context.Context, userDTO *CreateStudentDTOIn) (*CreateStudentDTOOut, error) {
+func (u *teacherUseCase) CreateStudent(ctx context.Context, userDTO *CreateUserDTOIn) (*CreateUserDTOOut, error) {
 	if err := validateCreateStudent(userDTO); err != nil {
 		return nil, err
 	}
@@ -67,20 +67,16 @@ func (u *teacherUseCase) CreateStudent(ctx context.Context, userDTO *CreateStude
 		FirstName:        userDTO.FirstName,
 		LastName:         userDTO.LastName,
 		FatherName:       userDTO.FatherName,
-		Role:             "student",
+		Role:             userDTO.Role,
 		PasswordSalt:     salt,
 	}
 
-	student := &model.Student{
-		GroupID: userDTO.GroupId,
-	}
-
-	userFromDB, err := u.teacherRepo.InsertStudent(ctx, user, student)
+	userFromDB, err := u.teacherRepo.InsertUser(ctx, user)
 	if err != nil {
 		return nil, errors.Wrap(err, "insert user")
 	}
 
-	return &CreateStudentDTOOut{UserID: userFromDB.ID}, nil
+	return &CreateUserDTOOut{UserID: userFromDB.ID}, nil
 }
 
 func (u *teacherUseCase) GetModules(ctx context.Context) (*GetModulesDTOOut, error) {
@@ -325,7 +321,7 @@ func hashPassword(password, salt string) (string, error) {
 	return string(hashedPasswordBytes), err
 }
 
-func validateCreateStudent(userDTO *CreateStudentDTOIn) error {
+func validateCreateStudent(userDTO *CreateUserDTOIn) error {
 	if len(userDTO.FirstName) < 1 {
 		return ErrShortFirstname
 	}

@@ -7,16 +7,16 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type CreateStudentDTOIn struct {
+type CreateUserDTOIn struct {
 	Email      string `json:"email"`
 	Password   string `json:"password"`
 	FirstName  string `json:"firstName"`
 	LastName   string `json:"lastName"`
 	FatherName string `json:"fatherName"`
-	GroupId    int64  `json:"groupId"`
+	Role       string `json:"role"`
 }
 
-type CreateStudentDTOOut struct {
+type CreateUserDTOOut struct {
 	UserID int64 `json:"userId"`
 }
 
