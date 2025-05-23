@@ -1,17 +1,17 @@
-package main
+package taskcheck
 
 import (
 	"fmt"
 	"golang_graphs/backend/internal/domain/model"
-	taskcheck "golang_graphs/backend/internal/domain/student/service/taskcheck"
+	// taskcheck "golang_graphs/backend/internal/domain/student/service/taskcheck"
 	"math"
 	"strconv"
 	"testing"
 )
 
-var (
-	DEFAULT_COLOR = ""
-)
+// var (
+// 	DEFAULT_COLOR = ""
+// )
 
 // Тест для MinPath
 func TestGraph_MinPath(t *testing.T) {
@@ -142,7 +142,7 @@ func TestGraph_DistanceMatrix(t *testing.T) {
 }
 
 func TestCheckAdjacentMatrix(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 	task := model.Graph{
 		Nodes: []model.Node{
 			{Label: "A"},
@@ -211,7 +211,7 @@ func TestChecker_CheckRadiusAndDiameter(t *testing.T) {
 		},
 	}
 
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	distMatrixAns := map[string]map[string]int{
 		"A": {"A": 0, "B": 1, "C": 2},
@@ -242,7 +242,7 @@ func TestChecker_CheckMinPath(t *testing.T) {
 		},
 	}
 
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	source := "A"
 	target := "C"
@@ -294,7 +294,7 @@ func TestChecker_CheckLinearToLine(t *testing.T) {
 		},
 	}
 
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 	score := checker.CheckLinearToLine(&task, &answer)
 	fmt.Println(score)
 	if score == 0 {
@@ -330,7 +330,7 @@ func TestChecker_CheckLinearFromLine(t *testing.T) {
 		},
 	}
 
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 	score := checker.CheckLinearFromLine(&task, &answer)
 	if score != 100 {
 		t.Errorf("Linear from Line check failed: expected non-zero score, got %d", score)
@@ -339,13 +339,13 @@ func TestChecker_CheckLinearFromLine(t *testing.T) {
 
 // Тест для max_
 func TestMax_(t *testing.T) {
-	if result := taskcheck.Max_(5, 10); result != 10 {
+	if result := Max_(5, 10); result != 10 {
 		t.Errorf("Expected 10, got %d", result)
 	}
-	if result := taskcheck.Max_(10, 5); result != 10 {
+	if result := Max_(10, 5); result != 10 {
 		t.Errorf("Expected 10, got %d", result)
 	}
-	if result := taskcheck.Max_(7, 7); result != 7 {
+	if result := Max_(7, 7); result != 7 {
 		t.Errorf("Expected 7, got %d", result)
 	}
 }
@@ -585,7 +585,7 @@ func TestCheckIntersectionGraphs(t *testing.T) {
 		},
 	}
 
-	ch := taskcheck.NewChecker()
+	ch := NewChecker()
 	score := ch.CheckIntersectionGraphs(&expected, g1, g2)
 
 	if score != 100 {
@@ -608,7 +608,7 @@ func TestCheckUnionGraphs(t *testing.T) {
 		},
 	}
 
-	ch := taskcheck.NewChecker()
+	ch := NewChecker()
 	score := ch.CheckUnionGraphs(&expected, g1, g2)
 
 	if score != 100 {
@@ -631,7 +631,7 @@ func TestCheckJoinGraphs(t *testing.T) {
 			{Source: model.Node{Label: "A", Id: 1}, Target: model.Node{Id: 4, Label: "D"}, Id: "4"},
 		},
 	}
-	ch := taskcheck.NewChecker()
+	ch := NewChecker()
 	score := ch.CheckJoinGraphs(&expected, g1, g2)
 
 	if score != 100 {
@@ -659,7 +659,7 @@ func TestCheckCartesianProduct(t *testing.T) {
 		},
 	}
 
-	ch := taskcheck.NewChecker()
+	ch := NewChecker()
 	score := ch.CheckCartesianProduct(&expected, g1, g2)
 
 	if score != 100 {
@@ -684,7 +684,7 @@ func TestCheckTensorProduct(t *testing.T) {
 			{Source: nodes[7], Target: nodes[3], Id: "7"}, {Source: nodes[7], Target: nodes[5], Id: "8"},
 		},
 	}
-	ch := taskcheck.NewChecker()
+	ch := NewChecker()
 	score := ch.CheckTensorProduct(&expected, g1, g2)
 
 	if score != 100 {
@@ -718,7 +718,7 @@ func TestCheckLexicographicalProduct(t *testing.T) {
 			{Source: nodes[5], Target: nodes[6], Id: "23"}, {Source: nodes[5], Target: nodes[7], Id: "24"},
 		},
 	}
-	ch := taskcheck.NewChecker()
+	ch := NewChecker()
 	score := ch.CheckLexicographicalProduct(&expected, g1, g2)
 
 	if score != 100 {
@@ -762,7 +762,7 @@ func TestCheckHamiltonianCycle(t *testing.T) {
 			{Source: model.Node{Label: "C", Id: 3}, Target: model.Node{Id: 5, Label: "F"}, Id: "7"},
 		},
 	}
-	ch := taskcheck.NewChecker()
+	ch := NewChecker()
 	score := ch.CheckHamiltonian(&graph, true, &graph)
 	if score != 100 {
 		t.Error("expected score 100")
@@ -802,7 +802,7 @@ func TestMinimalSpanningTree(t *testing.T) {
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 func TestChecker_CheckLinearToLine1(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 	task := model.Graph{
 		Nodes: []model.Node{
 			{Label: "A"}, {Label: "B"}, {Label: "C"},
@@ -874,7 +874,7 @@ func TestChecker_CheckLinearToLine1(t *testing.T) {
 }
 
 func TestChecker_CheckLinearFromLine1(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 	task := model.Graph{
 		Nodes: []model.Node{
 			{Label: "A"}, {Label: "B"}, {Label: "C"},
@@ -952,7 +952,7 @@ func TestChecker_CheckLinearFromLine1(t *testing.T) {
 }
 
 func TestChecker_CheckRadiusAndDiameter1(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	// Задача: граф из 7 вершин
 	task := model.Graph{
@@ -1031,7 +1031,7 @@ func TestChecker_CheckRadiusAndDiameter1(t *testing.T) {
 }
 
 func TestChecker_CheckAdjacentMatrix(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	// Неориентированный граф из 7 вершин
 	task := model.Graph{
@@ -1113,7 +1113,7 @@ func TestChecker_CheckAdjacentMatrix(t *testing.T) {
 }
 
 func TestChecker_CheckEulerGraph1(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	// Вспомогательная функция для создания узлов с id
 	makeNode := func(id int, label string) model.Node {
@@ -1215,7 +1215,7 @@ func TestChecker_CheckEulerGraph1(t *testing.T) {
 }
 
 func TestChecker_CheckMinPath1(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	// Удобная функция для создания узлов с Id и Label
 	makeNode := func(id int, label string) model.Node {
@@ -1297,7 +1297,7 @@ func TestChecker_CheckMinPath1(t *testing.T) {
 }
 
 func TestChecker_CheckPlanarGraph(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	makeNode := func(id int, label string, x, y float64) model.Node {
 		return model.Node{Id: id, Label: label, X: x, Y: y}
@@ -1441,7 +1441,7 @@ func TestChecker_CheckPlanarGraph(t *testing.T) {
 }
 
 func TestChecker_CheckIntersectionGraphs(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	makeNode := func(id int, label string) model.Node {
 		return model.Node{Id: id, Label: label}
@@ -1556,7 +1556,7 @@ func TestChecker_CheckIntersectionGraphs(t *testing.T) {
 }
 
 func TestChecker_CheckIntersectionGraphs_SixNodes(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	makeNode := func(id int, label string) model.Node {
 		return model.Node{Id: id, Label: label}
@@ -1695,7 +1695,7 @@ func TestChecker_CheckIntersectionGraphs_SixNodes(t *testing.T) {
 }
 
 func TestChecker_CheckUnionGraphs_SixNodes(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	makeNode := func(id int, label string) model.Node {
 		return model.Node{Id: id, Label: label}
@@ -1802,7 +1802,7 @@ func TestChecker_CheckUnionGraphs_SixNodes(t *testing.T) {
 }
 
 func TestChecker_CheckJoinGraphs_SixNodes(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	makeNode := func(id int, label string) model.Node {
 		return model.Node{Id: id, Label: label}
@@ -1886,7 +1886,7 @@ func TestChecker_CheckJoinGraphs_SixNodes(t *testing.T) {
 }
 
 func TestChecker_CheckIntersectionMatrices_SixNodes(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	// Удобная функция для создания матрицы смежности
 	makeAdjMatrix := func() map[string]map[string]int {
@@ -1956,7 +1956,7 @@ func TestChecker_CheckIntersectionMatrices_SixNodes(t *testing.T) {
 }
 
 func TestChecker_CheckUnionMatrices_SixNodes(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	makeAdjMatrix1 := func() map[string]map[string]int {
 		return map[string]map[string]int{
@@ -2028,7 +2028,7 @@ func TestChecker_CheckUnionMatrices_SixNodes(t *testing.T) {
 }
 
 func TestChecker_CheckJoinMatrices_SixNodes(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	// Матрица смежности для графа 1
 	matrix1 := map[string]map[string]int{
@@ -2095,7 +2095,7 @@ func TestChecker_CheckJoinMatrices_SixNodes(t *testing.T) {
 }
 
 func TestChecker_CheckCartesianProduct_ManualAnswer(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	graph1 := &model.Graph{
 		Nodes: []model.Node{
@@ -2179,7 +2179,7 @@ func TestChecker_CheckCartesianProduct_ManualAnswer(t *testing.T) {
 }
 
 func TestChecker_CheckTensorProduct_ManualAnswer(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	graph1 := &model.Graph{
 		Nodes: []model.Node{
@@ -2260,7 +2260,7 @@ func TestChecker_CheckTensorProduct_ManualAnswer(t *testing.T) {
 }
 
 func TestChecker_CheckLexicographicalProduct_ManualAnswer(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	graph1 := &model.Graph{
 		Nodes: []model.Node{
@@ -2341,7 +2341,7 @@ func TestChecker_CheckLexicographicalProduct_ManualAnswer(t *testing.T) {
 }
 
 func TestChecker_CheckHamiltonian(t *testing.T) {
-	checker := taskcheck.NewChecker()
+	checker := NewChecker()
 
 	// Создаем граф с гамильтоновым циклом: квадрат (4 вершины)
 	graph := &model.Graph{
@@ -2452,7 +2452,7 @@ func TestChecker_CheckHamiltonian(t *testing.T) {
 // 	edges, result := graph.MinimalSpanningTree()
 
 // 	// Проверка корректности
-// 	ch := taskcheck.NewChecker()
+// 	ch := NewChecker()
 // 	ch.CheckM
 // 	if score := expected; score != 100 {
 // 		t.Errorf("expected score 100, got %d", score)

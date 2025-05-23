@@ -323,8 +323,7 @@ func (g *Graph) Intersect(graph *Graph) *Graph {
 	}
 	nodes_answer := make(map[string]Node)
 	for _, node_graph := range graph.Nodes {
-		_, exist := nodes_g_set[node_graph.Label]
-		if exist {
+		if _, exist := nodes_g_set[node_graph.Label]; exist {
 			nodes_answer[node_graph.Label] = nodes_g_set[node_graph.Label]
 		}
 	}
@@ -344,10 +343,11 @@ func (g *Graph) Intersect(graph *Graph) *Graph {
 		if !flag {
 			delete(edges_final, id)
 		}
+		flag = false
 	}
 	answer := new(Graph)
 	node_id := 0
-	for _, node := range nodes_g_set {
+	for _, node := range nodes_answer {
 		node.Id = node_id
 		node_id++
 		answer.AddNode(node)
@@ -501,10 +501,10 @@ func (g *Graph) LexicographicalProduct(graph *Graph) *Graph {
 			trg1, _ := answer.FindNodeByLabel(fmt.Sprintf("(%s,%s)", node1.Label, edge2.Target.Label))
 			answer.AddEdgeByInfo(src1, trg1, strconv.Itoa(edge_id), "", "", 0)
 			edge_id++
-			src2, _ := answer.FindNodeByLabel(fmt.Sprintf("(%s,%s)", node1.Label, edge2.Source.Label))
-			trg2, _ := answer.FindNodeByLabel(fmt.Sprintf("(%s,%s)", node1.Label, edge2.Target.Label))
-			answer.AddEdgeByInfo(src2, trg2, strconv.Itoa(edge_id), "", "", 0)
-			edge_id++
+			// src2, _ := answer.FindNodeByLabel(fmt.Sprintf("(%s,%s)", node1.Label, edge2.Source.Label))
+			// trg2, _ := answer.FindNodeByLabel(fmt.Sprintf("(%s,%s)", node1.Label, edge2.Target.Label))
+			// answer.AddEdgeByInfo(src2, trg2, strconv.Itoa(edge_id), "", "", 0)
+			// edge_id++
 		}
 	}
 	for _, edge1 := range g.Edges {
@@ -707,126 +707,126 @@ func MakeGraphFromAdjLabelMatrix(matrix map[string]map[string]int) *Graph {
 	return new_graph
 }
 
-func (g *Graph) FindDominatingSets() [][]string {
-	n := len(g.Nodes)
-	labelToIdx := make(map[string]int)
-	for i, node := range g.Nodes {
-		labelToIdx[node.Label] = i
-	}
+// func (g *Graph) FindDominatingSets() [][]string {
+// 	n := len(g.Nodes)
+// 	labelToIdx := make(map[string]int)
+// 	for i, node := range g.Nodes {
+// 		labelToIdx[node.Label] = i
+// 	}
 
-	// Матрица смежности для быстрого поиска соседей
-	adjMatrix := make([][]bool, n)
-	for i := range adjMatrix {
-		adjMatrix[i] = make([]bool, n)
-	}
-	for _, edge := range g.Edges {
-		u := labelToIdx[edge.Source.Label]
-		v := labelToIdx[edge.Target.Label]
-		adjMatrix[u][v] = true
-		adjMatrix[v][u] = true
-	}
+// 	// Матрица смежности для быстрого поиска соседей
+// 	adjMatrix := make([][]bool, n)
+// 	for i := range adjMatrix {
+// 		adjMatrix[i] = make([]bool, n)
+// 	}
+// 	for _, edge := range g.Edges {
+// 		u := labelToIdx[edge.Source.Label]
+// 		v := labelToIdx[edge.Target.Label]
+// 		adjMatrix[u][v] = true
+// 		adjMatrix[v][u] = true
+// 	}
 
-	var results [][]string
-	var currentSet []int
-	covered := make([]bool, n) // покрытые вершины
+// 	var results [][]string
+// 	var currentSet []int
+// 	covered := make([]bool, n) // покрытые вершины
 
-	var backtrack func(start int)
-	backtrack = func(start int) {
-		// Проверяем, покрыты ли все вершины (внешняя устойчивость)
-		allCovered := true
-		for i := 0; i < n; i++ {
-			if !covered[i] {
-				allCovered = false
-				break
-			}
-		}
-		if allCovered {
-			setLabels := make([]string, len(currentSet))
-			for i, idx := range currentSet {
-				setLabels[i] = g.Nodes[idx].Label
-			}
-			results = append(results, setLabels)
-			return
-		}
+// 	var backtrack func(start int)
+// 	backtrack = func(start int) {
+// 		// Проверяем, покрыты ли все вершины (внешняя устойчивость)
+// 		allCovered := true
+// 		for i := 0; i < n; i++ {
+// 			if !covered[i] {
+// 				allCovered = false
+// 				break
+// 			}
+// 		}
+// 		if allCovered {
+// 			setLabels := make([]string, len(currentSet))
+// 			for i, idx := range currentSet {
+// 				setLabels[i] = g.Nodes[idx].Label
+// 			}
+// 			results = append(results, setLabels)
+// 			return
+// 		}
 
-		for i := start; i < n; i++ {
-			// Добавляем вершину i
-			currentSet = append(currentSet, i)
+// 		for i := start; i < n; i++ {
+// 			// Добавляем вершину i
+// 			currentSet = append(currentSet, i)
 
-			// Сохраняем старое состояние covered для отката
-			oldCovered := make([]bool, n)
-			copy(oldCovered, covered)
+// 			// Сохраняем старое состояние covered для отката
+// 			oldCovered := make([]bool, n)
+// 			copy(oldCovered, covered)
 
-			// Помечаем i и соседей i как покрытые
-			covered[i] = true
-			for j := 0; j < n; j++ {
-				if adjMatrix[i][j] {
-					covered[j] = true
-				}
-			}
+// 			// Помечаем i и соседей i как покрытые
+// 			covered[i] = true
+// 			for j := 0; j < n; j++ {
+// 				if adjMatrix[i][j] {
+// 					covered[j] = true
+// 				}
+// 			}
 
-			backtrack(i + 1)
+// 			backtrack(i + 1)
 
-			// Откатываем изменения
-			covered = oldCovered
-			currentSet = currentSet[:len(currentSet)-1]
-		}
-	}
+// 			// Откатываем изменения
+// 			covered = oldCovered
+// 			currentSet = currentSet[:len(currentSet)-1]
+// 		}
+// 	}
 
-	backtrack(0)
-	return results
-}
+// 	backtrack(0)
+// 	return results
+// }
 
-func (g *Graph) FindIndependentSets() [][]string {
-	n := len(g.Nodes)
-	labelToIdx := make(map[string]int)
-	for i, node := range g.Nodes {
-		labelToIdx[node.Label] = i
-	}
+// func (g *Graph) FindIndependentSets() [][]string {
+// 	n := len(g.Nodes)
+// 	labelToIdx := make(map[string]int)
+// 	for i, node := range g.Nodes {
+// 		labelToIdx[node.Label] = i
+// 	}
 
-	// Матрица смежности для быстрого поиска соседей
-	adjMatrix := make([][]bool, n)
-	for i := range adjMatrix {
-		adjMatrix[i] = make([]bool, n)
-	}
-	for _, edge := range g.Edges {
-		u := labelToIdx[edge.Source.Label]
-		v := labelToIdx[edge.Target.Label]
-		adjMatrix[u][v] = true
-		adjMatrix[v][u] = true
-	}
+// 	// Матрица смежности для быстрого поиска соседей
+// 	adjMatrix := make([][]bool, n)
+// 	for i := range adjMatrix {
+// 		adjMatrix[i] = make([]bool, n)
+// 	}
+// 	for _, edge := range g.Edges {
+// 		u := labelToIdx[edge.Source.Label]
+// 		v := labelToIdx[edge.Target.Label]
+// 		adjMatrix[u][v] = true
+// 		adjMatrix[v][u] = true
+// 	}
 
-	var results [][]string
-	var currentSet []int
+// 	var results [][]string
+// 	var currentSet []int
 
-	var backtrack func(start int)
-	backtrack = func(start int) {
-		// Добавляем текущее множество в результаты
-		setLabels := make([]string, len(currentSet))
-		for i, idx := range currentSet {
-			setLabels[i] = g.Nodes[idx].Label
-		}
-		results = append(results, setLabels)
+// 	var backtrack func(start int)
+// 	backtrack = func(start int) {
+// 		// Добавляем текущее множество в результаты
+// 		setLabels := make([]string, len(currentSet))
+// 		for i, idx := range currentSet {
+// 			setLabels[i] = g.Nodes[idx].Label
+// 		}
+// 		results = append(results, setLabels)
 
-		for i := start; i < n; i++ {
-			conflict := false
-			for _, selectedIdx := range currentSet {
-				if adjMatrix[i][selectedIdx] {
-					conflict = true
-					break
-				}
-			}
-			if !conflict {
-				currentSet = append(currentSet, i)
-				backtrack(i + 1)
-				currentSet = currentSet[:len(currentSet)-1]
-			}
-		}
-	}
+// 		for i := start; i < n; i++ {
+// 			conflict := false
+// 			for _, selectedIdx := range currentSet {
+// 				if adjMatrix[i][selectedIdx] {
+// 					conflict = true
+// 					break
+// 				}
+// 			}
+// 			if !conflict {
+// 				currentSet = append(currentSet, i)
+// 				backtrack(i + 1)
+// 				currentSet = currentSet[:len(currentSet)-1]
+// 			}
+// 		}
+// 	}
 
-	backtrack(0)
-	return results
-}
+// 	backtrack(0)
+// 	return results
+// }
 
 // func (g *Graph) MinCutUnweighted() (minCutWeight int, cutPartition map[string]bool) {
 // 	n := len(g.Nodes)

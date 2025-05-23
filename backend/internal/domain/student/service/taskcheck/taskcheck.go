@@ -17,6 +17,9 @@ const (
 	DEFAULT_COLOR                    string = ""
 )
 
+func p() {
+	fmt.Println()
+}
 func createGographWithoutInfo(graph *model.Graph) *gograph.Mutable {
 	if len(graph.Nodes) == 0 {
 		return gograph.New(0)
@@ -114,8 +117,7 @@ func (ch *checker) CheckLinearFromLine(task *model.Graph, answer *model.Graph) i
 	}
 	task_adj := task.NodeLabelAdjacentMatrix()
 	answer_adj := answer.EdgeLabelAdjacentMatrix()
-	fmt.Println(task_adj)
-	fmt.Println(answer_adj)
+
 	if len(task_adj) != len(answer_adj) {
 		return 0
 	}
@@ -189,6 +191,9 @@ func (ch *checker) CheckAdjacentMatrix(task *model.Graph, answer map[string]map[
 // Должно быть больше 2 ребер
 func (ch *checker) CheckEulerGraph(task *model.Graph, is_euler_ans bool, answer_graph *model.Graph) int {
 	task_gograph := createGographWithoutInfo(task)
+	if len(task.Edges)*len(answer_graph.Edges)*len(task.Nodes)*len(answer_graph.Nodes) == 0 {
+		return 0
+	}
 	_, is_euler := gograph.EulerUndirected(task_gograph)
 	if is_euler != is_euler_ans {
 		return 0
@@ -226,7 +231,7 @@ func (ch *checker) CheckEulerGraph(task *model.Graph, is_euler_ans bool, answer_
 		return 0
 	}
 	prev_node := second_node
-	for _, edge := range walk_ans[2:n_edges] {
+	for _, edge := range walk_ans[3:n_edges] {
 		if edge.Source.Id == prev_node {
 			prev_node = edge.Target.Id
 		} else if edge.Target.Id == prev_node {
@@ -284,7 +289,7 @@ func boundingBox(x1, x2, x3, x4 float64) bool {
 	if x3 > x4 {
 		x3, x4 = x4, x3
 	}
-	return math.Max(x1, x3) > math.Max(x2, x4)
+	return math.Max(x1, x3) <= math.Min(x2, x4)
 }
 
 func pseudoScalar(node1, node2, node3 model.Node) float64 {
@@ -300,6 +305,9 @@ func isIntersect(edge1, edge2 model.Edge) bool {
 }
 
 func (ch *checker) CheckPlanarGraph(answer *model.Graph) int {
+	if len(answer.Edges)*len(answer.Nodes) == 0 {
+		return 0
+	}
 	for _, edge1 := range answer.Edges {
 		for _, edge2 := range answer.Edges {
 			if edge1.Id != edge2.Id && !answer.IsEdgesAdjacent(edge1, edge2) {
@@ -335,9 +343,18 @@ func (ch *checker) checkBinaryOperations(answer, true_answer *model.Graph) (int,
 	}
 	correct_edges := 0
 	odd_edges := 0
+	edges_set_count := make(map[string]int)
+	for _, edge := range true_answer.Edges {
+		edges_set_count[edge.Id] = 0
+	}
 	for _, edge_answer := range answer.Edges {
-		if ans_bool, _ := true_answer.FindEdge(edge_answer.Source.Label, edge_answer.Target.Label); ans_bool {
-			correct_edges++
+		if ans_bool, edge_ := true_answer.FindEdge(edge_answer.Source.Label, edge_answer.Target.Label); ans_bool {
+			edges_set_count[edge_.Id]++
+			if edges_set_count[edge_.Id] > 1 {
+				odd_edges++
+			} else {
+				correct_edges++
+			}
 		} else {
 			odd_edges++
 		}
@@ -434,6 +451,6 @@ func (ch *checker) CheckHamiltonian(task *model.Graph, is_hamiltonian_ans bool, 
 	return 100
 }
 
-func (ch *checker) CheckMinimalSpanningTree() {
+// func (ch *checker) CheckMinimalSpanningTree() {
 
-}
+// }
