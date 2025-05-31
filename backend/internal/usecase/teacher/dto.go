@@ -143,3 +143,14 @@ type AuthTokenDTOOut struct {
 type GetGroupsDTOOut struct {
 	Groups []model.Group `json:"groups"`
 }
+
+type CreateTaskDTOIn struct {
+	TaskID   int64  `json:"taskID"`
+	ModuleID int64  `json:"moduleID"`
+	Payload  string `json:"payload"`
+	Answer   string `json:"answer"`
+}
+
+type CreateTaskDTOOut struct {
+	TaskID int64 `json:"taskID"`
+}

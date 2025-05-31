@@ -258,3 +258,22 @@ func (r *teacherRepository) SelectGroups(ctx context.Context) ([]model.Group, er
 
 	return groups, nil
 }
+
+func (r *teacherRepository) InsertTask(ctx context.Context, task *model.Task) (*model.Task, error) {
+	rows, err := r.conn.NamedQueryContext(ctx, insertTask, task)
+	if err != nil {
+		r.logger.LogDebug(opCreateTask, err, task)
+		return nil, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		if err := rows.Scan(&task.ID); err != nil {
+			r.logger.LogWarning(opCreateTask, err, task)
+			return nil, err
+		}
+		return task, nil
+	}
+
+	return nil, sql.ErrNoRows
+}

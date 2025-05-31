@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 	model "golang_graphs/backend/internal/domain/model"
 	teacherrepository "golang_graphs/backend/internal/domain/teacher/repository"
 	teacherservice "golang_graphs/backend/internal/domain/teacher/service"
@@ -32,6 +33,7 @@ type TeacherUseCase interface {
 	GetGroups(ctx context.Context) (*GetGroupsDTOOut, error)
 	GetTeacher(ctx context.Context, user *model.User) (*model.Teacher, error)
 	AuthToken(ctx context.Context, token string) (*AuthTokenDTOOut, error)
+	CreateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error)
 }
 
 type teacherUseCase struct {
@@ -306,6 +308,29 @@ func (u *teacherUseCase) GetGroups(ctx context.Context) (*GetGroupsDTOOut, error
 	}
 	return &GetGroupsDTOOut{
 		Groups: groups,
+	}, nil
+}
+
+func (u *teacherUseCase) CreateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error) {
+	answer := sql.NullString{String: in.Answer}
+	if in.Answer != "" {
+		answer.Valid = true
+
+	}
+
+	task := &model.Task{
+		ID:       in.TaskID,
+		ModuleID: in.ModuleID,
+		Payload:  in.Payload,
+		Answer:   answer,
+	}
+	out, err := u.teacherRepo.InsertTask(ctx, task)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CreateTaskDTOOut{
+		TaskID: out.ID,
 	}, nil
 }
 

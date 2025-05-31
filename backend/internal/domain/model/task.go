@@ -1,0 +1,10 @@
+package model
+
+import "database/sql"
+
+type Task struct {
+	ID       int64          `db:"task_id"`
+	ModuleID int64          `db:"module_id"`
+	Payload  string         `db:"payload"`
+	Answer   sql.NullString `db:"answer"`
+}

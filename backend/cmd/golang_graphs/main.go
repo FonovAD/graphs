@@ -67,7 +67,7 @@ func main() {
 	log.Println("prometheus setup end")
 
 	go func() {
-		if err := e.Start(":8081"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := e.Start(":" + cfg.Port); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			e.Logger.Fatal("shutting down the server")
 		}
 	}()

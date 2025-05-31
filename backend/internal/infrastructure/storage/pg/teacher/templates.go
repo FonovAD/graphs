@@ -110,4 +110,14 @@ const (
 	SELECT g.groups_id, groupsname
 	FROM groups g;
 	`
+
+	insertTask = `
+	INSERT INTO tasks (task_id, module_id, payload, answer) VALUES (:task_id, :module_id, :payload, :answer) 
+	ON CONFLICT (task_id) DO UPDATE
+	SET
+		module_id = EXCLUDED.module_id,
+		payload = EXCLUDED.payload,
+		answer = EXCLUDED.answer
+	RETURNING task_id;
+	`
 )

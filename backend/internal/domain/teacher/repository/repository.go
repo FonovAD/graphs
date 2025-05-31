@@ -21,4 +21,5 @@ type TeacherRepository interface {
 	SelectModulesFromLab(ctx context.Context, lab *model.Lab) ([]model.ModulesInLab, error)
 	SelectTeacher(ctx context.Context, user *model.User) (*model.Teacher, error)
 	SelectGroups(ctx context.Context) ([]model.Group, error)
+	InsertTask(ctx context.Context, task *model.Task) (*model.Task, error)
 }

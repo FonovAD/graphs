@@ -28,6 +28,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	teacherRouter.POST("/assigned_labs", h.GetAssignedLabs)
 	teacherRouter.POST("/lab_modules", h.GetLabModules)
 	teacherRouter.GET("/groups", h.GetGroups)
+	teacherRouter.POST("/create_task", h.CreateTask)
 
 }
 
