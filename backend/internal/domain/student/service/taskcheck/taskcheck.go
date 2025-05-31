@@ -1,7 +1,8 @@
-package service
+package taskcheck
 
 import (
-	model "golang_graphs/backend/internal/domain/model"
+	"fmt"
+	"golang_graphs/backend/internal/domain/model"
 	"math"
 	"strconv"
 
@@ -16,7 +17,10 @@ const (
 	DEFAULT_COLOR                    string = ""
 )
 
-func createGographWithoutInfo(graph model.Graph) *gograph.Mutable {
+func p() {
+	fmt.Println()
+}
+func createGographWithoutInfo(graph *model.Graph) *gograph.Mutable {
 	if len(graph.Nodes) == 0 {
 		return gograph.New(0)
 	}
@@ -40,24 +44,31 @@ type checker struct {
 
 type Checker interface {
 	CheckLinearToLine(task, answer *model.Graph) int
-	CheckLinearFromLine(task model.Graph, answer model.Graph) int
-	CheckRadiusAndDiameter(task model.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int
-	CheckAdjacentMatrix(task model.Graph, answer map[string]map[string]int) int
-	CheckEulerGraph(task model.Graph, is_euler_ans bool, answer_graph model.Graph) int
-	CheckMinPath(task model.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer model.Graph) int
-	CheckPlanarGraph(answer model.Graph) int
+	CheckLinearFromLine(task, answer *model.Graph) int
+	CheckRadiusAndDiameter(task *model.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int
+	CheckAdjacentMatrix(task *model.Graph, answer map[string]map[string]int) int
+	CheckEulerGraph(task *model.Graph, is_euler_ans bool, answer_graph *model.Graph) int
+	CheckMinPath(task *model.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer *model.Graph) int
+	CheckPlanarGraph(answer *model.Graph) int
 	CheckIntersectionGraphs(answer, graph1, graph2 *model.Graph) int
 	CheckUnionGraphs(answer, graph1, graph2 *model.Graph) int
 	CheckJoinGraphs(answer, graph1, graph2 *model.Graph) int
 	// Harary definition
-	// CheckCartesianProduct(answer, graph1, graph2 *models.Graph) int
+	CheckCartesianProduct(answer, graph1, graph2 *model.Graph) int
 	// Gorbatov definition
-	// CheckTensorProduct(answer, graph1, graph2 *models.Graph) int
+	CheckTensorProduct(answer, graph1, graph2 *model.Graph) int
 	// Composition
-	// CheckLexicographical(answer, graph1, graph2 *models.Graph) int
+	CheckLexicographicalProduct(answer, graph1, graph2 *model.Graph) int
+
 	CheckIntersectionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
 	CheckUnionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
 	CheckJoinMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
+
+	CheckHamiltonian(task *model.Graph, is_hamiltonian_ans bool, answer_graph *model.Graph) int
+	// CheckMinimalСut() int
+	// CheckMinimalSpanningTree()
+	// CheckInternalStability()
+	// CheckExternalStability()
 }
 
 // Харари - декартово, cartesian, box product
@@ -77,6 +88,10 @@ func Max_(a int, b int) int {
 
 // Проверка модуля "Реберный граф" (из графа в реберный)
 func (ch *checker) CheckLinearToLine(task *model.Graph, answer *model.Graph) int {
+	if len(task.Nodes)*len(answer.Nodes) == 0 {
+		return 0
+	}
+
 	task_adj := task.EdgeLabelAdjacentMatrix()
 	answer_adj := answer.NodeLabelAdjacentMatrix()
 
@@ -96,7 +111,10 @@ func (ch *checker) CheckLinearToLine(task *model.Graph, answer *model.Graph) int
 }
 
 // Проверка модуля "Реберный граф" (из реберного в граф)
-func (ch *checker) CheckLinearFromLine(task model.Graph, answer model.Graph) int {
+func (ch *checker) CheckLinearFromLine(task *model.Graph, answer *model.Graph) int {
+	if len(task.Nodes)*len(answer.Nodes) == 0 {
+		return 0
+	}
 	task_adj := task.NodeLabelAdjacentMatrix()
 	answer_adj := answer.EdgeLabelAdjacentMatrix()
 
@@ -116,7 +134,10 @@ func (ch *checker) CheckLinearFromLine(task model.Graph, answer model.Graph) int
 }
 
 // Проверки модуля "Радиус и диметр"
-func (ch *checker) CheckRadiusAndDiameter(task model.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int {
+func (ch *checker) CheckRadiusAndDiameter(task *model.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int {
+	if len(task.Nodes)*len(dist_matrix_ans) == 0 {
+		return 0
+	}
 	dist_matrix := task.DistanceMatrix(false)
 	max_dists := make([]int, 0, len(dist_matrix))
 	err_count := 0
@@ -149,7 +170,7 @@ func (ch *checker) CheckRadiusAndDiameter(task model.Graph, radius_ans int, diam
 	return Max_(0, 100-err_count*RADIUS_AND_DIAMETER_MODULE_COEFF)
 }
 
-func (ch *checker) CheckAdjacentMatrix(task model.Graph, answer map[string]map[string]int) int {
+func (ch *checker) CheckAdjacentMatrix(task *model.Graph, answer map[string]map[string]int) int {
 	adj_matrix := task.NodeLabelAdjacentMatrix()
 	if len(adj_matrix) != len(answer) {
 		return 0
@@ -168,8 +189,11 @@ func (ch *checker) CheckAdjacentMatrix(task model.Graph, answer map[string]map[s
 
 // Проверка модуля "Эйлеров граф"
 // Должно быть больше 2 ребер
-func (ch *checker) CheckEulerGraph(task model.Graph, is_euler_ans bool, answer_graph model.Graph) int {
+func (ch *checker) CheckEulerGraph(task *model.Graph, is_euler_ans bool, answer_graph *model.Graph) int {
 	task_gograph := createGographWithoutInfo(task)
+	if len(task.Edges)*len(answer_graph.Edges)*len(task.Nodes)*len(answer_graph.Nodes) == 0 {
+		return 0
+	}
 	_, is_euler := gograph.EulerUndirected(task_gograph)
 	if is_euler != is_euler_ans {
 		return 0
@@ -207,7 +231,7 @@ func (ch *checker) CheckEulerGraph(task model.Graph, is_euler_ans bool, answer_g
 		return 0
 	}
 	prev_node := second_node
-	for _, edge := range walk_ans[2:n_edges] {
+	for _, edge := range walk_ans[3:n_edges] {
 		if edge.Source.Id == prev_node {
 			prev_node = edge.Target.Id
 		} else if edge.Target.Id == prev_node {
@@ -224,7 +248,7 @@ func (ch *checker) CheckEulerGraph(task model.Graph, is_euler_ans bool, answer_g
 
 // Проверка модуля "Кратчайший путь"
 // Веса должны быть положительными
-func (ch *checker) CheckMinPath(task model.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer model.Graph) int {
+func (ch *checker) CheckMinPath(task *model.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer *model.Graph) int {
 	source_node := task.Nodes[0]
 	target_node := task.Nodes[0]
 	for _, node := range task.Nodes {
@@ -265,7 +289,7 @@ func boundingBox(x1, x2, x3, x4 float64) bool {
 	if x3 > x4 {
 		x3, x4 = x4, x3
 	}
-	return math.Max(x1, x3) > math.Max(x2, x4)
+	return math.Max(x1, x3) <= math.Min(x2, x4)
 }
 
 func pseudoScalar(node1, node2, node3 model.Node) float64 {
@@ -280,7 +304,10 @@ func isIntersect(edge1, edge2 model.Edge) bool {
 	return b1 && b2 && b3 && b4
 }
 
-func (ch *checker) CheckPlanarGraph(answer model.Graph) int {
+func (ch *checker) CheckPlanarGraph(answer *model.Graph) int {
+	if len(answer.Edges)*len(answer.Nodes) == 0 {
+		return 0
+	}
 	for _, edge1 := range answer.Edges {
 		for _, edge2 := range answer.Edges {
 			if edge1.Id != edge2.Id && !answer.IsEdgesAdjacent(edge1, edge2) {
@@ -316,9 +343,18 @@ func (ch *checker) checkBinaryOperations(answer, true_answer *model.Graph) (int,
 	}
 	correct_edges := 0
 	odd_edges := 0
+	edges_set_count := make(map[string]int)
+	for _, edge := range true_answer.Edges {
+		edges_set_count[edge.Id] = 0
+	}
 	for _, edge_answer := range answer.Edges {
-		if true_answer.FindEdge(edge_answer.Source.Label, edge_answer.Target.Label) {
-			correct_edges++
+		if ans_bool, edge_ := true_answer.FindEdge(edge_answer.Source.Label, edge_answer.Target.Label); ans_bool {
+			edges_set_count[edge_.Id]++
+			if edges_set_count[edge_.Id] > 1 {
+				odd_edges++
+			} else {
+				correct_edges++
+			}
 		} else {
 			odd_edges++
 		}
@@ -341,7 +377,7 @@ func (ch *checker) CheckUnionGraphs(answer, graph1, graph2 *model.Graph) int {
 }
 
 func (ch *checker) CheckJoinGraphs(answer, graph1, graph2 *model.Graph) int {
-	true_answer := graph1.Union(graph2)
+	true_answer := graph1.Join(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
 	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
@@ -364,3 +400,57 @@ func (ch *checker) CheckJoinMatrices(answer *model.Graph, matrix1, matrix2 map[s
 	graph2 := model.MakeGraphFromAdjLabelMatrix(matrix2)
 	return ch.CheckJoinGraphs(answer, graph1, graph2)
 }
+
+func (ch *checker) CheckCartesianProduct(answer, graph1, graph2 *model.Graph) int {
+	true_answer := graph1.CartesianProduct(graph2)
+	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
+	true_edges_count := len(true_answer.Edges)
+	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
+}
+
+func (ch *checker) CheckTensorProduct(answer, graph1, graph2 *model.Graph) int {
+	true_answer := graph1.TensorProduct(graph2)
+	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
+	true_edges_count := len(true_answer.Edges)
+	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
+}
+
+func (ch *checker) CheckLexicographicalProduct(answer, graph1, graph2 *model.Graph) int {
+	true_answer := graph1.LexicographicalProduct(graph2)
+	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
+	true_edges_count := len(true_answer.Edges)
+	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
+}
+
+func (ch *checker) CheckHamiltonian(task *model.Graph, is_hamiltonian_ans bool, answer_graph *model.Graph) int {
+	if answer_graph == nil {
+		return 0
+	}
+	bool_ans, _ := task.HamiltonianCycle()
+	if bool_ans != is_hamiltonian_ans {
+		return 0
+	}
+	if !bool_ans && !is_hamiltonian_ans {
+		return 100
+	}
+	path := make(map[string]int)
+	for _, node := range task.Nodes {
+		path[node.Label] = 0
+	}
+	for _, edge := range answer_graph.Edges {
+		if edge.Color != "" {
+			path[edge.Source.Label]++
+			path[edge.Target.Label]++
+		}
+	}
+	for _, node := range task.Nodes {
+		if path[node.Label] != 2 {
+			return 0
+		}
+	}
+	return 100
+}
+
+// func (ch *checker) CheckMinimalSpanningTree() {
+
+// }
