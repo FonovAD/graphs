@@ -2,17 +2,21 @@ package storage
 
 import (
 	"context"
+	"database/sql"
+	"golang_graphs/backend/internal/domain/model"
 	studentrepository "golang_graphs/backend/internal/domain/student/repository"
+	"golang_graphs/backend/internal/logger"
 
 	"github.com/jmoiron/sqlx"
 )
 
 type studentRepository struct {
-	conn *sqlx.DB
+	conn   *sqlx.DB
+	logger logger.Logger
 }
 
-func NewStudentRepository(conn *sqlx.DB) studentrepository.StudentRepository {
-	return &studentRepository{conn}
+func NewStudentRepository(conn *sqlx.DB, logger logger.Logger) studentrepository.StudentRepository {
+	return &studentRepository{conn: conn, logger: logger}
 }
 
 func (r *studentRepository) InsertTaskResult(ctx context.Context) (int64, error) {
@@ -34,4 +38,35 @@ func (r *studentRepository) InsertTaskResult(ctx context.Context) (int64, error)
 	// 	return id, nil
 	// }
 	return 0, nil
+}
+
+func (r *studentRepository) GetAssignedTasksByModule(ctx context.Context, user *model.User, module *model.Module) ([]model.Task, error) {
+	var tasks []model.Task
+	err := r.conn.SelectContext(ctx, &tasks, selectTasksByUserID, user.ID, module.ModuleId)
+	if err != nil {
+		r.logger.LogDebug(opSelectTasksByUserID, err, user.ID)
+		return nil, err
+	}
+
+	return tasks, nil
+}
+
+func (r *studentRepository) SelectStudent(ctx context.Context, user *model.User) (*model.Student, error) {
+	var student model.Student
+	rows, err := r.conn.NamedQueryContext(ctx, selectStudent, user)
+	if err != nil {
+		r.logger.LogWarning(opSelectStudent, err, user.ID)
+		return nil, err
+	}
+
+	if rows.Next() {
+		if err := rows.Scan(&student.ID); err != nil {
+			r.logger.LogWarning(opSelectStudent, err, user.ID)
+			return nil, err
+		}
+		student.UserID = user.ID
+		return &student, nil
+	}
+	r.logger.LogDebug(opSelectStudent, nil, user.ID)
+	return nil, sql.ErrNoRows
 }

@@ -30,6 +30,8 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	teacherRouter.GET("/groups", h.GetGroups)
 	teacherRouter.POST("/create_task", h.CreateTask)
 
+	studentRouter := e.Group("/api/v1/student", h.StudentMiddleware())
+	studentRouter.POST("/assigned_tasks_by_module", h.GetAssignedTasksByModule)
 }
 
 func Ping(ctx echo.Context) error {
