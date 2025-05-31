@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"context"
-	"fmt"
 	"golang_graphs/backend/internal/domain/model"
 	repository "golang_graphs/backend/internal/domain/student/repository"
 	studentservice "golang_graphs/backend/internal/domain/student/service"
@@ -48,7 +47,6 @@ func (u *studentUseCase) GetAssignedTasksByModule(ctx context.Context, in *GetAs
 		return nil, err
 	}
 
-	fmt.Println(out)
 	return &GetAssignedTasksByModuleDTOOut{Tasks: out}, nil
 }
 

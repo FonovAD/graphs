@@ -26,6 +26,7 @@ type TeacherHandler interface {
 	TeacherMiddleware() echo.MiddlewareFunc
 	GetGroups(ctx echo.Context) error
 	CreateTask(ctx echo.Context) error
+	GetTasksByModule(ctx echo.Context) error
 }
 
 type teacherHandler struct {
@@ -296,6 +297,24 @@ func (h *teacherHandler) CreateTask(ctx echo.Context) error {
 
 	ctxBack := context.Background()
 	response, err := h.teacherUseCase.CreateTask(ctxBack, &request)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (h *teacherHandler) GetTasksByModule(ctx echo.Context) error {
+	var request usecase.GetTasksByModuleDTOIn
+	if err := ctx.Bind(&request); err != nil {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+	}
+
+	ctxBack := context.Background()
+	response, err := h.teacherUseCase.GetTasksByModule(ctxBack, &request)
 	if err != nil {
 		ctx.Set("error", err.Error())
 

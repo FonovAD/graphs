@@ -17,4 +17,5 @@ const (
 	opSelectGroups              = "infra.storage.pg.teacher.repo.SelectGroups"
 	opSelectTeacher             = "infra.storage.pg.teacher.repo.SelectTeacher"
 	opCreateTask                = "infra.storage.pg.teacher.repo.InsertTask"
+	opSelectTasksByModule       = "infra.storage.pg.teacher.repo.SelectTasksByModule"
 )

@@ -29,6 +29,7 @@ func NewRouter(e *echo.Echo, h handler.AppHandler) {
 	teacherRouter.POST("/lab_modules", h.GetLabModules)
 	teacherRouter.GET("/groups", h.GetGroups)
 	teacherRouter.POST("/create_task", h.CreateTask)
+	teacherRouter.POST("/tasks_by_module", h.GetTasksByModule)
 
 	studentRouter := e.Group("/api/v1/student", h.StudentMiddleware())
 	studentRouter.POST("/assigned_tasks_by_module", h.GetAssignedTasksByModule)

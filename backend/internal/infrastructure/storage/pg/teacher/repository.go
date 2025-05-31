@@ -277,3 +277,14 @@ func (r *teacherRepository) InsertTask(ctx context.Context, task *model.Task) (*
 
 	return nil, sql.ErrNoRows
 }
+
+func (r *teacherRepository) GetTasksByModule(ctx context.Context, module *model.Module) ([]model.TaskByModule, error) {
+	var tasks []model.TaskByModule
+	err := r.conn.SelectContext(ctx, &tasks, selectTasksByModule, module.ModuleId)
+	if err != nil {
+		r.logger.LogDebug(opSelectTasksByModule, err, module.ModuleId)
+		return nil, err
+	}
+
+	return tasks, nil
+}

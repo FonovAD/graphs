@@ -8,3 +8,8 @@ type Task struct {
 	Payload  string         `db:"payload"`
 	Answer   sql.NullString `db:"answer"`
 }
+
+type TaskByModule struct {
+	ID      int64  `db:"task_id" json:"taskID"`
+	Payload string `db:"payload" json:"payload"`
+}

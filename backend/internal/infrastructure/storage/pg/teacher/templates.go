@@ -120,4 +120,11 @@ const (
 		answer = EXCLUDED.answer
 	RETURNING task_id;
 	`
+
+	selectTasksByModule = `
+	SELECT t.task_id, t.payload
+	FROM tasks t
+	JOIN modules m ON t.module_id = m.module_id
+	WHERE m.module_id = $1;
+	`
 )
