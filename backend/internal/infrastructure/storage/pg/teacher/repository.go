@@ -278,6 +278,25 @@ func (r *teacherRepository) InsertTask(ctx context.Context, task *model.Task) (*
 	return nil, sql.ErrNoRows
 }
 
+func (r *teacherRepository) UpdateTask(ctx context.Context, task *model.Task) (*model.Task, error) {
+	rows, err := r.conn.NamedQueryContext(ctx, updateTask, task)
+	if err != nil {
+		r.logger.LogDebug(opUpdateTask, err, task)
+		return nil, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		if err := rows.Scan(&task.ID); err != nil {
+			r.logger.LogWarning(opUpdateTask, err, task)
+			return nil, err
+		}
+		return task, nil
+	}
+
+	return nil, sql.ErrNoRows
+}
+
 func (r *teacherRepository) GetTasksByModule(ctx context.Context, module *model.Module) ([]model.TaskByModule, error) {
 	var tasks []model.TaskByModule
 	err := r.conn.SelectContext(ctx, &tasks, selectTasksByModule, module.ModuleId)

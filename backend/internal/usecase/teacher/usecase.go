@@ -34,6 +34,7 @@ type TeacherUseCase interface {
 	GetTeacher(ctx context.Context, user *model.User) (*model.Teacher, error)
 	AuthToken(ctx context.Context, token string) (*AuthTokenDTOOut, error)
 	CreateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error)
+	UpdateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error)
 	GetTasksByModule(ctx context.Context, in *GetTasksByModuleDTOIn) (*GetTasksByModuleDTOOut, error)
 }
 
@@ -182,10 +183,11 @@ func (u *teacherUseCase) AssignLab(ctx context.Context, in *AssignLabDTOIn) (*As
 func (u *teacherUseCase) AssignLabGroup(ctx context.Context, in *AssignLabGroupDTOIn) (*AssignLabGroupDTOOut, error) {
 	groupLab := &model.UserLabGroup{
 		LabID:          in.LabID,
-		AssignmentDate: in.AssignmentDate,
+		AssignmentDate: time.Now(),
 		StartTime:      in.StartTime,
 		TeacherID:      in.AssigneID,
 		Deadline:       in.Deadline,
+		GroupID:        in.GroupID,
 	}
 	out, err := u.teacherRepo.InsertLabToStudentGroup(ctx, groupLab)
 	if err != nil {
@@ -326,6 +328,29 @@ func (u *teacherUseCase) CreateTask(ctx context.Context, in *CreateTaskDTOIn) (*
 		Answer:   answer,
 	}
 	out, err := u.teacherRepo.InsertTask(ctx, task)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CreateTaskDTOOut{
+		TaskID: out.ID,
+	}, nil
+}
+
+func (u *teacherUseCase) UpdateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error) {
+	answer := sql.NullString{String: in.Answer}
+	if in.Answer != "" {
+		answer.Valid = true
+
+	}
+
+	task := &model.Task{
+		ID:       in.TaskID,
+		ModuleID: in.ModuleID,
+		Payload:  in.Payload,
+		Answer:   answer,
+	}
+	out, err := u.teacherRepo.UpdateTask(ctx, task)
 	if err != nil {
 		return nil, err
 	}

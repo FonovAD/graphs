@@ -112,12 +112,18 @@ const (
 	`
 
 	insertTask = `
-	INSERT INTO tasks (task_id, module_id, payload, answer) VALUES (:task_id, :module_id, :payload, :answer) 
-	ON CONFLICT (task_id) DO UPDATE
+	INSERT INTO tasks (module_id, payload, answer) 
+	VALUES (:module_id, :payload, :answer)
+	RETURNING task_id;
+	`
+
+	updateTask = `
+	UPDATE tasks
 	SET
-		module_id = EXCLUDED.module_id,
-		payload = EXCLUDED.payload,
-		answer = EXCLUDED.answer
+		module_id = :module_id,
+		payload = :payload,
+		answer = :answer
+	WHERE task_id = :task_id
 	RETURNING task_id;
 	`
 

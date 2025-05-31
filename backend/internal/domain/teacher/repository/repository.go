@@ -22,5 +22,6 @@ type TeacherRepository interface {
 	SelectTeacher(ctx context.Context, user *model.User) (*model.Teacher, error)
 	SelectGroups(ctx context.Context) ([]model.Group, error)
 	InsertTask(ctx context.Context, task *model.Task) (*model.Task, error)
+	UpdateTask(ctx context.Context, task *model.Task) (*model.Task, error)
 	GetTasksByModule(ctx context.Context, module *model.Module) ([]model.TaskByModule, error)
 }
