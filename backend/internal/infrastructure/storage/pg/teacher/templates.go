@@ -107,6 +107,26 @@ const (
 	SELECT :lab_id AS lab_id;
 	`
 
+	selectAvailableTasksCountByModule = `
+	with modules_from_lab as (
+	select ml.module_id 
+	from module_lab ml
+	join labs l on l.lab_id = ml.lab_id
+	where l.lab_id = $1
+	)
+
+	select count (*) as tasks_count
+	from tasks t
+	join modules_from_lab mfl on mfl.module_id = t.module_id
+	where t.user_lab_id is null;
+	`
+
+	selectStudentsCountFromGroup = `
+	select count (*) as students_count
+	from students s
+	where s.groupsid  = $1;
+	`
+
 	selectNonExistingUserLabs = `
 	SELECT l.lab_id, l.name 
 	FROM labs l 

@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	storage "golang_graphs/backend/internal/infrastructure/storage/pg/teacher"
 	usecase "golang_graphs/backend/internal/usecase/teacher"
 	"net/http"
 
@@ -179,6 +180,10 @@ func (h *teacherHandler) AssignLabGroup(ctx echo.Context) error {
 	response, err := h.teacherUseCase.AssignLabGroup(ctxBack, &request)
 	if err != nil {
 		ctx.Set("error", err.Error())
+
+		if errors.Is(err, storage.ErrTasksLessThanStudents) {
+			return ctx.JSON(http.StatusInternalServerError, BadRequestResponse{ErrorMsg: err.Error()})
+		}
 
 		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
