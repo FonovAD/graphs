@@ -13,3 +13,9 @@ type TaskByModule struct {
 	ID      int64  `db:"task_id" json:"taskID"`
 	Payload string `db:"payload" json:"payload"`
 }
+
+type AssignedTaskByModule struct {
+	ID      int64         `db:"task_id" json:"taskID"`
+	Payload string        `db:"payload" json:"payload"`
+	Score   sql.NullInt64 `db:"score"   json:"score"`
+}

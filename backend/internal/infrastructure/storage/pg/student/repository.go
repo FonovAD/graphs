@@ -40,8 +40,8 @@ func (r *studentRepository) InsertTaskResult(ctx context.Context) (int64, error)
 	return 0, nil
 }
 
-func (r *studentRepository) GetAssignedTasksByModule(ctx context.Context, user *model.User, module *model.Module) ([]model.TaskByModule, error) {
-	var tasks []model.TaskByModule
+func (r *studentRepository) GetAssignedTasksByModule(ctx context.Context, user *model.User, module *model.Module) ([]model.AssignedTaskByModule, error) {
+	var tasks []model.AssignedTaskByModule
 	err := r.conn.SelectContext(ctx, &tasks, selectTasksByUserID, user.ID, module.ModuleId)
 	if err != nil {
 		r.logger.LogDebug(opSelectTasksByUserID, err, user.ID)

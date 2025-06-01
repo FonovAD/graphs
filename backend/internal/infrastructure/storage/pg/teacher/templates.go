@@ -69,19 +69,42 @@ const (
 	`
 
 	insertLabToStudentGroup = `
-	INSERT INTO user_lab (
-    user_id, 
-    lab_id, 
-    assignment_date, 
-    start_time, 
-    teacher_id, 
-    deadline,
-    score
+	WITH inserted_user_labs AS (
+    INSERT INTO user_lab (
+        user_id, lab_id, assignment_date, start_time, teacher_id, deadline, score
+    )
+    SELECT 
+        s.usersid, :lab_id, :assignment_date, :start_time, :teacher_id, :deadline, NULL                       
+    FROM students s
+    WHERE s.groupsid = :groups_id
+    RETURNING user_lab_id, user_id
+	),
+	available_tasks AS (
+		SELECT 
+			task_id,
+			ROW_NUMBER() OVER (ORDER BY task_id) as task_row
+		FROM tasks
+		WHERE module_id IN (
+			SELECT module_id FROM module_lab WHERE lab_id = :lab_id
+		)
+		AND user_lab_id IS NULL
+	),
+	numbered_students AS (
+		SELECT 
+			user_lab_id,
+			user_id,
+			ROW_NUMBER() OVER (ORDER BY user_id) as student_row
+		FROM inserted_user_labs
+	),
+	updated_tasks AS (
+		UPDATE tasks t
+		SET user_lab_id = ns.user_lab_id
+		FROM available_tasks at
+		JOIN numbered_students ns ON at.task_row = ns.student_row
+		WHERE t.task_id = at.task_id
+		RETURNING t.task_id
 	)
-	SELECT s.usersid, :lab_id, :assignment_date, :start_time, :teacher_id, :deadline, NULL                       
-	FROM students s
-	WHERE s.groupsid = :groups_id
-	RETURNING lab_id;
+	SELECT :lab_id AS lab_id;
 	`
 
 	selectNonExistingUserLabs = `

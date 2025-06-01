@@ -6,11 +6,12 @@ const (
 	`
 
 	selectTasksByUserID = `
-	SELECT t.task_id, t.payload
+	SELECT t.task_id, t.payload, ua.score
 	FROM tasks t
 	JOIN modules m ON t.module_id = m.module_id
 	JOIN user_lab ul ON t.user_lab_id  = ul.user_lab_id
 	JOIN users u ON ul.user_id = u.usersid
+	LEFT JOIN user_answer ua ON t.task_id = ua.task_id
 	WHERE u.usersid = $1 AND m.module_id = $2;
 	`
 

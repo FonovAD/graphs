@@ -8,7 +8,7 @@ type GetAssignedTasksByModuleDTOIn struct {
 }
 
 type GetAssignedTasksByModuleDTOOut struct {
-	Tasks []model.TaskByModule `json:"tasks"`
+	Tasks []model.AssignedTaskByModule `json:"tasks"`
 }
 
 type AuthTokenDTOOut struct {
