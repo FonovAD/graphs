@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	model "golang_graphs/backend/internal/domain/model"
 	teacherrepository "golang_graphs/backend/internal/domain/teacher/repository"
 	"golang_graphs/backend/internal/logger"
@@ -224,9 +225,9 @@ func (r *teacherRepository) SelectNonExistingUserLabs(ctx context.Context, pagin
 
 func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context) ([]model.UserLabWithInfo, error) {
 	var tempResults []struct {
-		LabID     int64  `db:"lab_id"`
-		LabName   string `db:"lab_name"`
-		GroupData []byte `db:"group_data"`
+		LabID   int64  `db:"lab_id"`
+		LabName string `db:"lab_name"`
+		Groups  []byte `db:"groups"`
 	}
 
 	err := r.conn.SelectContext(ctx, &tempResults, selectExistingUserLabs)
@@ -237,15 +238,15 @@ func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context) ([]model
 
 	userLabs := make([]model.UserLabWithInfo, 0, len(tempResults))
 	for _, temp := range tempResults {
-		var group model.Group
-		if err := json.Unmarshal(temp.GroupData, &group); err != nil {
-			return nil, err
+		var groups []model.Group
+		if err := json.Unmarshal(temp.Groups, &groups); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal groups: %w", err)
 		}
 
 		userLabs = append(userLabs, model.UserLabWithInfo{
-			LabID:     temp.LabID,
-			LabName:   temp.LabName,
-			GroupData: group,
+			LabID:   temp.LabID,
+			LabName: temp.LabName,
+			Groups:  groups,
 		})
 	}
 

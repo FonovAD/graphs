@@ -136,13 +136,24 @@ const (
 	`
 
 	selectExistingUserLabs = `
-	SELECT l.lab_id, l.name as lab_name, json_build_object('groupID', g.groups_id , 'groupName', g.groupsname) as group_data
-	FROM labs l 
-	INNER JOIN user_lab ul ON l.lab_id = ul.lab_id 
-	join users u on ul.user_id = u.usersid
-	join students s on u.usersid = s.usersid
-	join "groups" g on s.groupsid = g.groups_id
-	group by l.lab_id, g.groups_id;
+	SELECT 
+		l.lab_id, 
+		l.name as lab_name,
+		(
+			SELECT json_agg(json_build_object('groupID', g.groups_id, 'groupName', g.groupsname))
+			FROM (
+				SELECT DISTINCT g.groups_id, g.groupsname
+				FROM user_lab ul
+				JOIN users u ON ul.user_id = u.usersid
+				JOIN students s ON u.usersid = s.usersid
+				JOIN "groups" g ON s.groupsid = g.groups_id
+				WHERE ul.lab_id = l.lab_id
+			) g
+		) as groups
+	FROM labs l
+	WHERE EXISTS (
+		SELECT 1 FROM user_lab WHERE lab_id = l.lab_id
+	);
 	`
 
 	selectTeacher = `
