@@ -266,7 +266,7 @@ func (r *teacherRepository) SelectTeacher(ctx context.Context, user *model.User)
 
 func (r *teacherRepository) SelectGroups(ctx context.Context) ([]model.Group, error) {
 	var groups []model.Group
-	err := r.conn.SelectContext(ctx, groups, selectGroups)
+	err := r.conn.SelectContext(ctx, &groups, selectGroups)
 	if err != nil {
 		r.logger.LogWarning(opSelectGroups, err, nil)
 		return nil, err
