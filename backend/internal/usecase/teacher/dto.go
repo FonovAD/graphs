@@ -118,9 +118,9 @@ type GetNonAssignedLabsDTOOut struct {
 	Labs []model.Lab `json:"labs"`
 }
 
-type GetAssignedLabsDTOIn struct {
-	Page int64 `json:"page"`
-}
+// type GetAssignedLabsDTOIn struct {
+// 	Page int64 `json:"page"`
+// }
 
 type GetAssignedLabsDTOOut struct {
 	Labs []model.UserLabWithInfo `json:"labs"`

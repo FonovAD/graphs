@@ -136,10 +136,13 @@ const (
 	`
 
 	selectExistingUserLabs = `
-	SELECT ul.user_lab_id, l.lab_id, l.name 
+	SELECT l.lab_id, l.name as lab_name, json_build_object('groupID', g.groups_id , 'groupName', g.groupsname) as group_data
 	FROM labs l 
 	INNER JOIN user_lab ul ON l.lab_id = ul.lab_id 
-	LIMIT $1 OFFSET $2;
+	join users u on ul.user_id = u.usersid
+	join students s on u.usersid = s.usersid
+	join "groups" g on s.groupsid = g.groups_id
+	group by l.lab_id, g.groups_id;
 	`
 
 	selectTeacher = `

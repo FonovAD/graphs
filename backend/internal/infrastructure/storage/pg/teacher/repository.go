@@ -221,12 +221,12 @@ func (r *teacherRepository) SelectNonExistingUserLabs(ctx context.Context, pagin
 	return labs, nil
 }
 
-func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context, pagination model.Pagination) ([]model.UserLabWithInfo, error) {
+func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context) ([]model.UserLabWithInfo, error) {
 	var userLabs []model.UserLabWithInfo
 
-	err := r.conn.SelectContext(ctx, &userLabs, selectExistingUserLabs, pagination.Limit, pagination.Offset)
+	err := r.conn.SelectContext(ctx, &userLabs, selectExistingUserLabs)
 	if err != nil {
-		r.logger.LogDebug(opSelectExistingUserLabs, err, pagination)
+		r.logger.LogDebug(opSelectExistingUserLabs, err, nil)
 		return nil, err
 	}
 

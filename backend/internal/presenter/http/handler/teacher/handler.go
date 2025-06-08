@@ -246,14 +246,8 @@ func (h *teacherHandler) GetNonAssignedLabs(ctx echo.Context) error {
 }
 
 func (h *teacherHandler) GetAssignedLabs(ctx echo.Context) error {
-	var request usecase.GetAssignedLabsDTOIn
-	if err := ctx.Bind(&request); err != nil {
-		ctx.Set("error", err.Error())
-		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
-	}
-
 	ctxBack := context.Background()
-	response, err := h.teacherUseCase.GetAssignedLabs(ctxBack, &request)
+	response, err := h.teacherUseCase.GetAssignedLabs(ctxBack)
 	if err != nil {
 		ctx.Set("error", err.Error())
 

@@ -28,7 +28,7 @@ type TeacherUseCase interface {
 	AddModuleLab(ctx context.Context, in *AddModuleLabDTOIn) (*AddModuleLabDTOOut, error)
 	RemoveModuleLab(ctx context.Context, in *RemoveModuleLabDTOIn) (*RemoveModuleLabDTOOut, error)
 	GetNonAssignedLabs(ctx context.Context, in *GetNonAssignedLabsDTOIn) (*GetNonAssignedLabsDTOOut, error)
-	GetAssignedLabs(ctx context.Context, in *GetAssignedLabsDTOIn) (*GetAssignedLabsDTOOut, error)
+	GetAssignedLabs(ctx context.Context) (*GetAssignedLabsDTOOut, error)
 	GetLabModules(ctx context.Context, in *GetLabModulesDTOIn) (*GetLabModulesDTOOut, error)
 	GetGroups(ctx context.Context) (*GetGroupsDTOOut, error)
 	GetTeacher(ctx context.Context, user *model.User) (*model.Teacher, error)
@@ -245,12 +245,8 @@ func (u *teacherUseCase) GetNonAssignedLabs(ctx context.Context, in *GetNonAssig
 	}, nil
 }
 
-func (u *teacherUseCase) GetAssignedLabs(ctx context.Context, in *GetAssignedLabsDTOIn) (*GetAssignedLabsDTOOut, error) {
-	pagination := model.Pagination{
-		Limit:  limit,
-		Offset: limit * (in.Page - 1),
-	}
-	out, err := u.teacherRepo.SelectExistingUserLabs(ctx, pagination)
+func (u *teacherUseCase) GetAssignedLabs(ctx context.Context) (*GetAssignedLabsDTOOut, error) {
+	out, err := u.teacherRepo.SelectExistingUserLabs(ctx)
 	if err != nil {
 		return nil, err
 	}
