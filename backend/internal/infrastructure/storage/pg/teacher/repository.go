@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	model "golang_graphs/backend/internal/domain/model"
 	teacherrepository "golang_graphs/backend/internal/domain/teacher/repository"
 	"golang_graphs/backend/internal/logger"
@@ -222,12 +223,30 @@ func (r *teacherRepository) SelectNonExistingUserLabs(ctx context.Context, pagin
 }
 
 func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context) ([]model.UserLabWithInfo, error) {
-	var userLabs []model.UserLabWithInfo
+	var tempResults []struct {
+		LabID     int64  `db:"lab_id"`
+		LabName   string `db:"lab_name"`
+		GroupData []byte `db:"group_data"`
+	}
 
-	err := r.conn.SelectContext(ctx, &userLabs, selectExistingUserLabs)
+	err := r.conn.SelectContext(ctx, &tempResults, selectExistingUserLabs)
 	if err != nil {
 		r.logger.LogDebug(opSelectExistingUserLabs, err, nil)
 		return nil, err
+	}
+
+	userLabs := make([]model.UserLabWithInfo, 0, len(tempResults))
+	for _, temp := range tempResults {
+		var group model.Group
+		if err := json.Unmarshal(temp.GroupData, &group); err != nil {
+			return nil, err
+		}
+
+		userLabs = append(userLabs, model.UserLabWithInfo{
+			LabID:     temp.LabID,
+			LabName:   temp.LabName,
+			GroupData: group,
+		})
 	}
 
 	return userLabs, nil
