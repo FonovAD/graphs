@@ -1,14 +1,13 @@
 package handler
 
 import (
-<<<<<<< HEAD
+	"context"
 	usecase "golang_graphs/backend/internal/usecase/student"
-	// "context"
+
 	// "golang_graphs/backend/internal/dto"
 	// "golang_graphs/backend/internal/models"
-	// "net/http"
+	"net/http"
 
-	// "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4"
 )
 
@@ -71,8 +70,6 @@ func (h *studentHandler) GetAssignedTasksByModule(ctx echo.Context) error {
 
 // 	return ctx.JSON(http.StatusOK, response)
 // }
-
-
 
 // func (h *handler) SendAnswers(ctx echo.Context) error {
 // 	var request models.SendAnswersRequest
