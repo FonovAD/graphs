@@ -36,7 +36,7 @@ func NewStudentUseCase(
 	}
 }
 
-// func (c *controller) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendTaskResultResponse, error) {
+// func (c *studentUseCase) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendTaskResultResponse, error) {
 
 // 	grade := int64(0)
 // 	moduleType := int64(0)

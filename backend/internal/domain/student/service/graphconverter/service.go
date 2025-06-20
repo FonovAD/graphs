@@ -76,6 +76,16 @@ func (gc *graphConverter) convertJSONStructsToGraph(ctx context.Context, nodes_j
 	return graph, nil
 }
 
+func (gc *graphConverter) parserModuleStruct(ctx context.Context, json_str string) (*ModulesJSON, error) {
+	ans := new(ModulesJSON)
+	// var parser_ans []ModulesDataJSON
+	if err := json.Unmarshal([]byte(json_str), &ans); err != nil {
+		return nil, err
+	}
+	// ans.Modules = parser_ans
+	return ans, nil
+}
+
 // func (c *controller) parserGraphStruct(ctx context.Context, request  SendAnswersRequest) (* Graph, error) {
 // 	graph := new( Graph)
 // 	var json_struct

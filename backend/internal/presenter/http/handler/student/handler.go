@@ -1,6 +1,14 @@
 package handler
 
-import usecase "golang_graphs/backend/internal/usecase/student"
+import (
+	usecase "golang_graphs/backend/internal/usecase/student"
+	// "context"
+	// "golang_graphs/backend/internal/dto"
+	// "golang_graphs/backend/internal/models"
+	// "net/http"
+
+	// "github.com/labstack/echo/v4"
+)
 
 type StudentHandler interface{}
 
@@ -35,14 +43,7 @@ func NewStudentHandler(u usecase.StudentUseCase) StudentHandler {
 // 	return ctx.JSON(http.StatusOK, response)
 // }
 
-// import (
-// 	"context"
-// 	"golang_graphs/backend/internal/dto"
-// 	"golang_graphs/backend/internal/models"
-// 	"net/http"
 
-// 	"github.com/labstack/echo/v4"
-// )
 
 // func (h *handler) SendAnswers(ctx echo.Context) error {
 // 	var request models.SendAnswersRequest
