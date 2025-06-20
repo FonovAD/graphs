@@ -24,4 +24,5 @@ type TeacherRepository interface {
 	InsertTask(ctx context.Context, task *model.Task) (*model.Task, error)
 	UpdateTask(ctx context.Context, task *model.Task) (*model.Task, error)
 	GetTasksByModule(ctx context.Context, module *model.Module) ([]model.TaskByModule, error)
+	GetGroupLabResults(ctx context.Context, group *model.Group) ([]model.GroupLabResult, error)
 }

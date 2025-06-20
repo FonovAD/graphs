@@ -29,6 +29,7 @@ type TeacherHandler interface {
 	CreateTask(ctx echo.Context) error
 	UpdateTask(ctx echo.Context) error
 	GetTasksByModule(ctx echo.Context) error
+	GetLabResults(ctx echo.Context) error
 }
 
 type teacherHandler struct {
@@ -333,6 +334,24 @@ func (h *teacherHandler) GetTasksByModule(ctx echo.Context) error {
 
 	ctxBack := context.Background()
 	response, err := h.teacherUseCase.GetTasksByModule(ctxBack, &request)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (h *teacherHandler) GetLabResults(ctx echo.Context) error {
+	var request usecase.GetLabResultsDTOIn
+	if err := ctx.Bind(&request); err != nil {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+	}
+
+	ctxBack := context.Background()
+	response, err := h.teacherUseCase.GetLabResults(ctxBack, &request)
 	if err != nil {
 		ctx.Set("error", err.Error())
 

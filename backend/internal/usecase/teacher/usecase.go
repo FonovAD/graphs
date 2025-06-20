@@ -36,6 +36,7 @@ type TeacherUseCase interface {
 	CreateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error)
 	UpdateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error)
 	GetTasksByModule(ctx context.Context, in *GetTasksByModuleDTOIn) (*GetTasksByModuleDTOOut, error)
+	GetLabResults(ctx context.Context, in *GetLabResultsDTOIn) (*GetLabResultsDTOOut, error)
 }
 
 type teacherUseCase struct {
@@ -364,6 +365,16 @@ func (u *teacherUseCase) GetTasksByModule(ctx context.Context, in *GetTasksByMod
 	}
 
 	return &GetTasksByModuleDTOOut{Tasks: out}, nil
+}
+
+func (u *teacherUseCase) GetLabResults(ctx context.Context, in *GetLabResultsDTOIn) (*GetLabResultsDTOOut, error) {
+	group := &model.Group{ID: in.GroupID}
+	out, err := u.teacherRepo.GetGroupLabResults(ctx, group)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GetLabResultsDTOOut{Results: out}, nil
 }
 
 // Hash password using the bcrypt hashing algorithm
