@@ -13,6 +13,7 @@ import (
 type StudentUseCase interface {
 	GetAssignedTasksByModule(ctx context.Context, in *GetAssignedTasksByModuleDTOIn) (*GetAssignedTasksByModuleDTOOut, error)
 	AuthToken(ctx context.Context, token string) (*AuthTokenDTOOut, error)
+	SendAnswers(ctx context.Context, request *SendAnswersDTOIn) (*SendAnswersDTOOut, error)
 }
 
 type studentUseCase struct {
@@ -71,46 +72,13 @@ func (u *studentUseCase) AuthToken(ctx context.Context, token string) (*AuthToke
 	}, nil
 }
 
-// func (c *controller) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendTaskResultResponse, error) {
-// 	grade := int64(0)
-// 	moduleType := int64(0)
-// 	for _, module := range request.Modules {
-// 		if len(module.DataModule.Nodes) > 0 && len(module.DataModule.Edges) > 0 {
-// 			grade = 100
-// 		}
-// 		moduleType = module.TaskID
-// 		// grade += c.checkResult(answer, c.findAnswerByID(tasksWithAnswers, answer.TaskID))
-// 	}
+func (u *studentUseCase) SendAnswers(ctx context.Context, request *SendAnswersDTOIn) (*SendAnswersDTOOut, error) {
 
-// 	// maxGrade := int64(100)
-// 	// for _, answer := range tasksWithAnswers {
-// 	// 	maxGrade += answer.MaxGrade
-// 	// }
+	return &SendAnswersDTOOut{}, nil
+}
 
-// 	// result := dto.Result{
-// 	// 	Start:     time.Time{},
-// 	// 	End:       time.Now(),
-// 	// 	Grade:     grade,
-// 	// 	StudentID: user.Id,
-// 	// 	TestID:    1,
-// 	// 	MaxGrade:  maxGrade,
-// 	// }
-
-// 	// err := c.db.InsertResult(ctx, result)
-// 	result := dto.TaskResult{
-// 		Type:   moduleType,
-// 		UserID: user.Id,
-// 		Grade:  grade,
-// 	}
-
-// 	id, err := c.db.InsertTaskResult(ctx, result)
-// 	if err != nil && id == -1 {
-// 		return models.SendTaskResultResponse{TaskType: id}, err
-// 	}
-
-// 	if err != nil {
-// 		return models.SendTaskResultResponse{}, err
-// 	}
-
-// 	return models.SendTaskResultResponse{TaskType: id}, nil
-// }
+func (u *studentUseCase) exportTaskCheck(ctx context.Context, taskType, subType string) {
+	// var TaskChecks = map[string]any{
+	// 	"LinearToLine": u.taskChecker.CheckLinearToLine,
+	// }
+}

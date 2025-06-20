@@ -177,22 +177,6 @@ func (r *teacherRepository) RemoveModuleFromLab(ctx context.Context, moduleLab *
 }
 
 func (r *teacherRepository) InsertLabToStudentGroup(ctx context.Context, userLab *model.UserLabGroup) (*model.UserLabGroup, error) {
-	var studentsCount int
-	err := r.conn.QueryRowContext(ctx, selectStudentsCountFromGroup, userLab.GroupID).Scan(&studentsCount)
-	if err != nil {
-		return nil, err
-	}
-
-	var availableTasksCount int
-	err = r.conn.QueryRowContext(ctx, selectAvailableTasksCountByModule, userLab.LabID).Scan(&availableTasksCount)
-	if err != nil {
-		return nil, err
-	}
-
-	if availableTasksCount < studentsCount {
-		return nil, ErrTasksLessThanStudents
-	}
-
 	rows, err := r.conn.NamedQueryContext(ctx, insertLabToStudentGroup, userLab)
 	if err != nil {
 		r.logger.LogDebug(opInsertLabStudentGroup, err, userLab)

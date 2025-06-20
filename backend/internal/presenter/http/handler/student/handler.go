@@ -48,6 +48,24 @@ func (h *studentHandler) GetAssignedTasksByModule(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, response)
 }
 
+func (h *studentHandler) SendAnswers(ctx echo.Context) error {
+	var request usecase.SendAnswersDTOIn
+	if err := ctx.Bind(&request); err != nil {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+	}
+
+	ctxBack := context.Background()
+	response, err := h.studentUseCase.SendAnswers(ctxBack, &request)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
 // func (h *handler) CheckResults(ctx echo.Context) error {
 // 	var request models.CheckResultsRequest
 // 	if err := ctx.Bind(&request); err != nil {

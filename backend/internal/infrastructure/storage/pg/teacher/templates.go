@@ -70,61 +70,44 @@ const (
 
 	insertLabToStudentGroup = `
 	WITH inserted_user_labs AS (
-    INSERT INTO user_lab (
-        user_id, lab_id, assignment_date, start_time, teacher_id, deadline, score
-    )
-    SELECT 
-        s.usersid, :lab_id, :assignment_date, :start_time, :teacher_id, :deadline, NULL                       
-    FROM students s
-    WHERE s.groupsid = :groups_id
-    RETURNING user_lab_id, user_id
+		INSERT INTO user_lab (
+			user_id, lab_id, assignment_date, start_time, teacher_id, deadline, score
+		)
+		SELECT 
+			s.usersid, :lab_id, :assignment_date, :start_time, :teacher_id, :deadline, NULL                       
+		FROM students s
+		WHERE s.groupsid = :groups_id
+		RETURNING user_lab_id, user_id
 	),
+	-- Доступные таски для лабы
 	available_tasks AS (
 		SELECT 
-			task_id,
-			ROW_NUMBER() OVER (ORDER BY task_id) as task_row
-		FROM tasks
-		WHERE module_id IN (
-			SELECT module_id FROM module_lab WHERE lab_id = :lab_id
-		)
-		AND user_lab_id IS NULL
+			t.task_id,
+			ROW_NUMBER() OVER (ORDER BY t.task_id) - 1 AS task_num  -- Нумерация с 0
+		FROM tasks t
+		JOIN module_lab ml ON t.module_id = ml.module_id
+		WHERE ml.lab_id = :lab_id
 	),
+	-- Нумерованные студенты
 	numbered_students AS (
 		SELECT 
 			user_lab_id,
 			user_id,
-			ROW_NUMBER() OVER (ORDER BY user_id) as student_row
+			ROW_NUMBER() OVER (ORDER BY user_id) - 1 AS student_num  -- Нумерация с 0
 		FROM inserted_user_labs
 	),
-	updated_tasks AS (
-		UPDATE tasks t
-		SET user_lab_id = ns.user_lab_id
-		FROM available_tasks at
-		JOIN numbered_students ns ON at.task_row = ns.student_row
-		WHERE t.task_id = at.task_id
-		RETURNING t.task_id
+	-- Общее кол-во вариков
+	task_count AS (
+		SELECT COUNT(*) AS total FROM available_tasks
 	)
-	SELECT :lab_id AS lab_id;
-	`
-
-	selectAvailableTasksCountByModule = `
-	with modules_from_lab as (
-	select ml.module_id 
-	from module_lab ml
-	join labs l on l.lab_id = ml.lab_id
-	where l.lab_id = $1
-	)
-
-	select count (*) as tasks_count
-	from tasks t
-	join modules_from_lab mfl on mfl.module_id = t.module_id
-	where t.user_lab_id is null;
-	`
-
-	selectStudentsCountFromGroup = `
-	select count (*) as students_count
-	from students s
-	where s.groupsid  = $1;
+	-- Назначение по кругу
+	INSERT INTO user_task (user_lab_id, task_id)
+	SELECT 
+		ns.user_lab_id,
+		at.task_id
+	FROM numbered_students ns
+	JOIN available_tasks at ON at.task_num = (ns.student_num % (SELECT total FROM task_count))
+	RETURNING :lab_id AS lab_id;
 	`
 
 	selectNonExistingUserLabs = `
