@@ -11,7 +11,7 @@ import (
 )
 
 func (i *interactor) NewStudentRepository() repository.StudentRepository {
-	return storage.NewStudentRepository(i.conn)
+	return storage.NewStudentRepository(i.conn, i.logger)
 }
 
 func (i *interactor) NewStudentService() service.StudentService {

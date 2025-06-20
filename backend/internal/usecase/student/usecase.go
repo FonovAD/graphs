@@ -1,6 +1,8 @@
 package usecase
 
 import (
+	"context"
+	"golang_graphs/backend/internal/domain/model"
 	repository "golang_graphs/backend/internal/domain/student/repository"
 	studentservice "golang_graphs/backend/internal/domain/student/service"
 	graphconverter "golang_graphs/backend/internal/domain/student/service/graphconverter"
@@ -9,7 +11,8 @@ import (
 )
 
 type StudentUseCase interface {
-	// CheckToken()
+	GetAssignedTasksByModule(ctx context.Context, in *GetAssignedTasksByModuleDTOIn) (*GetAssignedTasksByModuleDTOOut, error)
+	AuthToken(ctx context.Context, token string) (*AuthTokenDTOOut, error)
 }
 
 type studentUseCase struct {
@@ -36,8 +39,39 @@ func NewStudentUseCase(
 	}
 }
 
-// func (c *studentUseCase) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendTaskResultResponse, error) {
+func (u *studentUseCase) GetAssignedTasksByModule(ctx context.Context, in *GetAssignedTasksByModuleDTOIn) (*GetAssignedTasksByModuleDTOOut, error) {
+	user := &model.User{ID: in.UserID}
+	module := &model.Module{ModuleId: in.ModuleID}
+	out, err := u.studentRepo.GetAssignedTasksByModule(ctx, user, module)
+	if err != nil {
+		return nil, err
+	}
 
+	return &GetAssignedTasksByModuleDTOOut{Tasks: out}, nil
+}
+
+func (u *studentUseCase) AuthToken(ctx context.Context, token string) (*AuthTokenDTOOut, error) {
+	user, err := u.userService.ParseToken(token)
+	if err != nil {
+		return nil, ErrParseToken
+	}
+
+	if user.Role != "student" {
+		return nil, ErrNoPermissions
+	}
+
+	out, err := u.studentRepo.SelectStudent(ctx, user)
+	if err != nil {
+		return nil, err
+	}
+
+	return &AuthTokenDTOOut{
+		UserID:    out.UserID,
+		StudentID: out.ID,
+	}, nil
+}
+
+// func (c *controller) SendAnswers(ctx context.Context, user dto.User, request models.SendAnswersRequest) (models.SendTaskResultResponse, error) {
 // 	grade := int64(0)
 // 	moduleType := int64(0)
 // 	for _, module := range request.Modules {

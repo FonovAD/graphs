@@ -16,4 +16,7 @@ const (
 	opSelectModulesFromLab      = "infra.storage.pg.teacher.repo.SelectModulesFromLab"
 	opSelectGroups              = "infra.storage.pg.teacher.repo.SelectGroups"
 	opSelectTeacher             = "infra.storage.pg.teacher.repo.SelectTeacher"
+	opCreateTask                = "infra.storage.pg.teacher.repo.InsertTask"
+	opUpdateTask                = "infra.storage.pg.teacher.repo.UpdateTask"
+	opSelectTasksByModule       = "infra.storage.pg.teacher.repo.SelectTasksByModule"
 )

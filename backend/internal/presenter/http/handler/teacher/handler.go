@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"errors"
+	storage "golang_graphs/backend/internal/infrastructure/storage/pg/teacher"
 	usecase "golang_graphs/backend/internal/usecase/teacher"
 	"net/http"
 
@@ -25,6 +26,9 @@ type TeacherHandler interface {
 	GetLabModules(ctx echo.Context) error
 	TeacherMiddleware() echo.MiddlewareFunc
 	GetGroups(ctx echo.Context) error
+	CreateTask(ctx echo.Context) error
+	UpdateTask(ctx echo.Context) error
+	GetTasksByModule(ctx echo.Context) error
 }
 
 type teacherHandler struct {
@@ -177,6 +181,10 @@ func (h *teacherHandler) AssignLabGroup(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
+		if errors.Is(err, storage.ErrTasksLessThanStudents) {
+			return ctx.JSON(http.StatusInternalServerError, BadRequestResponse{ErrorMsg: err.Error()})
+		}
+
 		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
 
@@ -238,14 +246,8 @@ func (h *teacherHandler) GetNonAssignedLabs(ctx echo.Context) error {
 }
 
 func (h *teacherHandler) GetAssignedLabs(ctx echo.Context) error {
-	var request usecase.GetAssignedLabsDTOIn
-	if err := ctx.Bind(&request); err != nil {
-		ctx.Set("error", err.Error())
-		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
-	}
-
 	ctxBack := context.Background()
-	response, err := h.teacherUseCase.GetAssignedLabs(ctxBack, &request)
+	response, err := h.teacherUseCase.GetAssignedLabs(ctxBack)
 	if err != nil {
 		ctx.Set("error", err.Error())
 
@@ -277,6 +279,60 @@ func (h *teacherHandler) GetGroups(ctx echo.Context) error {
 	ctxBack := context.Background()
 
 	response, err := h.teacherUseCase.GetGroups(ctxBack)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (h *teacherHandler) CreateTask(ctx echo.Context) error {
+	var request usecase.CreateTaskDTOIn
+	if err := ctx.Bind(&request); err != nil {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+	}
+
+	ctxBack := context.Background()
+	response, err := h.teacherUseCase.CreateTask(ctxBack, &request)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (h *teacherHandler) UpdateTask(ctx echo.Context) error {
+	var request usecase.CreateTaskDTOIn
+	if err := ctx.Bind(&request); err != nil {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+	}
+
+	ctxBack := context.Background()
+	response, err := h.teacherUseCase.UpdateTask(ctxBack, &request)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (h *teacherHandler) GetTasksByModule(ctx echo.Context) error {
+	var request usecase.GetTasksByModuleDTOIn
+	if err := ctx.Bind(&request); err != nil {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+	}
+
+	ctxBack := context.Background()
+	response, err := h.teacherUseCase.GetTasksByModule(ctxBack, &request)
 	if err != nil {
 		ctx.Set("error", err.Error())
 

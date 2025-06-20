@@ -3,6 +3,8 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	model "golang_graphs/backend/internal/domain/model"
 	teacherrepository "golang_graphs/backend/internal/domain/teacher/repository"
 	"golang_graphs/backend/internal/logger"
@@ -175,6 +177,22 @@ func (r *teacherRepository) RemoveModuleFromLab(ctx context.Context, moduleLab *
 }
 
 func (r *teacherRepository) InsertLabToStudentGroup(ctx context.Context, userLab *model.UserLabGroup) (*model.UserLabGroup, error) {
+	var studentsCount int
+	err := r.conn.QueryRowContext(ctx, selectStudentsCountFromGroup, userLab.GroupID).Scan(&studentsCount)
+	if err != nil {
+		return nil, err
+	}
+
+	var availableTasksCount int
+	err = r.conn.QueryRowContext(ctx, selectAvailableTasksCountByModule, userLab.LabID).Scan(&availableTasksCount)
+	if err != nil {
+		return nil, err
+	}
+
+	if availableTasksCount < studentsCount {
+		return nil, ErrTasksLessThanStudents
+	}
+
 	rows, err := r.conn.NamedQueryContext(ctx, insertLabToStudentGroup, userLab)
 	if err != nil {
 		r.logger.LogDebug(opInsertLabStudentGroup, err, userLab)
@@ -205,13 +223,31 @@ func (r *teacherRepository) SelectNonExistingUserLabs(ctx context.Context, pagin
 	return labs, nil
 }
 
-func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context, pagination model.Pagination) ([]model.UserLabWithInfo, error) {
-	var userLabs []model.UserLabWithInfo
+func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context) ([]model.UserLabWithInfo, error) {
+	var tempResults []struct {
+		LabID   int64  `db:"lab_id"`
+		LabName string `db:"lab_name"`
+		Groups  []byte `db:"groups"`
+	}
 
-	err := r.conn.SelectContext(ctx, &userLabs, selectExistingUserLabs, pagination.Limit, pagination.Offset)
+	err := r.conn.SelectContext(ctx, &tempResults, selectExistingUserLabs)
 	if err != nil {
-		r.logger.LogDebug(opSelectExistingUserLabs, err, pagination)
+		r.logger.LogDebug(opSelectExistingUserLabs, err, nil)
 		return nil, err
+	}
+
+	userLabs := make([]model.UserLabWithInfo, 0, len(tempResults))
+	for _, temp := range tempResults {
+		var groups []model.Group
+		if err := json.Unmarshal(temp.Groups, &groups); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal groups: %w", err)
+		}
+
+		userLabs = append(userLabs, model.UserLabWithInfo{
+			LabID:   temp.LabID,
+			LabName: temp.LabName,
+			Groups:  groups,
+		})
 	}
 
 	return userLabs, nil
@@ -250,11 +286,60 @@ func (r *teacherRepository) SelectTeacher(ctx context.Context, user *model.User)
 
 func (r *teacherRepository) SelectGroups(ctx context.Context) ([]model.Group, error) {
 	var groups []model.Group
-	err := r.conn.SelectContext(ctx, groups, selectGroups)
+	err := r.conn.SelectContext(ctx, &groups, selectGroups)
 	if err != nil {
 		r.logger.LogWarning(opSelectGroups, err, nil)
 		return nil, err
 	}
 
 	return groups, nil
+}
+
+func (r *teacherRepository) InsertTask(ctx context.Context, task *model.Task) (*model.Task, error) {
+	rows, err := r.conn.NamedQueryContext(ctx, insertTask, task)
+	if err != nil {
+		r.logger.LogDebug(opCreateTask, err, task)
+		return nil, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		if err := rows.Scan(&task.ID); err != nil {
+			r.logger.LogWarning(opCreateTask, err, task)
+			return nil, err
+		}
+		return task, nil
+	}
+
+	return nil, sql.ErrNoRows
+}
+
+func (r *teacherRepository) UpdateTask(ctx context.Context, task *model.Task) (*model.Task, error) {
+	rows, err := r.conn.NamedQueryContext(ctx, updateTask, task)
+	if err != nil {
+		r.logger.LogDebug(opUpdateTask, err, task)
+		return nil, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		if err := rows.Scan(&task.ID); err != nil {
+			r.logger.LogWarning(opUpdateTask, err, task)
+			return nil, err
+		}
+		return task, nil
+	}
+
+	return nil, sql.ErrNoRows
+}
+
+func (r *teacherRepository) GetTasksByModule(ctx context.Context, module *model.Module) ([]model.TaskByModule, error) {
+	var tasks []model.TaskByModule
+	err := r.conn.SelectContext(ctx, &tasks, selectTasksByModule, module.ModuleId)
+	if err != nil {
+		r.logger.LogDebug(opSelectTasksByModule, err, module.ModuleId)
+		return nil, err
+	}
+
+	return tasks, nil
 }

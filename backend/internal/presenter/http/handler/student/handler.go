@@ -1,6 +1,7 @@
 package handler
 
 import (
+<<<<<<< HEAD
 	usecase "golang_graphs/backend/internal/usecase/student"
 	// "context"
 	// "golang_graphs/backend/internal/dto"
@@ -8,9 +9,13 @@ import (
 	// "net/http"
 
 	// "github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4"
 )
 
-type StudentHandler interface{}
+type StudentHandler interface {
+	StudentMiddleware() echo.MiddlewareFunc
+	GetAssignedTasksByModule(ctx echo.Context) error
+}
 
 type studentHandler struct {
 	studentUseCase usecase.StudentUseCase
@@ -18,6 +23,30 @@ type studentHandler struct {
 
 func NewStudentHandler(u usecase.StudentUseCase) StudentHandler {
 	return &studentHandler{u}
+}
+
+func (h *studentHandler) GetAssignedTasksByModule(ctx echo.Context) error {
+	var request usecase.GetAssignedTasksByModuleDTOIn
+	if err := ctx.Bind(&request); err != nil {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+	}
+
+	userID, ok := ctx.Get("userID").(int64)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	request.UserID = userID
+	ctxBack := context.Background()
+	response, err := h.studentUseCase.GetAssignedTasksByModule(ctxBack, &request)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
 }
 
 // func (h *handler) CheckResults(ctx echo.Context) error {

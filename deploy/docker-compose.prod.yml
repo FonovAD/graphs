@@ -4,11 +4,11 @@ networks:
   graphs:
 
 services:
-  graphs_back_1:
+  graphs_back:
     container_name: graphs_back
     build:
       context: ..
-      dockerfile: prod/Dockerfile
+      dockerfile: deploy/Dockerfile
     environment:
       - POSTGRES_USER=user
       - POSTGRES_DB=graphs
@@ -17,6 +17,6 @@ services:
       - METRICS_PORT=9091
       - PORT=8081
     ports:
-      - "8080:8080"
+      - "8081:8081"
     networks:
       - graphs

@@ -26,7 +26,7 @@ type UserLabGroup struct {
 }
 
 type UserLabWithInfo struct {
-	UserLabID int64  `db:"user_lab_id" json:"userLabId"`
-	LabID     int64  `db:"lab_id" json:"labId"`
-	LabName   string `db:"name" json:"labName"`
+	LabID   int64   `db:"lab_id" json:"labId"`
+	LabName string  `db:"lab_name" json:"labName"`
+	Groups  []Group `db:"groups" json:"groups"`
 }

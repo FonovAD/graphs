@@ -118,9 +118,9 @@ type GetNonAssignedLabsDTOOut struct {
 	Labs []model.Lab `json:"labs"`
 }
 
-type GetAssignedLabsDTOIn struct {
-	Page int64 `json:"page"`
-}
+// type GetAssignedLabsDTOIn struct {
+// 	Page int64 `json:"page"`
+// }
 
 type GetAssignedLabsDTOOut struct {
 	Labs []model.UserLabWithInfo `json:"labs"`
@@ -142,4 +142,22 @@ type AuthTokenDTOOut struct {
 
 type GetGroupsDTOOut struct {
 	Groups []model.Group `json:"groups"`
+}
+
+type CreateTaskDTOIn struct {
+	TaskID   int64  `json:"taskID"`
+	ModuleID int64  `json:"moduleID"`
+	Payload  string `json:"payload"`
+	Answer   string `json:"answer"`
+}
+
+type CreateTaskDTOOut struct {
+	TaskID int64 `json:"taskID"`
+}
+
+type GetTasksByModuleDTOIn struct {
+	ModuleID int64 `json:"moduleID"`
+}
+type GetTasksByModuleDTOOut struct {
+	Tasks []model.TaskByModule `json:"tasks"`
 }

@@ -17,8 +17,11 @@ type TeacherRepository interface {
 	RemoveModuleFromLab(ctx context.Context, moduleLab *model.ModuleLab) (*model.ModuleLab, error)
 	InsertLabToStudentGroup(ctx context.Context, userLab *model.UserLabGroup) (*model.UserLabGroup, error)
 	SelectNonExistingUserLabs(ctx context.Context, pagination model.Pagination) ([]model.Lab, error)
-	SelectExistingUserLabs(ctx context.Context, pagination model.Pagination) ([]model.UserLabWithInfo, error)
+	SelectExistingUserLabs(ctx context.Context) ([]model.UserLabWithInfo, error)
 	SelectModulesFromLab(ctx context.Context, lab *model.Lab) ([]model.ModulesInLab, error)
 	SelectTeacher(ctx context.Context, user *model.User) (*model.Teacher, error)
 	SelectGroups(ctx context.Context) ([]model.Group, error)
+	InsertTask(ctx context.Context, task *model.Task) (*model.Task, error)
+	UpdateTask(ctx context.Context, task *model.Task) (*model.Task, error)
+	GetTasksByModule(ctx context.Context, module *model.Module) ([]model.TaskByModule, error)
 }

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 	model "golang_graphs/backend/internal/domain/model"
 	teacherrepository "golang_graphs/backend/internal/domain/teacher/repository"
 	teacherservice "golang_graphs/backend/internal/domain/teacher/service"
@@ -27,11 +28,14 @@ type TeacherUseCase interface {
 	AddModuleLab(ctx context.Context, in *AddModuleLabDTOIn) (*AddModuleLabDTOOut, error)
 	RemoveModuleLab(ctx context.Context, in *RemoveModuleLabDTOIn) (*RemoveModuleLabDTOOut, error)
 	GetNonAssignedLabs(ctx context.Context, in *GetNonAssignedLabsDTOIn) (*GetNonAssignedLabsDTOOut, error)
-	GetAssignedLabs(ctx context.Context, in *GetAssignedLabsDTOIn) (*GetAssignedLabsDTOOut, error)
+	GetAssignedLabs(ctx context.Context) (*GetAssignedLabsDTOOut, error)
 	GetLabModules(ctx context.Context, in *GetLabModulesDTOIn) (*GetLabModulesDTOOut, error)
 	GetGroups(ctx context.Context) (*GetGroupsDTOOut, error)
 	GetTeacher(ctx context.Context, user *model.User) (*model.Teacher, error)
 	AuthToken(ctx context.Context, token string) (*AuthTokenDTOOut, error)
+	CreateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error)
+	UpdateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error)
+	GetTasksByModule(ctx context.Context, in *GetTasksByModuleDTOIn) (*GetTasksByModuleDTOOut, error)
 }
 
 type teacherUseCase struct {
@@ -179,10 +183,11 @@ func (u *teacherUseCase) AssignLab(ctx context.Context, in *AssignLabDTOIn) (*As
 func (u *teacherUseCase) AssignLabGroup(ctx context.Context, in *AssignLabGroupDTOIn) (*AssignLabGroupDTOOut, error) {
 	groupLab := &model.UserLabGroup{
 		LabID:          in.LabID,
-		AssignmentDate: in.AssignmentDate,
+		AssignmentDate: time.Now(),
 		StartTime:      in.StartTime,
 		TeacherID:      in.AssigneID,
 		Deadline:       in.Deadline,
+		GroupID:        in.GroupID,
 	}
 	out, err := u.teacherRepo.InsertLabToStudentGroup(ctx, groupLab)
 	if err != nil {
@@ -240,12 +245,8 @@ func (u *teacherUseCase) GetNonAssignedLabs(ctx context.Context, in *GetNonAssig
 	}, nil
 }
 
-func (u *teacherUseCase) GetAssignedLabs(ctx context.Context, in *GetAssignedLabsDTOIn) (*GetAssignedLabsDTOOut, error) {
-	pagination := model.Pagination{
-		Limit:  limit,
-		Offset: limit * (in.Page - 1),
-	}
-	out, err := u.teacherRepo.SelectExistingUserLabs(ctx, pagination)
+func (u *teacherUseCase) GetAssignedLabs(ctx context.Context) (*GetAssignedLabsDTOOut, error) {
+	out, err := u.teacherRepo.SelectExistingUserLabs(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -307,6 +308,62 @@ func (u *teacherUseCase) GetGroups(ctx context.Context) (*GetGroupsDTOOut, error
 	return &GetGroupsDTOOut{
 		Groups: groups,
 	}, nil
+}
+
+func (u *teacherUseCase) CreateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error) {
+	answer := sql.NullString{String: in.Answer}
+	if in.Answer != "" {
+		answer.Valid = true
+
+	}
+
+	task := &model.Task{
+		ID:       in.TaskID,
+		ModuleID: in.ModuleID,
+		Payload:  in.Payload,
+		Answer:   answer,
+	}
+	out, err := u.teacherRepo.InsertTask(ctx, task)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CreateTaskDTOOut{
+		TaskID: out.ID,
+	}, nil
+}
+
+func (u *teacherUseCase) UpdateTask(ctx context.Context, in *CreateTaskDTOIn) (*CreateTaskDTOOut, error) {
+	answer := sql.NullString{String: in.Answer}
+	if in.Answer != "" {
+		answer.Valid = true
+
+	}
+
+	task := &model.Task{
+		ID:       in.TaskID,
+		ModuleID: in.ModuleID,
+		Payload:  in.Payload,
+		Answer:   answer,
+	}
+	out, err := u.teacherRepo.UpdateTask(ctx, task)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CreateTaskDTOOut{
+		TaskID: out.ID,
+	}, nil
+}
+
+func (u *teacherUseCase) GetTasksByModule(ctx context.Context, in *GetTasksByModuleDTOIn) (*GetTasksByModuleDTOOut, error) {
+	module := &model.Module{ModuleId: in.ModuleID}
+	out, err := u.teacherRepo.GetTasksByModule(ctx, module)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GetTasksByModuleDTOOut{Tasks: out}, nil
 }
 
 // Hash password using the bcrypt hashing algorithm
