@@ -3,6 +3,7 @@ package usecase
 import (
 	"golang_graphs/backend/internal/domain/model"
 	service "golang_graphs/backend/internal/domain/student/service/graphconverter"
+	"time"
 )
 
 type GetAssignedTasksByModuleDTOIn struct {
@@ -56,7 +57,8 @@ type BeginLabDTOIn struct {
 }
 
 type BeginLabDTOOut struct {
-	LabID int64 `json:"labID"`
+	LabID     int64     `json:"labID"`
+	StartTime time.Time `json:"startTime"`
 }
 
 type FinishLabDTOIn struct {

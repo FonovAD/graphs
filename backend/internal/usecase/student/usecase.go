@@ -134,7 +134,7 @@ func (u *studentUseCase) BeginLab(ctx context.Context, in *BeginLabDTOIn) (*Begi
 		return &BeginLabDTOOut{}, err
 	}
 
-	return &BeginLabDTOOut{LabID: out.LabID}, nil
+	return &BeginLabDTOOut{LabID: out.LabID, StartTime: userLab.StartTime}, nil
 }
 
 func (u *studentUseCase) FinishLab(ctx context.Context, in *FinishLabDTOIn) (*FinishLabDTOOut, error) {
