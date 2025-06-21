@@ -161,3 +161,10 @@ type GetTasksByModuleDTOIn struct {
 type GetTasksByModuleDTOOut struct {
 	Tasks []model.TaskByModule `json:"tasks"`
 }
+
+type GetLabResultsDTOIn struct {
+	GroupID int64 `json:"groupID"`
+}
+type GetLabResultsDTOOut struct {
+	Results []model.GroupLabResult `json:"results"`
+}

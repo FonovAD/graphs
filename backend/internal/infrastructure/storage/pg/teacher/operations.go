@@ -19,4 +19,5 @@ const (
 	opCreateTask                = "infra.storage.pg.teacher.repo.InsertTask"
 	opUpdateTask                = "infra.storage.pg.teacher.repo.UpdateTask"
 	opSelectTasksByModule       = "infra.storage.pg.teacher.repo.SelectTasksByModule"
+	opGetGroupLabResults        = "infra.storage.pg.teacher.repo.GetGroupLabResults"
 )

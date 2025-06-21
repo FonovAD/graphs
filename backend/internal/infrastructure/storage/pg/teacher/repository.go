@@ -237,6 +237,34 @@ func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context) ([]model
 	return userLabs, nil
 }
 
+func (r *teacherRepository) GetGroupLabResults(ctx context.Context, group *model.Group) ([]model.GroupLabResult, error) {
+	var tempResults []struct {
+		LabID    int64  `db:"lab_id"`
+		Students []byte `db:"students"`
+	}
+
+	err := r.conn.SelectContext(ctx, &tempResults, getLabsResults, group.ID)
+	if err != nil {
+		r.logger.LogDebug(opGetGroupLabResults, err, map[string]any{"groupID": group.ID})
+		return nil, err
+	}
+
+	results := make([]model.GroupLabResult, 0, len(tempResults))
+	for _, temp := range tempResults {
+		var students []model.StudentLabResult
+		if err := json.Unmarshal(temp.Students, &students); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal students: %w", err)
+		}
+
+		results = append(results, model.GroupLabResult{
+			LabID:    temp.LabID,
+			Students: students,
+		})
+	}
+
+	return results, nil
+}
+
 func (r *teacherRepository) SelectModulesFromLab(ctx context.Context, lab *model.Lab) ([]model.ModulesInLab, error) {
 	var modules []model.ModulesInLab
 	err := r.conn.SelectContext(ctx, &modules, selectModulesFromLab, lab.ID)

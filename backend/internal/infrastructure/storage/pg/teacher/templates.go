@@ -173,4 +173,52 @@ const (
 	JOIN modules m ON t.module_id = m.module_id
 	WHERE m.module_id = $1;
 	`
+
+	getLabsResults = `
+	WITH student_lab_scores AS (
+		SELECT 
+			ul.lab_id,
+			s.usersid AS user_id,
+			CONCAT(u.last_name, ' ', u.first_name, ' ', u.father_name) AS fio,
+			ul.score AS overall_score,
+			m.module_id,
+			m.type AS module_name,
+			COALESCE(ua.score, 0) AS module_score
+		FROM user_lab ul
+		JOIN students s ON ul.user_id = s.usersid
+		JOIN users u ON s.usersid = u.usersid
+		join user_task ut on ul.user_lab_id = ut.user_lab_id
+		JOIN tasks t ON ut.task_id = t.task_id
+		JOIN modules m ON t.module_id = m.module_id
+		LEFT JOIN user_answer ua ON t.task_id = ua.task_id AND ul.user_lab_id = ua.user_lab_id
+		WHERE s.groupsid = $1
+	)
+
+	SELECT 
+		lab_id,
+		json_agg(
+			json_build_object(
+				'user_id', user_id,
+				'fio', fio,
+				'overall_score', overall_score,
+				'module_results', (
+					SELECT json_agg(
+						json_build_object(
+							'module_id', module_id,
+							'module_name', module_name,
+							'module_score', module_score
+						)
+					)
+					FROM student_lab_scores s2
+					WHERE s2.user_id = s1.user_id AND s2.lab_id = s1.lab_id
+				)
+			)
+		) AS students
+	FROM (
+		SELECT DISTINCT lab_id, user_id, fio, overall_score
+		FROM student_lab_scores
+	) s1
+	GROUP BY lab_id
+	ORDER BY lab_id;
+	`
 )
