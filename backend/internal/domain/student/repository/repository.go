@@ -13,4 +13,5 @@ type StudentRepository interface {
 	SelectScore(ctx context.Context, userLab *model.UserLab) (*model.AssignedTaskByModule, error)
 	BeginLab(ctx context.Context, userLab *model.UserLab) (*model.UserLab, error)
 	FinishLab(ctx context.Context, userLab *model.UserLab) (*model.UserLab, error)
+	SendAnswers(ctx context.Context, userLab *model.UserLabAnswer) (*model.UserLabAnswer, error)
 }

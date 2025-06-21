@@ -28,3 +28,8 @@ type UserTask struct {
 type TaskType struct {
 	TaskType string `db:"task_type"`
 }
+
+type UserLabTask struct {
+	UserLabID int64 `db:"user_lab_id"`
+	TaskID    int64 `db:"task_id"`
+}

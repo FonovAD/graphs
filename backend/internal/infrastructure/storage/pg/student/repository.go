@@ -158,3 +158,36 @@ func (r *studentRepository) FinishLab(ctx context.Context, userLab *model.UserLa
 	}
 	return nil, sql.ErrNoRows
 }
+
+func (r *studentRepository) SendAnswers(ctx context.Context, userLab *model.UserLabAnswer) (*model.UserLabAnswer, error) {
+	rows, err := r.conn.NamedQueryContext(ctx, selectUserLabTask, userLab)
+	if err != nil {
+		return nil, err
+	}
+
+	if rows.Next() {
+		if err := rows.StructScan(&userLab); err != nil {
+			return nil, err
+		}
+	}
+
+	var isActive bool
+	err = r.conn.QueryRowxContext(ctx, checkLabActive, userLab.UserLabID).Scan(&isActive)
+	if err != nil {
+		r.logger.LogWarning(opFinishLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+		return nil, err
+	}
+	if !isActive {
+		return nil, ErrTimeExceeded
+	}
+
+	err = r.conn.QueryRowxContext(ctx, insertScore, userLab.UserLabID, userLab.TaskID, userLab.Answer, userLab.Score).Scan(&userLab.TaskID)
+	if err != nil {
+		return nil, err
+	}
+	if userLab.TaskID == -1 {
+		return nil, ErrAnswerAlreadySent
+	}
+
+	return userLab, nil
+}

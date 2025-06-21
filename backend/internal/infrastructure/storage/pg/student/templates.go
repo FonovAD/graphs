@@ -78,4 +78,32 @@ const (
 	WHERE user_lab.user_lab_id = ur.user_lab_id
 	returning user_lab.lab_id;
 	`
+
+	selectUserLabTask = `
+	select ul.user_lab_id , ut.task_id
+	from labs l 
+	join user_lab ul on l.lab_id = ul.lab_id 
+	join user_task ut on ul.user_lab_id = ut.user_lab_id
+	where ul.user_id = :user_id and l.lab_id = :lab_id;
+	`
+
+	checkLabActive = `
+	SELECT (ul.start_time + l.duration) > NOW() as is_active
+    FROM user_lab ul
+    JOIN labs l ON ul.lab_id = l.lab_id
+    WHERE ul.user_lab_id = $1;
+	`
+
+	insertScore = `
+	WITH insert_result AS (
+    	INSERT INTO user_answer (user_lab_id, task_id, answer, score)
+    	VALUES (:user_lab_id, :task_id, :answer, :score)
+    	ON CONFLICT (user_lab_id, task_id) DO NOTHING 
+    	RETURNING task_id
+	)
+	SELECT COALESCE(
+    (SELECT task_id FROM insert_result),
+    -1  -- Возвращаем -1 если вставка не произошла (конфликт)
+	) AS result_task_id;
+	`
 )

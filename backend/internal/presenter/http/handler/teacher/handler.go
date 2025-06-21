@@ -183,8 +183,8 @@ func (h *teacherHandler) AssignLabGroup(ctx echo.Context) error {
 	if err != nil {
 		ctx.Set("error", err.Error())
 
-		if errors.Is(err, storage.ErrTasksLessThanStudents) {
-			return ctx.JSON(http.StatusInternalServerError, BadRequestResponse{ErrorMsg: err.Error()})
+		if errors.Is(err, storage.ErrLabAlreadyAssigned) {
+			return ctx.JSON(http.StatusBadRequest, request)
 		}
 
 		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})

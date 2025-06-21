@@ -20,7 +20,7 @@ type AuthTokenDTOOut struct {
 }
 
 type SendAnswersDTOOut struct {
-	TypeID int64
+	TaskID int64 `json:"taskID"`
 }
 
 type SendAnswersDTOIn struct {
@@ -30,19 +30,19 @@ type SendAnswersDTOIn struct {
 }
 
 type Module struct {
-	TypeID        int64                     `json:"type"`
-	TaskID        int64                     `json:"taskID"`
-	DataModule    []DataAnswer              `json:"data"`
-	RadiusAns     *int                      `json:"radiusAns"`
-	DiameterAns   *int                      `json:"diameterAns"`
-	Matrix1       map[string]map[string]int `json:"matrix1"`
-	Matrix2       map[string]map[string]int `json:"matrix2"`
-	Source        *string                   `json:"source"`
-	Target        *string                   `json:"target"`
-	WeightPathAns map[string]int            `json:"weightPathAns"`
-	MinPathAns    *int                      `json:"minPathAns"`
-	IsEulerAns    *bool                     `json:"isEulerAns"`
-	IsHamiltonian *bool                     `json:"isHamiltonianAns"`
+	TypeID        int64                     `json:"type,omitempty"`
+	TaskID        int64                     `json:"taskID,omitempty"`
+	DataModule    []DataAnswer              `json:"data,omitempty"`
+	RadiusAns     *int                      `json:"radiusAns,omitempty"`
+	DiameterAns   *int                      `json:"diameterAns,omitempty"`
+	Matrix1       map[string]map[string]int `json:"matrix1,omitempty"`
+	Matrix2       map[string]map[string]int `json:"matrix2,omitempty"`
+	Source        *string                   `json:"source,omitempty"`
+	Target        *string                   `json:"target,omitempty"`
+	WeightPathAns map[string]int            `json:"weightPathAns,omitempty"`
+	MinPathAns    *int                      `json:"minPathAns,omitempty"`
+	IsEulerAns    *bool                     `json:"isEulerAns,omitempty"`
+	IsHamiltonian *bool                     `json:"isHamiltonianAns,omitempty"`
 }
 
 type DataAnswer struct {

@@ -77,6 +77,7 @@ const (
 			s.usersid, :lab_id, :assignment_date, :start_time, :teacher_id, :deadline, NULL                       
 		FROM students s
 		WHERE s.groupsid = :groups_id
+		ON CONFLICT (user_id, lab_id) DO NOTHING
 		RETURNING user_lab_id, user_id
 	),
 	-- Доступные таски для лабы

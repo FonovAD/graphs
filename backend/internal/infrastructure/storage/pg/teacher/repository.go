@@ -192,7 +192,7 @@ func (r *teacherRepository) InsertLabToStudentGroup(ctx context.Context, userLab
 		return userLab, nil
 	}
 
-	return nil, sql.ErrNoRows
+	return nil, ErrLabAlreadyAssigned
 }
 
 func (r *teacherRepository) SelectNonExistingUserLabs(ctx context.Context, pagination model.Pagination) ([]model.Lab, error) {

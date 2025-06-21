@@ -30,3 +30,12 @@ type UserLabWithInfo struct {
 	LabName string  `db:"lab_name" json:"labName"`
 	Groups  []Group `db:"groups" json:"groups"`
 }
+
+type UserLabAnswer struct {
+	UserLabID int64  `db:"user_lab_id"`
+	UserID    int64  `db:"user_id"`
+	LabID     int64  `db:"lab_id"`
+	TaskID    int64  `db:"task_id"`
+	Answer    string `db:"answer"`
+	Score     int    `db:"score"`
+}

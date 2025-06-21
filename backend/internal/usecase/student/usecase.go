@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"golang_graphs/backend/internal/domain/model"
 	repository "golang_graphs/backend/internal/domain/student/repository"
@@ -113,7 +114,17 @@ func (u *studentUseCase) SendAnswers(ctx context.Context, in *SendAnswersDTOIn) 
 	taskCheckerFunc := u.extractTaskCheck(taskType.TaskType)
 
 	targetScore := taskCheckerFunc(inputData)
-	return &SendAnswersDTOOut{TypeID: int64(targetScore)}, nil
+	answer, err := json.Marshal(module.DataModule[0])
+	if err != nil {
+		return nil, err
+	}
+	userLabAnswer := &model.UserLabAnswer{UserID: in.UserID, LabID: in.LabID, Answer: string(answer), Score: targetScore}
+	out, err := u.studentRepo.SendAnswers(ctx, userLabAnswer)
+	if err != nil {
+		return nil, err
+	}
+
+	return &SendAnswersDTOOut{TaskID: out.TaskID}, nil
 }
 
 func (u *studentUseCase) BeginLab(ctx context.Context, in *BeginLabDTOIn) (*BeginLabDTOOut, error) {

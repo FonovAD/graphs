@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"errors"
+	storage "golang_graphs/backend/internal/infrastructure/storage/pg/student"
 	usecase "golang_graphs/backend/internal/usecase/student"
 
 	// "golang_graphs/backend/internal/dto"
@@ -15,6 +17,7 @@ type StudentHandler interface {
 	StudentMiddleware() echo.MiddlewareFunc
 	GetAssignedTasksByModule(ctx echo.Context) error
 	BeginLab(ctx echo.Context) error
+	SendAnswers(ctx echo.Context) error
 	FinishLab(ctx echo.Context) error
 }
 
@@ -61,6 +64,9 @@ func (h *studentHandler) SendAnswers(ctx echo.Context) error {
 	response, err := h.studentUseCase.SendAnswers(ctxBack, &request)
 	if err != nil {
 		ctx.Set("error", err.Error())
+		if errors.Is(err, storage.ErrAnswerAlreadySent) || errors.Is(err, storage.ErrTimeExceeded) {
+			return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+		}
 
 		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
 	}
