@@ -178,6 +178,7 @@ const (
 	WITH student_lab_scores AS (
 		SELECT 
 			ul.lab_id,
+			l.name AS lab_name,  -- Добавляем название лабораторной работы
 			s.usersid AS user_id,
 			CONCAT(u.last_name, ' ', u.first_name, ' ', u.father_name) AS fio,
 			ul.score AS overall_score,
@@ -185,6 +186,7 @@ const (
 			m.type AS module_name,
 			COALESCE(ua.score, 0) AS module_score
 		FROM user_lab ul
+		JOIN labs l ON ul.lab_id = l.lab_id  -- Добавляем соединение с таблицей labs
 		JOIN students s ON ul.user_id = s.usersid
 		JOIN users u ON s.usersid = u.usersid
 		join user_task ut on ul.user_lab_id = ut.user_lab_id
@@ -196,6 +198,7 @@ const (
 
 	SELECT 
 		lab_id,
+		MAX(lab_name) AS lab_name,  -- Добавляем название лабораторной работы в результат
 		json_agg(
 			json_build_object(
 				'user_id', user_id,
@@ -215,7 +218,7 @@ const (
 			)
 		) AS students
 	FROM (
-		SELECT DISTINCT lab_id, user_id, fio, overall_score
+		SELECT DISTINCT lab_id, lab_name, user_id, fio, overall_score
 		FROM student_lab_scores
 	) s1
 	GROUP BY lab_id

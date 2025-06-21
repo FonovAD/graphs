@@ -70,3 +70,57 @@ func (r *studentRepository) SelectStudent(ctx context.Context, user *model.User)
 	r.logger.LogDebug(opSelectStudent, nil, user.ID)
 	return nil, sql.ErrNoRows
 }
+
+func (r *studentRepository) SelectModuleTypeByLab(ctx context.Context, userLab *model.UserLab) (*model.TaskType, error) {
+	var taskType model.TaskType
+	rows, err := r.conn.NamedQueryContext(ctx, selectModuleTypeByLab, userLab)
+	if err != nil {
+		r.logger.LogWarning(opSelectModuleTypeByLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+		return nil, err
+	}
+
+	if rows.Next() {
+		if err := rows.Scan(&taskType.TaskType); err != nil {
+			r.logger.LogWarning(opSelectModuleTypeByLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+			return nil, err
+		}
+		return &taskType, nil
+	}
+	return nil, sql.ErrNoRows
+}
+
+func (r *studentRepository) SelectModuleTypeByTask(ctx context.Context, userTask *model.UserTask) (*model.TaskType, error) {
+	var taskType model.TaskType
+	rows, err := r.conn.NamedQueryContext(ctx, selectModuleTypeByTask, userTask)
+	if err != nil {
+		r.logger.LogWarning(opSelectModuleTypeByTask, err, map[string]any{"userID": userTask.UserID, "labID": userTask.TaskID})
+		return nil, err
+	}
+
+	if rows.Next() {
+		if err := rows.Scan(&taskType.TaskType); err != nil {
+			r.logger.LogWarning(opSelectModuleTypeByTask, err, map[string]any{"userID": userTask.UserID, "labID": userTask.TaskID})
+			return nil, err
+		}
+		return &taskType, nil
+	}
+	return nil, sql.ErrNoRows
+}
+
+func (r *studentRepository) SelectScore(ctx context.Context, userLab *model.UserLab) (*model.AssignedTaskByModule, error) {
+	var score model.AssignedTaskByModule
+	rows, err := r.conn.NamedQueryContext(ctx, selectScore, userLab)
+	if err != nil {
+		r.logger.LogWarning(opSelectScore, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+		return nil, err
+	}
+
+	if rows.Next() {
+		if err := rows.Scan(&score.Score); err != nil {
+			r.logger.LogWarning(opSelectScore, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+			return nil, err
+		}
+		return &score, nil
+	}
+	return nil, sql.ErrNoRows
+}

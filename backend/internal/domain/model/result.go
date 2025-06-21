@@ -2,6 +2,7 @@ package model
 
 type GroupLabResult struct {
 	LabID    int64              `json:"lab_id"`
+	LabName  string             `json:"lab_name"`
 	Students []StudentLabResult `json:"students"`
 }
 

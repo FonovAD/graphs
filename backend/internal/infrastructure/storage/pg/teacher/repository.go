@@ -240,6 +240,7 @@ func (r *teacherRepository) SelectExistingUserLabs(ctx context.Context) ([]model
 func (r *teacherRepository) GetGroupLabResults(ctx context.Context, group *model.Group) ([]model.GroupLabResult, error) {
 	var tempResults []struct {
 		LabID    int64  `db:"lab_id"`
+		LabName  string `db:"lab_name"`
 		Students []byte `db:"students"`
 	}
 
@@ -258,6 +259,7 @@ func (r *teacherRepository) GetGroupLabResults(ctx context.Context, group *model
 
 		results = append(results, model.GroupLabResult{
 			LabID:    temp.LabID,
+			LabName:  temp.LabName,
 			Students: students,
 		})
 	}

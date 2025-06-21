@@ -24,22 +24,36 @@ type SendAnswersDTOOut struct {
 }
 
 type SendAnswersDTOIn struct {
+	UserID  int64
+	LabID   int64    `json:"labID"`
 	Modules []Module `json:"modules"`
 }
 
 type Module struct {
-	TypeID      int64      `json:"type"`
-	SubType     string     `json:"subType"`
-	DataModule  DataAnswer `json:"data"`
-	InputValue1 string     `json:"inputValue1"`
-	InputValue2 string     `json:"inputValue2"`
-	InputValue3 string     `json:"inputValue3"`
-	InputValue4 string     `json:"inputValue4"`
-	InputValue5 string     `json:"inputValue5"`
-	InputValue6 string     `json:"inputValue6"`
+	TypeID        int64                     `json:"type"`
+	TaskID        int64                     `json:"taskID"`
+	DataModule    []DataAnswer              `json:"data"`
+	RadiusAns     *int                      `json:"radiusAns"`
+	DiameterAns   *int                      `json:"diameterAns"`
+	Matrix1       map[string]map[string]int `json:"matrix1"`
+	Matrix2       map[string]map[string]int `json:"matrix2"`
+	Source        *string                   `json:"source"`
+	Target        *string                   `json:"target"`
+	WeightPathAns map[string]int            `json:"weightPathAns"`
+	MinPathAns    *int                      `json:"minPathAns"`
+	IsEulerAns    *bool                     `json:"isEulerAns"`
+	IsHamiltonian *bool                     `json:"isHamiltonianAns"`
 }
 
 type DataAnswer struct {
 	Nodes []service.NodeJSON `json:"nodes"`
 	Edges []service.EdgeJSON `json:"edges"`
+}
+
+type BeginLabDTOIn struct {
+	LabID int64 `json:"labID`
+}
+
+type BeginLabDTOOut struct {
+	LabID int64 `json:"labID`
 }

@@ -43,28 +43,28 @@ type checker struct {
 }
 
 type InputData struct {
-	task_graph1        *model.Graph
-	task_graph2        *model.Graph
-	answer_graph       *model.Graph
-	radius_ans         int
-	diameter_ans       int
-	matrix1            map[string]map[string]int
-	matrix2            map[string]map[string]int
-	source             string
-	target             string
-	weights_path_ans   map[string]int
-	min_path_ans       int
-	is_euler_ans       bool
-	is_hamiltonian_ans bool
+	TaskGraph1       *model.Graph // DataAnswer[1]
+	TaskGraph2       *model.Graph // DataAnswer[2]
+	AnswerGraph      *model.Graph // DataAnswer[0]
+	RadiusAns        int          //
+	DiameterAns      int
+	Matrix1          map[string]map[string]int
+	Matrix2          map[string]map[string]int
+	Source           string
+	Target           string
+	WeightsPathAns   map[string]int
+	MinPathAns       int
+	IsEulerAns       bool
+	IsHamiltonianAns bool
 }
 
 type Checker interface {
 	// CheckLinearToLine(task, answer *model.Graph) int
 	// CheckLinearFromLine(task, answer *model.Graph) int
-	// CheckRadiusAndDiameter(task *model.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int
+	// CheckRadiusAndDiameter(task *model.Graph, RadiusAns int, DiameterAns int, dist_matrix_ans map[string]map[string]int) int
 	// CheckAdjacentMatrix(task *model.Graph, answer map[string]map[string]int) int
-	// CheckEulerGraph(task *model.Graph, is_euler_ans bool, answer_graph *model.Graph) int
-	// CheckMinPath(task *model.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer *model.Graph) int
+	// CheckEulerGraph(task *model.Graph, IsEulerAns bool, AnswerGraph *model.Graph) int
+	// CheckMinPath(task *model.Graph, Source string, Target string, MinPathAns int, WeightsPathAns map[string]int, answer *model.Graph) int
 	// CheckPlanarGraph(answer *model.Graph) int
 	// CheckIntersectionGraphs(answer, graph1, graph2 *model.Graph) int
 	// CheckUnionGraphs(answer, graph1, graph2 *model.Graph) int
@@ -76,11 +76,11 @@ type Checker interface {
 	// // Composition
 	// CheckLexicographicalProduct(answer, graph1, graph2 *model.Graph) int
 
-	// CheckIntersectionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
-	// CheckUnionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
-	// CheckJoinMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
+	// CheckIntersectionMatrices(answer *model.Graph, Matrix1, Matrix2 map[string]map[string]int) int
+	// CheckUnionMatrices(answer *model.Graph, Matrix1, Matrix2 map[string]map[string]int) int
+	// CheckJoinMatrices(answer *model.Graph, Matrix1, Matrix2 map[string]map[string]int) int
 
-	// CheckHamiltonian(task *model.Graph, is_hamiltonian_ans bool, answer_graph *model.Graph) int
+	// CheckHamiltonian(task *model.Graph, IsHamiltonianAns bool, AnswerGraph *model.Graph) int
 	CheckLinearToLine(input_data *InputData) int
 	CheckLinearFromLine(input_data *InputData) int
 	CheckRadiusAndDiameter(input_data *InputData) int
@@ -126,8 +126,8 @@ func Max_(a int, b int) int {
 
 // Проверка модуля "Реберный граф" (из графа в реберный)
 func (ch *checker) CheckLinearToLine(input_data *InputData) int {
-	task := input_data.task_graph1
-	answer := input_data.answer_graph
+	task := input_data.TaskGraph1
+	answer := input_data.AnswerGraph
 	if len(task.Nodes)*len(answer.Nodes) == 0 {
 		return 0
 	}
@@ -152,8 +152,8 @@ func (ch *checker) CheckLinearToLine(input_data *InputData) int {
 
 // Проверка модуля "Реберный граф" (из реберного в граф)
 func (ch *checker) CheckLinearFromLine(input_data *InputData) int {
-	task := input_data.task_graph1
-	answer := input_data.answer_graph
+	task := input_data.TaskGraph1
+	answer := input_data.AnswerGraph
 	if len(task.Nodes)*len(answer.Nodes) == 0 {
 		return 0
 	}
@@ -177,10 +177,10 @@ func (ch *checker) CheckLinearFromLine(input_data *InputData) int {
 
 // Проверки модуля "Радиус и диметр"
 func (ch *checker) CheckRadiusAndDiameter(input_data *InputData) int {
-	task := input_data.task_graph1
-	radius_ans := input_data.radius_ans
-	diameter_ans := input_data.diameter_ans
-	dist_matrix_ans := input_data.matrix1
+	task := input_data.TaskGraph1
+	RadiusAns := input_data.RadiusAns
+	DiameterAns := input_data.DiameterAns
+	dist_matrix_ans := input_data.Matrix1
 	if len(task.Nodes)*len(dist_matrix_ans) == 0 {
 		return 0
 	}
@@ -210,15 +210,15 @@ func (ch *checker) CheckRadiusAndDiameter(input_data *InputData) int {
 			diameter = dist
 		}
 	}
-	if radius != radius_ans || diameter != diameter_ans {
+	if radius != RadiusAns || diameter != DiameterAns {
 		return 0
 	}
 	return Max_(0, 100-err_count*RADIUS_AND_DIAMETER_MODULE_COEFF)
 }
 
 func (ch *checker) CheckAdjacentMatrix(input_data *InputData) int {
-	task := input_data.task_graph1
-	answer := input_data.matrix1
+	task := input_data.TaskGraph1
+	answer := input_data.Matrix1
 	adj_matrix := task.NodeLabelAdjacentMatrix()
 	if len(adj_matrix) != len(answer) {
 		return 0
@@ -238,25 +238,25 @@ func (ch *checker) CheckAdjacentMatrix(input_data *InputData) int {
 // Проверка модуля "Эйлеров граф"
 // Должно быть больше 2 ребер
 func (ch *checker) CheckEulerGraph(input_data *InputData) int {
-	task := input_data.task_graph1
-	is_euler_ans := input_data.is_euler_ans
-	answer_graph := input_data.answer_graph
+	task := input_data.TaskGraph1
+	IsEulerAns := input_data.IsEulerAns
+	AnswerGraph := input_data.AnswerGraph
 	task_gograph := createGographWithoutInfo(task)
-	if len(task.Edges)*len(answer_graph.Edges)*len(task.Nodes)*len(answer_graph.Nodes) == 0 {
+	if len(task.Edges)*len(AnswerGraph.Edges)*len(task.Nodes)*len(AnswerGraph.Nodes) == 0 {
 		return 0
 	}
 	_, is_euler := gograph.EulerUndirected(task_gograph)
-	if is_euler != is_euler_ans {
+	if is_euler != IsEulerAns {
 		return 0
 	}
-	if !is_euler && !is_euler_ans {
+	if !is_euler && !IsEulerAns {
 		return 100
 	}
 	walk_ans_labels := make(map[string]model.Edge)
-	for _, edge := range answer_graph.Edges {
+	for _, edge := range AnswerGraph.Edges {
 		walk_ans_labels[edge.Label] = edge
 	}
-	n_edges := len(answer_graph.Edges)
+	n_edges := len(AnswerGraph.Edges)
 	if len(walk_ans_labels) != n_edges {
 		return 0
 	}
@@ -300,29 +300,29 @@ func (ch *checker) CheckEulerGraph(input_data *InputData) int {
 // Проверка модуля "Кратчайший путь"
 // Веса должны быть положительными
 func (ch *checker) CheckMinPath(input_data *InputData) int {
-	task := input_data.task_graph1
-	source := input_data.source
-	target := input_data.target
-	min_path_ans := input_data.min_path_ans
-	weights_path_ans := input_data.weights_path_ans
-	answer := input_data.answer_graph
-	source_node := task.Nodes[0]
-	target_node := task.Nodes[0]
+	task := input_data.TaskGraph1
+	Source := input_data.Source
+	Target := input_data.Target
+	MinPathAns := input_data.MinPathAns
+	WeightsPathAns := input_data.WeightsPathAns
+	answer := input_data.AnswerGraph
+	Source_node := task.Nodes[0]
+	Target_node := task.Nodes[0]
 	for _, node := range task.Nodes {
-		if source == node.Label {
-			source_node = node
+		if Source == node.Label {
+			Source_node = node
 		}
-		if target == node.Label {
-			target_node = node
+		if Target == node.Label {
+			Target_node = node
 		}
 	}
-	min_path, weights_path := task.MinPath(source_node, target_node, true)
-	if min_path != min_path_ans {
+	min_path, weights_path := task.MinPath(Source_node, Target_node, true)
+	if min_path != MinPathAns {
 		return 0
 	}
 	err_count := 0
 	for node_label, weight := range weights_path {
-		weight_ans, ok := weights_path_ans[node_label]
+		weight_ans, ok := WeightsPathAns[node_label]
 		if !ok || weight_ans != weight {
 			err_count++
 		}
@@ -362,8 +362,8 @@ func isIntersect(edge1, edge2 model.Edge) bool {
 }
 
 func (ch *checker) CheckPlanarGraph(input_data *InputData) int {
-	answer := input_data.answer_graph
-	matrix := input_data.matrix1
+	answer := input_data.AnswerGraph
+	matrix := input_data.Matrix1
 	if len(answer.Edges)*len(answer.Nodes) == 0 {
 		return 0
 	}
@@ -434,9 +434,9 @@ func (ch *checker) checkBinaryOperations(answer, true_answer *model.Graph) (int,
 }
 
 func (ch *checker) CheckIntersectionGraphs(input_data *InputData) int {
-	answer := input_data.answer_graph
-	graph1 := input_data.task_graph1
-	graph2 := input_data.task_graph2
+	answer := input_data.AnswerGraph
+	graph1 := input_data.TaskGraph1
+	graph2 := input_data.TaskGraph2
 	true_answer := graph1.Intersect(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
@@ -444,9 +444,9 @@ func (ch *checker) CheckIntersectionGraphs(input_data *InputData) int {
 }
 
 func (ch *checker) CheckUnionGraphs(input_data *InputData) int {
-	answer := input_data.answer_graph
-	graph1 := input_data.task_graph1
-	graph2 := input_data.task_graph2
+	answer := input_data.AnswerGraph
+	graph1 := input_data.TaskGraph1
+	graph2 := input_data.TaskGraph2
 	true_answer := graph1.Union(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
@@ -454,9 +454,9 @@ func (ch *checker) CheckUnionGraphs(input_data *InputData) int {
 }
 
 func (ch *checker) CheckJoinGraphs(input_data *InputData) int {
-	answer := input_data.answer_graph
-	graph1 := input_data.task_graph1
-	graph2 := input_data.task_graph2
+	answer := input_data.AnswerGraph
+	graph1 := input_data.TaskGraph1
+	graph2 := input_data.TaskGraph2
 	true_answer := graph1.Join(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
@@ -464,48 +464,48 @@ func (ch *checker) CheckJoinGraphs(input_data *InputData) int {
 }
 
 func (ch *checker) CheckIntersectionMatrices(input_data *InputData) int {
-	answer := input_data.answer_graph
-	matrix1 := input_data.matrix1
-	matrix2 := input_data.matrix2
-	graph1 := model.MakeGraphFromAdjLabelMatrix(matrix1)
-	graph2 := model.MakeGraphFromAdjLabelMatrix(matrix2)
+	answer := input_data.AnswerGraph
+	Matrix1 := input_data.Matrix1
+	Matrix2 := input_data.Matrix2
+	graph1 := model.MakeGraphFromAdjLabelMatrix(Matrix1)
+	graph2 := model.MakeGraphFromAdjLabelMatrix(Matrix2)
 	return ch.CheckIntersectionGraphs(&InputData{
-		task_graph1:  graph1,
-		task_graph2:  graph2,
-		answer_graph: answer,
+		TaskGraph1:  graph1,
+		TaskGraph2:  graph2,
+		AnswerGraph: answer,
 	})
 }
 
 func (ch *checker) CheckUnionMatrices(input_data *InputData) int {
-	answer := input_data.answer_graph
-	matrix1 := input_data.matrix1
-	matrix2 := input_data.matrix2
-	graph1 := model.MakeGraphFromAdjLabelMatrix(matrix1)
-	graph2 := model.MakeGraphFromAdjLabelMatrix(matrix2)
+	answer := input_data.AnswerGraph
+	Matrix1 := input_data.Matrix1
+	Matrix2 := input_data.Matrix2
+	graph1 := model.MakeGraphFromAdjLabelMatrix(Matrix1)
+	graph2 := model.MakeGraphFromAdjLabelMatrix(Matrix2)
 	return ch.CheckUnionGraphs(&InputData{
-		task_graph1:  graph1,
-		task_graph2:  graph2,
-		answer_graph: answer,
+		TaskGraph1:  graph1,
+		TaskGraph2:  graph2,
+		AnswerGraph: answer,
 	})
 }
 
 func (ch *checker) CheckJoinMatrices(input_data *InputData) int {
-	answer := input_data.answer_graph
-	matrix1 := input_data.matrix1
-	matrix2 := input_data.matrix2
-	graph1 := model.MakeGraphFromAdjLabelMatrix(matrix1)
-	graph2 := model.MakeGraphFromAdjLabelMatrix(matrix2)
+	answer := input_data.AnswerGraph
+	Matrix1 := input_data.Matrix1
+	Matrix2 := input_data.Matrix2
+	graph1 := model.MakeGraphFromAdjLabelMatrix(Matrix1)
+	graph2 := model.MakeGraphFromAdjLabelMatrix(Matrix2)
 	return ch.CheckJoinGraphs(&InputData{
-		task_graph1:  graph1,
-		task_graph2:  graph2,
-		answer_graph: answer,
+		TaskGraph1:  graph1,
+		TaskGraph2:  graph2,
+		AnswerGraph: answer,
 	})
 }
 
 func (ch *checker) CheckCartesianProduct(input_data *InputData) int {
-	answer := input_data.answer_graph
-	graph1 := input_data.task_graph1
-	graph2 := input_data.task_graph2
+	answer := input_data.AnswerGraph
+	graph1 := input_data.TaskGraph1
+	graph2 := input_data.TaskGraph2
 	true_answer := graph1.CartesianProduct(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
@@ -513,9 +513,9 @@ func (ch *checker) CheckCartesianProduct(input_data *InputData) int {
 }
 
 func (ch *checker) CheckTensorProduct(input_data *InputData) int {
-	answer := input_data.answer_graph
-	graph1 := input_data.task_graph1
-	graph2 := input_data.task_graph2
+	answer := input_data.AnswerGraph
+	graph1 := input_data.TaskGraph1
+	graph2 := input_data.TaskGraph2
 	true_answer := graph1.TensorProduct(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
@@ -523,9 +523,9 @@ func (ch *checker) CheckTensorProduct(input_data *InputData) int {
 }
 
 func (ch *checker) CheckLexicographicalProduct(input_data *InputData) int {
-	answer := input_data.answer_graph
-	graph1 := input_data.task_graph1
-	graph2 := input_data.task_graph2
+	answer := input_data.AnswerGraph
+	graph1 := input_data.TaskGraph1
+	graph2 := input_data.TaskGraph2
 	true_answer := graph1.LexicographicalProduct(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
@@ -533,24 +533,24 @@ func (ch *checker) CheckLexicographicalProduct(input_data *InputData) int {
 }
 
 func (ch *checker) CheckHamiltonian(input_data *InputData) int {
-	task := input_data.task_graph1
-	answer_graph := input_data.answer_graph
-	is_hamiltonian_ans := input_data.is_hamiltonian_ans
-	if answer_graph == nil {
+	task := input_data.TaskGraph1
+	AnswerGraph := input_data.AnswerGraph
+	IsHamiltonianAns := input_data.IsHamiltonianAns
+	if AnswerGraph == nil {
 		return 0
 	}
 	bool_ans, _ := task.HamiltonianCycle()
-	if bool_ans != is_hamiltonian_ans {
+	if bool_ans != IsHamiltonianAns {
 		return 0
 	}
-	if !bool_ans && !is_hamiltonian_ans {
+	if !bool_ans && !IsHamiltonianAns {
 		return 100
 	}
 	path := make(map[string]int)
 	for _, node := range task.Nodes {
 		path[node.Label] = 0
 	}
-	for _, edge := range answer_graph.Edges {
+	for _, edge := range AnswerGraph.Edges {
 		if edge.Color != "" {
 			path[edge.Source.Label]++
 			path[edge.Target.Label]++
