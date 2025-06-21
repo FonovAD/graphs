@@ -42,29 +42,67 @@ func createGographWithoutInfo(graph *model.Graph) *gograph.Mutable {
 type checker struct {
 }
 
+type InputData struct {
+	task_graph1        *model.Graph
+	task_graph2        *model.Graph
+	answer_graph       *model.Graph
+	radius_ans         int
+	diameter_ans       int
+	matrix1            map[string]map[string]int
+	matrix2            map[string]map[string]int
+	source             string
+	target             string
+	weights_path_ans   map[string]int
+	min_path_ans       int
+	is_euler_ans       bool
+	is_hamiltonian_ans bool
+}
+
 type Checker interface {
-	CheckLinearToLine(task, answer *model.Graph) int
-	CheckLinearFromLine(task, answer *model.Graph) int
-	CheckRadiusAndDiameter(task *model.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int
-	CheckAdjacentMatrix(task *model.Graph, answer map[string]map[string]int) int
-	CheckEulerGraph(task *model.Graph, is_euler_ans bool, answer_graph *model.Graph) int
-	CheckMinPath(task *model.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer *model.Graph) int
-	CheckPlanarGraph(answer *model.Graph) int
-	CheckIntersectionGraphs(answer, graph1, graph2 *model.Graph) int
-	CheckUnionGraphs(answer, graph1, graph2 *model.Graph) int
-	CheckJoinGraphs(answer, graph1, graph2 *model.Graph) int
+	// CheckLinearToLine(task, answer *model.Graph) int
+	// CheckLinearFromLine(task, answer *model.Graph) int
+	// CheckRadiusAndDiameter(task *model.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int
+	// CheckAdjacentMatrix(task *model.Graph, answer map[string]map[string]int) int
+	// CheckEulerGraph(task *model.Graph, is_euler_ans bool, answer_graph *model.Graph) int
+	// CheckMinPath(task *model.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer *model.Graph) int
+	// CheckPlanarGraph(answer *model.Graph) int
+	// CheckIntersectionGraphs(answer, graph1, graph2 *model.Graph) int
+	// CheckUnionGraphs(answer, graph1, graph2 *model.Graph) int
+	// CheckJoinGraphs(answer, graph1, graph2 *model.Graph) int
+	// // Harary definition
+	// CheckCartesianProduct(answer, graph1, graph2 *model.Graph) int
+	// // Gorbatov definition
+	// CheckTensorProduct(answer, graph1, graph2 *model.Graph) int
+	// // Composition
+	// CheckLexicographicalProduct(answer, graph1, graph2 *model.Graph) int
+
+	// CheckIntersectionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
+	// CheckUnionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
+	// CheckJoinMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
+
+	// CheckHamiltonian(task *model.Graph, is_hamiltonian_ans bool, answer_graph *model.Graph) int
+	CheckLinearToLine(input_data *InputData) int
+	CheckLinearFromLine(input_data *InputData) int
+	CheckRadiusAndDiameter(input_data *InputData) int
+	CheckAdjacentMatrix(input_data *InputData) int
+	CheckEulerGraph(input_data *InputData) int
+	CheckMinPath(input_data *InputData) int
+	CheckPlanarGraph(input_data *InputData) int
+	CheckIntersectionGraphs(input_data *InputData) int
+	CheckUnionGraphs(input_data *InputData) int
+	CheckJoinGraphs(input_data *InputData) int
 	// Harary definition
-	CheckCartesianProduct(answer, graph1, graph2 *model.Graph) int
+	CheckCartesianProduct(input_data *InputData) int
 	// Gorbatov definition
-	CheckTensorProduct(answer, graph1, graph2 *model.Graph) int
+	CheckTensorProduct(input_data *InputData) int
 	// Composition
-	CheckLexicographicalProduct(answer, graph1, graph2 *model.Graph) int
+	CheckLexicographicalProduct(input_data *InputData) int
 
-	CheckIntersectionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
-	CheckUnionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
-	CheckJoinMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int
+	CheckIntersectionMatrices(input_data *InputData) int
+	CheckUnionMatrices(input_data *InputData) int
+	CheckJoinMatrices(input_data *InputData) int
 
-	CheckHamiltonian(task *model.Graph, is_hamiltonian_ans bool, answer_graph *model.Graph) int
+	CheckHamiltonian(input_data *InputData) int
 	// CheckMinimalСut() int
 	// CheckMinimalSpanningTree()
 	// CheckInternalStability()
@@ -87,7 +125,9 @@ func Max_(a int, b int) int {
 }
 
 // Проверка модуля "Реберный граф" (из графа в реберный)
-func (ch *checker) CheckLinearToLine(task *model.Graph, answer *model.Graph) int {
+func (ch *checker) CheckLinearToLine(input_data *InputData) int {
+	task := input_data.task_graph1
+	answer := input_data.answer_graph
 	if len(task.Nodes)*len(answer.Nodes) == 0 {
 		return 0
 	}
@@ -111,7 +151,9 @@ func (ch *checker) CheckLinearToLine(task *model.Graph, answer *model.Graph) int
 }
 
 // Проверка модуля "Реберный граф" (из реберного в граф)
-func (ch *checker) CheckLinearFromLine(task *model.Graph, answer *model.Graph) int {
+func (ch *checker) CheckLinearFromLine(input_data *InputData) int {
+	task := input_data.task_graph1
+	answer := input_data.answer_graph
 	if len(task.Nodes)*len(answer.Nodes) == 0 {
 		return 0
 	}
@@ -134,7 +176,11 @@ func (ch *checker) CheckLinearFromLine(task *model.Graph, answer *model.Graph) i
 }
 
 // Проверки модуля "Радиус и диметр"
-func (ch *checker) CheckRadiusAndDiameter(task *model.Graph, radius_ans int, diameter_ans int, dist_matrix_ans map[string]map[string]int) int {
+func (ch *checker) CheckRadiusAndDiameter(input_data *InputData) int {
+	task := input_data.task_graph1
+	radius_ans := input_data.radius_ans
+	diameter_ans := input_data.diameter_ans
+	dist_matrix_ans := input_data.matrix1
 	if len(task.Nodes)*len(dist_matrix_ans) == 0 {
 		return 0
 	}
@@ -170,7 +216,9 @@ func (ch *checker) CheckRadiusAndDiameter(task *model.Graph, radius_ans int, dia
 	return Max_(0, 100-err_count*RADIUS_AND_DIAMETER_MODULE_COEFF)
 }
 
-func (ch *checker) CheckAdjacentMatrix(task *model.Graph, answer map[string]map[string]int) int {
+func (ch *checker) CheckAdjacentMatrix(input_data *InputData) int {
+	task := input_data.task_graph1
+	answer := input_data.matrix1
 	adj_matrix := task.NodeLabelAdjacentMatrix()
 	if len(adj_matrix) != len(answer) {
 		return 0
@@ -189,7 +237,10 @@ func (ch *checker) CheckAdjacentMatrix(task *model.Graph, answer map[string]map[
 
 // Проверка модуля "Эйлеров граф"
 // Должно быть больше 2 ребер
-func (ch *checker) CheckEulerGraph(task *model.Graph, is_euler_ans bool, answer_graph *model.Graph) int {
+func (ch *checker) CheckEulerGraph(input_data *InputData) int {
+	task := input_data.task_graph1
+	is_euler_ans := input_data.is_euler_ans
+	answer_graph := input_data.answer_graph
 	task_gograph := createGographWithoutInfo(task)
 	if len(task.Edges)*len(answer_graph.Edges)*len(task.Nodes)*len(answer_graph.Nodes) == 0 {
 		return 0
@@ -248,7 +299,13 @@ func (ch *checker) CheckEulerGraph(task *model.Graph, is_euler_ans bool, answer_
 
 // Проверка модуля "Кратчайший путь"
 // Веса должны быть положительными
-func (ch *checker) CheckMinPath(task *model.Graph, source string, target string, min_path_ans int, weights_path_ans map[string]int, answer *model.Graph) int {
+func (ch *checker) CheckMinPath(input_data *InputData) int {
+	task := input_data.task_graph1
+	source := input_data.source
+	target := input_data.target
+	min_path_ans := input_data.min_path_ans
+	weights_path_ans := input_data.weights_path_ans
+	answer := input_data.answer_graph
 	source_node := task.Nodes[0]
 	target_node := task.Nodes[0]
 	for _, node := range task.Nodes {
@@ -304,8 +361,22 @@ func isIntersect(edge1, edge2 model.Edge) bool {
 	return b1 && b2 && b3 && b4
 }
 
-func (ch *checker) CheckPlanarGraph(answer *model.Graph) int {
+func (ch *checker) CheckPlanarGraph(input_data *InputData) int {
+	answer := input_data.answer_graph
+	matrix := input_data.matrix1
 	if len(answer.Edges)*len(answer.Nodes) == 0 {
+		return 0
+	}
+	if len(matrix) != len(answer.Nodes) {
+		return 0
+	}
+	edges_cnt := 0
+	for _, n1 := range matrix {
+		for _, n2 := range n1 {
+			edges_cnt += n2
+		}
+	}
+	if edges_cnt != 2*len(answer.Edges) {
 		return 0
 	}
 	for _, edge1 := range answer.Edges {
@@ -362,67 +433,109 @@ func (ch *checker) checkBinaryOperations(answer, true_answer *model.Graph) (int,
 	return correct_edges, odd_edges
 }
 
-func (ch *checker) CheckIntersectionGraphs(answer, graph1, graph2 *model.Graph) int {
+func (ch *checker) CheckIntersectionGraphs(input_data *InputData) int {
+	answer := input_data.answer_graph
+	graph1 := input_data.task_graph1
+	graph2 := input_data.task_graph2
 	true_answer := graph1.Intersect(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
 	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
 }
 
-func (ch *checker) CheckUnionGraphs(answer, graph1, graph2 *model.Graph) int {
+func (ch *checker) CheckUnionGraphs(input_data *InputData) int {
+	answer := input_data.answer_graph
+	graph1 := input_data.task_graph1
+	graph2 := input_data.task_graph2
 	true_answer := graph1.Union(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
 	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
 }
 
-func (ch *checker) CheckJoinGraphs(answer, graph1, graph2 *model.Graph) int {
+func (ch *checker) CheckJoinGraphs(input_data *InputData) int {
+	answer := input_data.answer_graph
+	graph1 := input_data.task_graph1
+	graph2 := input_data.task_graph2
 	true_answer := graph1.Join(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
 	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
 }
 
-func (ch *checker) CheckIntersectionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int {
+func (ch *checker) CheckIntersectionMatrices(input_data *InputData) int {
+	answer := input_data.answer_graph
+	matrix1 := input_data.matrix1
+	matrix2 := input_data.matrix2
 	graph1 := model.MakeGraphFromAdjLabelMatrix(matrix1)
 	graph2 := model.MakeGraphFromAdjLabelMatrix(matrix2)
-	return ch.CheckIntersectionGraphs(answer, graph1, graph2)
+	return ch.CheckIntersectionGraphs(&InputData{
+		task_graph1:  graph1,
+		task_graph2:  graph2,
+		answer_graph: answer,
+	})
 }
 
-func (ch *checker) CheckUnionMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int {
+func (ch *checker) CheckUnionMatrices(input_data *InputData) int {
+	answer := input_data.answer_graph
+	matrix1 := input_data.matrix1
+	matrix2 := input_data.matrix2
 	graph1 := model.MakeGraphFromAdjLabelMatrix(matrix1)
 	graph2 := model.MakeGraphFromAdjLabelMatrix(matrix2)
-	return ch.CheckUnionGraphs(answer, graph1, graph2)
+	return ch.CheckUnionGraphs(&InputData{
+		task_graph1:  graph1,
+		task_graph2:  graph2,
+		answer_graph: answer,
+	})
 }
 
-func (ch *checker) CheckJoinMatrices(answer *model.Graph, matrix1, matrix2 map[string]map[string]int) int {
+func (ch *checker) CheckJoinMatrices(input_data *InputData) int {
+	answer := input_data.answer_graph
+	matrix1 := input_data.matrix1
+	matrix2 := input_data.matrix2
 	graph1 := model.MakeGraphFromAdjLabelMatrix(matrix1)
 	graph2 := model.MakeGraphFromAdjLabelMatrix(matrix2)
-	return ch.CheckJoinGraphs(answer, graph1, graph2)
+	return ch.CheckJoinGraphs(&InputData{
+		task_graph1:  graph1,
+		task_graph2:  graph2,
+		answer_graph: answer,
+	})
 }
 
-func (ch *checker) CheckCartesianProduct(answer, graph1, graph2 *model.Graph) int {
+func (ch *checker) CheckCartesianProduct(input_data *InputData) int {
+	answer := input_data.answer_graph
+	graph1 := input_data.task_graph1
+	graph2 := input_data.task_graph2
 	true_answer := graph1.CartesianProduct(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
 	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
 }
 
-func (ch *checker) CheckTensorProduct(answer, graph1, graph2 *model.Graph) int {
+func (ch *checker) CheckTensorProduct(input_data *InputData) int {
+	answer := input_data.answer_graph
+	graph1 := input_data.task_graph1
+	graph2 := input_data.task_graph2
 	true_answer := graph1.TensorProduct(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
 	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
 }
 
-func (ch *checker) CheckLexicographicalProduct(answer, graph1, graph2 *model.Graph) int {
+func (ch *checker) CheckLexicographicalProduct(input_data *InputData) int {
+	answer := input_data.answer_graph
+	graph1 := input_data.task_graph1
+	graph2 := input_data.task_graph2
 	true_answer := graph1.LexicographicalProduct(graph2)
 	correct_edges, odd_edges := ch.checkBinaryOperations(answer, true_answer)
 	true_edges_count := len(true_answer.Edges)
 	return Max_(0, int(math.Ceil(100.00*float64(correct_edges-odd_edges)/float64(true_edges_count))))
 }
 
-func (ch *checker) CheckHamiltonian(task *model.Graph, is_hamiltonian_ans bool, answer_graph *model.Graph) int {
+func (ch *checker) CheckHamiltonian(input_data *InputData) int {
+	task := input_data.task_graph1
+	answer_graph := input_data.answer_graph
+	is_hamiltonian_ans := input_data.is_hamiltonian_ans
 	if answer_graph == nil {
 		return 0
 	}
