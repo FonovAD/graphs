@@ -224,4 +224,14 @@ const (
 	GROUP BY lab_id
 	ORDER BY lab_id;
 	`
+
+	selectStudentsFromGroup = `
+	select 
+		u.usersid,
+		CONCAT(u.last_name, ' ', u.first_name, ' ', u.father_name) AS fio
+	from "groups" g 
+	join students s on s.groupsid = g.groups_id
+	join users u on u.usersid = s.usersid
+	where g.groups_id = $1;
+	`
 )

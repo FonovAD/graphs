@@ -25,4 +25,5 @@ type TeacherRepository interface {
 	UpdateTask(ctx context.Context, task *model.Task) (*model.Task, error)
 	GetTasksByModule(ctx context.Context, module *model.Module) ([]model.TaskByModule, error)
 	GetGroupLabResults(ctx context.Context, group *model.Group) ([]model.GroupLabResult, error)
+	SelectStudentsFromGroup(ctx context.Context, group *model.Group) ([]model.StudentWithInfo, error)
 }

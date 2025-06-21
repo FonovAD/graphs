@@ -357,3 +357,14 @@ func (r *teacherRepository) GetTasksByModule(ctx context.Context, module *model.
 
 	return tasks, nil
 }
+
+func (r *teacherRepository) SelectStudentsFromGroup(ctx context.Context, group *model.Group) ([]model.StudentWithInfo, error) {
+	var students []model.StudentWithInfo
+	err := r.conn.SelectContext(ctx, &students, selectStudentsFromGroup, group.ID)
+	if err != nil {
+		r.logger.LogDebug(opSelectStudentsFromGroup, err, map[string]any{"groupID": group.ID})
+		return nil, err
+	}
+
+	return students, nil
+}

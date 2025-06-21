@@ -168,3 +168,11 @@ type GetLabResultsDTOIn struct {
 type GetLabResultsDTOOut struct {
 	Results []model.GroupLabResult `json:"results"`
 }
+
+type GetStudentsDTOIn struct {
+	GroupID int64 `json:"groupID"`
+}
+
+type GetStudentsDTOOut struct {
+	Students []model.StudentWithInfo `json:"students"`
+}
