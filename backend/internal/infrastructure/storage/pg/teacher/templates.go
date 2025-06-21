@@ -153,8 +153,8 @@ const (
 	`
 
 	insertTask = `
-	INSERT INTO tasks (module_id, payload, answer) 
-	VALUES (:module_id, :payload, :answer)
+	INSERT INTO tasks (module_id, payload, answer, subtype) 
+	VALUES (:module_id, :payload, :answer, :subtype)
 	RETURNING task_id;
 	`
 

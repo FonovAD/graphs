@@ -86,7 +86,6 @@ func (r *studentRepository) SelectModuleTypeByLab(ctx context.Context, userLab *
 		}
 		return &taskType, nil
 	}
-	fmt.Println(userLab)
 	return nil, sql.ErrNoRows
 }
 

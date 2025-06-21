@@ -149,6 +149,7 @@ type CreateTaskDTOIn struct {
 	ModuleID int64  `json:"moduleID"`
 	Payload  string `json:"payload"`
 	Answer   string `json:"answer"`
+	Subtype  string `json:"subtype,omitempty"`
 }
 
 type CreateTaskDTOOut struct {

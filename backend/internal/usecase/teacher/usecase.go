@@ -324,6 +324,7 @@ func (u *teacherUseCase) CreateTask(ctx context.Context, in *CreateTaskDTOIn) (*
 		ModuleID: in.ModuleID,
 		Payload:  in.Payload,
 		Answer:   answer,
+		Subtype:  in.Subtype,
 	}
 	out, err := u.teacherRepo.InsertTask(ctx, task)
 	if err != nil {

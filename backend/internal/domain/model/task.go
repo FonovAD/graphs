@@ -7,6 +7,7 @@ type Task struct {
 	ModuleID int64          `db:"module_id" json:"moduleID"`
 	Payload  string         `db:"payload"`
 	Answer   sql.NullString `db:"answer"`
+	Subtype  string         `db:"subtype"`
 }
 
 type TaskByModule struct {
