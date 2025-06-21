@@ -6,4 +6,6 @@ const (
 	opSelectModuleTypeByLab  = "infra.storage.pg.student.repo.SelectModuleTypeByLab"
 	opSelectModuleTypeByTask = "infra.storage.pg.student.repo.SelectModuleTypeByTask"
 	opSelectScore            = "infra.storage.pg.student.repo.SelectScore"
+	opBeginLab               = "infra.storage.pg.student.repo.BeginLab"
+	opFinishLab              = "infra.storage.pg.student.repo.FinishLab"
 )

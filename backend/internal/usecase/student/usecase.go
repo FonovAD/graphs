@@ -10,12 +10,15 @@ import (
 	taskcheck "golang_graphs/backend/internal/domain/student/service/taskcheck"
 	userservice "golang_graphs/backend/internal/domain/user/service"
 	"strings"
+	"time"
 )
 
 type StudentUseCase interface {
 	GetAssignedTasksByModule(ctx context.Context, in *GetAssignedTasksByModuleDTOIn) (*GetAssignedTasksByModuleDTOOut, error)
 	AuthToken(ctx context.Context, token string) (*AuthTokenDTOOut, error)
 	SendAnswers(ctx context.Context, request *SendAnswersDTOIn) (*SendAnswersDTOOut, error)
+	BeginLab(ctx context.Context, in *BeginLabDTOIn) (*BeginLabDTOOut, error)
+	FinishLab(ctx context.Context, in *FinishLabDTOIn) (*FinishLabDTOOut, error)
 }
 
 type studentUseCase struct {
@@ -74,8 +77,8 @@ func (u *studentUseCase) AuthToken(ctx context.Context, token string) (*AuthToke
 	}, nil
 }
 
-func (u *studentUseCase) SendAnswers(ctx context.Context, request *SendAnswersDTOIn) (*SendAnswersDTOOut, error) {
-	userLab := &model.UserLab{UserID: request.UserID, LabID: request.LabID}
+func (u *studentUseCase) SendAnswers(ctx context.Context, in *SendAnswersDTOIn) (*SendAnswersDTOOut, error) {
+	userLab := &model.UserLab{UserID: in.UserID, LabID: in.LabID}
 	score, err := u.studentRepo.SelectScore(ctx, userLab)
 	if err != nil {
 		return &SendAnswersDTOOut{}, err
@@ -89,15 +92,52 @@ func (u *studentUseCase) SendAnswers(ctx context.Context, request *SendAnswersDT
 	if err != nil {
 		return &SendAnswersDTOOut{}, err
 	}
-
+	module := in.Modules[0]
 	taskType.TaskType = strings.TrimSpace(taskType.TaskType)
+	inputData := &taskcheck.InputData{
+		AnswerGraph:      u.safeGetGraph(ctx, module.DataModule, 0),
+		TaskGraph1:       u.safeGetGraph(ctx, module.DataModule, 1),
+		TaskGraph2:       u.safeGetGraph(ctx, module.DataModule, 2),
+		RadiusAns:        safeGetPointerInt(module.RadiusAns),
+		DiameterAns:      safeGetPointerInt(module.DiameterAns),
+		Matrix1:          module.Matrix1,
+		Matrix2:          module.Matrix2,
+		Source:           safeGetPointerString(module.Source),
+		Target:           safeGetPointerString(module.Target),
+		WeightsPathAns:   module.WeightPathAns,
+		MinPathAns:       safeGetPointerInt(module.MinPathAns),
+		IsEulerAns:       safeGetPointerBool(module.IsEulerAns),
+		IsHamiltonianAns: safeGetPointerBool(module.IsHamiltonian),
+	}
 
-	return &SendAnswersDTOOut{}, nil
+	taskCheckerFunc := u.extractTaskCheck(taskType.TaskType)
+
+	targetScore := taskCheckerFunc(inputData)
+	return &SendAnswersDTOOut{TypeID: int64(targetScore)}, nil
 }
 
-func (u *studentUseCase) extractTaskCheck(ctx context.Context, taskType string) any {
-	// поход в бд
-	var TaskChecks = map[string]any{
+func (u *studentUseCase) BeginLab(ctx context.Context, in *BeginLabDTOIn) (*BeginLabDTOOut, error) {
+	userLab := &model.UserLab{UserID: in.UserID, LabID: in.LabID, StartTime: time.Now()}
+	out, err := u.studentRepo.BeginLab(ctx, userLab)
+	if err != nil {
+		return &BeginLabDTOOut{}, err
+	}
+
+	return &BeginLabDTOOut{LabID: out.LabID}, nil
+}
+
+func (u *studentUseCase) FinishLab(ctx context.Context, in *FinishLabDTOIn) (*FinishLabDTOOut, error) {
+	userLab := &model.UserLab{UserID: in.UserID, LabID: in.LabID}
+	out, err := u.studentRepo.FinishLab(ctx, userLab)
+	if err != nil {
+		return &FinishLabDTOOut{}, err
+	}
+
+	return &FinishLabDTOOut{LabID: out.LabID}, nil
+}
+
+func (u *studentUseCase) extractTaskCheck(taskType string) func(*taskcheck.InputData) int {
+	var TaskChecks = map[string]func(*taskcheck.InputData) int{
 		"Реберный граф В":                      u.taskChecker.CheckLinearToLine,
 		"Реберный граф Из":                     u.taskChecker.CheckLinearFromLine,
 		"Радиус и диаметр":                     u.taskChecker.CheckRadiusAndDiameter,
@@ -119,4 +159,40 @@ func (u *studentUseCase) extractTaskCheck(ctx context.Context, taskType string) 
 
 	return TaskChecks[taskType]
 
+}
+
+func (u *studentUseCase) safeGetGraph(ctx context.Context, data []DataAnswer, index int) *model.Graph {
+	if index < 0 || index >= len(data) {
+		return nil
+	}
+	graph, err := u.graphConverter.ConvertJSONStructsToGraph(ctx, data[index].Nodes, data[index].Edges)
+	if err != nil {
+		return nil
+	}
+
+	return graph
+}
+
+func safeGetPointerInt(ptr *int) int {
+	if ptr == nil {
+		return 0
+	}
+
+	return *ptr
+}
+
+func safeGetPointerString(ptr *string) string {
+	if ptr == nil {
+		return ""
+	}
+
+	return *ptr
+}
+
+func safeGetPointerBool(ptr *bool) bool {
+	if ptr == nil {
+		return false
+	}
+
+	return *ptr
 }

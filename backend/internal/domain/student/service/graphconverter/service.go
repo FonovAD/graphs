@@ -8,6 +8,7 @@ import (
 )
 
 type GraphConverter interface {
+	ConvertJSONStructsToGraph(ctx context.Context, nodes_json []NodeJSON, edges_json []EdgeJSON) (*model.Graph, error)
 }
 
 type graphConverter struct {
@@ -37,11 +38,11 @@ func (gc *graphConverter) parserEdgeStruct(ctx context.Context, json_str string)
 	return ans, nil
 }
 
-func (gc *graphConverter) convertJSONStructsToGraph(ctx context.Context, nodes_json *NodesJSON, edges_json *EdgesJSON) (*model.Graph, error) {
+func (gc *graphConverter) ConvertJSONStructsToGraph(ctx context.Context, nodes_json []NodeJSON, edges_json []EdgeJSON) (*model.Graph, error) {
 	graph := new(model.Graph)
 	node_id_map := make(map[string]int)
 	curr_id := 0
-	for _, node_json := range nodes_json.NodeArr {
+	for _, node_json := range nodes_json {
 		node_id_map[node_json.NodeData.Id] = curr_id
 		curr_id++
 		weight, err := strconv.Atoi(node_json.NodeData.Weight)
@@ -56,7 +57,7 @@ func (gc *graphConverter) convertJSONStructsToGraph(ctx context.Context, nodes_j
 			node_json.Position.Y)
 	}
 
-	for _, edge := range edges_json.EdgeArr {
+	for _, edge := range edges_json {
 		src, err := graph.FindNodeById(node_id_map[edge.EdgeData.Source])
 		if err != nil {
 			return graph, err

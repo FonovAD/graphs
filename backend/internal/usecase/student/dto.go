@@ -51,9 +51,19 @@ type DataAnswer struct {
 }
 
 type BeginLabDTOIn struct {
-	LabID int64 `json:"labID`
+	UserID int64
+	LabID  int64 `json:"labID"`
 }
 
 type BeginLabDTOOut struct {
-	LabID int64 `json:"labID`
+	LabID int64 `json:"labID"`
+}
+
+type FinishLabDTOIn struct {
+	UserID int64
+	LabID  int64 `json:"labID"`
+}
+
+type FinishLabDTOOut struct {
+	LabID int64 `json:"labID"`
 }

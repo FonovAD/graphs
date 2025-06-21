@@ -11,4 +11,6 @@ type StudentRepository interface {
 	SelectModuleTypeByTask(ctx context.Context, userTask *model.UserTask) (*model.TaskType, error)
 	SelectModuleTypeByLab(ctx context.Context, userLab *model.UserLab) (*model.TaskType, error)
 	SelectScore(ctx context.Context, userLab *model.UserLab) (*model.AssignedTaskByModule, error)
+	BeginLab(ctx context.Context, userLab *model.UserLab) (*model.UserLab, error)
+	FinishLab(ctx context.Context, userLab *model.UserLab) (*model.UserLab, error)
 }

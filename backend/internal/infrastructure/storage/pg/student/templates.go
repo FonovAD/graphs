@@ -48,4 +48,34 @@ const (
 	join user_answer ua on ul.user_lab_id = ua.user_lab_id 
 	where ul.lab_id = :lab_id and ul.user_id = :user_id;
 	`
+
+	beginLab = `
+	update user_lab
+	set 
+		start_time = :start_time
+	where 
+		lab_id = :lab_id and user_id = :user_id
+	returning user_lab.lab_id;
+	`
+
+	finishLab = `
+	WITH user_results AS (
+	SELECT 
+		ul.user_lab_id,
+		SUM(COALESCE(ua.score, 0) * ml.weight) AS final_score 
+	FROM user_lab ul
+	join user_task ut on ul.user_lab_id = ut.user_lab_id
+	JOIN tasks t ON t.task_id = ut.task_id
+	JOIN user_answer ua ON t.task_id = ua.task_id and ul.user_lab_id = ua.user_lab_id
+	JOIN module_lab ml ON t.module_id = ml.module_id AND ul.lab_id = ml.lab_id
+	WHERE ul.lab_id = :lab_id
+	AND ul.user_id = :user_id
+	GROUP BY ul.user_lab_id
+	)
+	UPDATE user_lab
+	SET score = ROUND(ur.final_score)
+	FROM user_results ur
+	WHERE user_lab.user_lab_id = ur.user_lab_id
+	returning user_lab.lab_id;
+	`
 )

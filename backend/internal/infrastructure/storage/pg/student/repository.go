@@ -124,3 +124,37 @@ func (r *studentRepository) SelectScore(ctx context.Context, userLab *model.User
 	}
 	return nil, sql.ErrNoRows
 }
+
+func (r *studentRepository) BeginLab(ctx context.Context, userLab *model.UserLab) (*model.UserLab, error) {
+	rows, err := r.conn.NamedQueryContext(ctx, beginLab, userLab)
+	if err != nil {
+		r.logger.LogWarning(opBeginLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+		return nil, err
+	}
+
+	if rows.Next() {
+		if err := rows.Scan(&userLab.LabID); err != nil {
+			r.logger.LogWarning(opBeginLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+			return nil, err
+		}
+		return userLab, nil
+	}
+	return nil, sql.ErrNoRows
+}
+
+func (r *studentRepository) FinishLab(ctx context.Context, userLab *model.UserLab) (*model.UserLab, error) {
+	rows, err := r.conn.NamedQueryContext(ctx, finishLab, userLab)
+	if err != nil {
+		r.logger.LogWarning(opFinishLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+		return nil, err
+	}
+
+	if rows.Next() {
+		if err := rows.Scan(&userLab.LabID); err != nil {
+			r.logger.LogWarning(opFinishLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+			return nil, err
+		}
+		return userLab, nil
+	}
+	return nil, sql.ErrNoRows
+}

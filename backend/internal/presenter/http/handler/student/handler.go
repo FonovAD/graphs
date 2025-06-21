@@ -14,6 +14,8 @@ import (
 type StudentHandler interface {
 	StudentMiddleware() echo.MiddlewareFunc
 	GetAssignedTasksByModule(ctx echo.Context) error
+	BeginLab(ctx echo.Context) error
+	FinishLab(ctx echo.Context) error
 }
 
 type studentHandler struct {
@@ -57,6 +59,54 @@ func (h *studentHandler) SendAnswers(ctx echo.Context) error {
 
 	ctxBack := context.Background()
 	response, err := h.studentUseCase.SendAnswers(ctxBack, &request)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (h *studentHandler) BeginLab(ctx echo.Context) error {
+	var request usecase.BeginLabDTOIn
+	if err := ctx.Bind(&request); err != nil {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+	}
+
+	userID, ok := ctx.Get("userID").(int64)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+	request.UserID = userID
+
+	ctxBack := context.Background()
+	response, err := h.studentUseCase.BeginLab(ctxBack, &request)
+	if err != nil {
+		ctx.Set("error", err.Error())
+
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (h *studentHandler) FinishLab(ctx echo.Context) error {
+	var request usecase.FinishLabDTOIn
+	if err := ctx.Bind(&request); err != nil {
+		ctx.Set("error", err.Error())
+		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
+	}
+
+	userID, ok := ctx.Get("userID").(int64)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+	request.UserID = userID
+
+	ctxBack := context.Background()
+	response, err := h.studentUseCase.FinishLab(ctxBack, &request)
 	if err != nil {
 		ctx.Set("error", err.Error())
 
