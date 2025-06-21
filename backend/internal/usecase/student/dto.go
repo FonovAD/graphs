@@ -25,7 +25,7 @@ type SendAnswersDTOOut struct {
 
 type SendAnswersDTOIn struct {
 	UserID  int64
-	LabID   int64    `json:"labID"`
+	LabID   int64    `json:"labID,omitempty"`
 	Modules []Module `json:"modules"`
 }
 

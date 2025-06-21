@@ -174,7 +174,7 @@ func (r *studentRepository) SendAnswers(ctx context.Context, userLab *model.User
 	var isActive bool
 	err = r.conn.QueryRowxContext(ctx, checkLabActive, userLab.UserLabID).Scan(&isActive)
 	if err != nil {
-		r.logger.LogWarning(opFinishLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+		r.logger.LogWarning(opFinishLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.TaskID})
 		return nil, err
 	}
 	if !isActive {

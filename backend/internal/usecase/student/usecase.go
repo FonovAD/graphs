@@ -118,7 +118,7 @@ func (u *studentUseCase) SendAnswers(ctx context.Context, in *SendAnswersDTOIn) 
 	if err != nil {
 		return nil, err
 	}
-	userLabAnswer := &model.UserLabAnswer{UserID: in.UserID, LabID: in.LabID, Answer: string(answer), Score: targetScore}
+	userLabAnswer := &model.UserLabAnswer{UserID: in.UserID, LabID: in.LabID, TaskID: module.TaskID, Answer: string(answer), Score: targetScore}
 	out, err := u.studentRepo.SendAnswers(ctx, userLabAnswer)
 	if err != nil {
 		return nil, err

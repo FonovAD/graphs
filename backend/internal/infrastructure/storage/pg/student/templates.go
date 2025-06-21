@@ -80,11 +80,10 @@ const (
 	`
 
 	selectUserLabTask = `
-	select ul.user_lab_id , ut.task_id
-	from labs l 
-	join user_lab ul on l.lab_id = ul.lab_id 
+	select ul.user_lab_id
+	from user_lab ul
 	join user_task ut on ul.user_lab_id = ut.user_lab_id
-	where ul.user_id = :user_id and l.lab_id = :lab_id;
+	where ul.user_id = :user_id and ut.task_id = :task_id;
 	`
 
 	checkLabActive = `
