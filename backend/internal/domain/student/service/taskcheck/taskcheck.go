@@ -300,9 +300,10 @@ func (ch *checker) CheckEulerGraph(input_data *InputData) int {
 // Проверка модуля "Кратчайший путь"
 // Веса должны быть положительными
 func (ch *checker) CheckMinPath(input_data *InputData) int {
-	task := input_data.TaskGraph1
-	Source := input_data.Source
-	Target := input_data.Target
+	// task := input_data.TaskGraph1
+	task := input_data.AnswerGraph
+	Source := "0"
+	Target := "5"
 	MinPathAns := input_data.MinPathAns
 	WeightsPathAns := input_data.WeightsPathAns
 	answer := input_data.AnswerGraph

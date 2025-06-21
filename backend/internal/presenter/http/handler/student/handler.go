@@ -59,8 +59,12 @@ func (h *studentHandler) SendAnswers(ctx echo.Context) error {
 		ctx.Set("error", err.Error())
 		return ctx.JSON(http.StatusBadRequest, BadRequestResponse{ErrorMsg: err.Error()})
 	}
-
 	ctxBack := context.Background()
+	userID, ok := ctx.Get("userID").(int64)
+	if !ok {
+		return ctx.JSON(http.StatusInternalServerError, InternalServerErrorResponse{ErrorMsg: ErrInternalServer.Error()})
+	}
+	request.UserID = userID
 	response, err := h.studentUseCase.SendAnswers(ctxBack, &request)
 	if err != nil {
 		ctx.Set("error", err.Error())

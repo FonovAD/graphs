@@ -49,13 +49,18 @@ const (
 	where ul.lab_id = :lab_id and ul.user_id = :user_id;
 	`
 
+	getStartTime = `
+	select start_time 
+	from user_lab ul 
+	where ul.user_id = :user_id and ul.lab_id = :lab_id;
+	`
 	beginLab = `
 	update user_lab
 	set 
 		start_time = :start_time
 	where 
 		lab_id = :lab_id and user_id = :user_id
-	returning user_lab.lab_id;
+	returning user_lab.lab_id, user_lab.start_time;
 	`
 
 	finishLab = `
@@ -96,13 +101,13 @@ const (
 	insertScore = `
 	WITH insert_result AS (
     	INSERT INTO user_answer (user_lab_id, task_id, answer, score)
-    	VALUES (:user_lab_id, :task_id, :answer, :score)
+    	VALUES ($1, $2, $3, $4)
     	ON CONFLICT (user_lab_id, task_id) DO NOTHING 
     	RETURNING task_id
 	)
 	SELECT COALESCE(
     (SELECT task_id FROM insert_result),
-    -1  -- Возвращаем -1 если вставка не произошла (конфликт)
+    -1  
 	) AS result_task_id;
 	`
 )

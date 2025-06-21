@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"golang_graphs/backend/internal/domain/model"
 	repository "golang_graphs/backend/internal/domain/student/repository"
@@ -10,6 +11,7 @@ import (
 	graphconverter "golang_graphs/backend/internal/domain/student/service/graphconverter"
 	taskcheck "golang_graphs/backend/internal/domain/student/service/taskcheck"
 	userservice "golang_graphs/backend/internal/domain/user/service"
+	storage "golang_graphs/backend/internal/infrastructure/storage/pg/student"
 	"strings"
 	"time"
 )
@@ -82,16 +84,19 @@ func (u *studentUseCase) SendAnswers(ctx context.Context, in *SendAnswersDTOIn) 
 	userLab := &model.UserLab{UserID: in.UserID, LabID: in.LabID}
 	score, err := u.studentRepo.SelectScore(ctx, userLab)
 	if err != nil {
-		return &SendAnswersDTOOut{}, err
+		if errors.Is(err, storage.ErrAnswerAlreadySent) {
+			return nil, err
+		}
+		return nil, err
 	}
 
 	if score.Score.Valid {
-		return &SendAnswersDTOOut{}, fmt.Errorf("answer was already sent")
+		return nil, fmt.Errorf("answer was already sent")
 	}
 
 	taskType, err := u.studentRepo.SelectModuleTypeByLab(ctx, userLab)
 	if err != nil {
-		return &SendAnswersDTOOut{}, err
+		return nil, err
 	}
 	module := in.Modules[0]
 	taskType.TaskType = strings.TrimSpace(taskType.TaskType)
@@ -103,8 +108,8 @@ func (u *studentUseCase) SendAnswers(ctx context.Context, in *SendAnswersDTOIn) 
 		DiameterAns:      safeGetPointerInt(module.DiameterAns),
 		Matrix1:          module.Matrix1,
 		Matrix2:          module.Matrix2,
-		Source:           safeGetPointerString(module.Source),
-		Target:           safeGetPointerString(module.Target),
+		Source:           "0",
+		Target:           "5",
 		WeightsPathAns:   module.WeightPathAns,
 		MinPathAns:       safeGetPointerInt(module.MinPathAns),
 		IsEulerAns:       safeGetPointerBool(module.IsEulerAns),

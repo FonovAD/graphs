@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"golang_graphs/backend/internal/domain/model"
 	studentrepository "golang_graphs/backend/internal/domain/student/repository"
 	"golang_graphs/backend/internal/logger"
@@ -78,7 +79,6 @@ func (r *studentRepository) SelectModuleTypeByLab(ctx context.Context, userLab *
 		r.logger.LogWarning(opSelectModuleTypeByLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
 		return nil, err
 	}
-
 	if rows.Next() {
 		if err := rows.Scan(&taskType.TaskType); err != nil {
 			r.logger.LogWarning(opSelectModuleTypeByLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
@@ -86,6 +86,7 @@ func (r *studentRepository) SelectModuleTypeByLab(ctx context.Context, userLab *
 		}
 		return &taskType, nil
 	}
+	fmt.Println(userLab)
 	return nil, sql.ErrNoRows
 }
 
@@ -112,21 +113,34 @@ func (r *studentRepository) SelectScore(ctx context.Context, userLab *model.User
 	rows, err := r.conn.NamedQueryContext(ctx, selectScore, userLab)
 	if err != nil {
 		r.logger.LogWarning(opSelectScore, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
-		return nil, err
+		return nil, fmt.Errorf("failed to select score")
 	}
 
 	if rows.Next() {
 		if err := rows.Scan(&score.Score); err != nil {
 			r.logger.LogWarning(opSelectScore, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
-			return nil, err
+			return nil, fmt.Errorf("failed to scan score")
 		}
-		return &score, nil
+		return &score, ErrAnswerAlreadySent
 	}
-	return nil, sql.ErrNoRows
+	return &model.AssignedTaskByModule{}, nil
 }
 
 func (r *studentRepository) BeginLab(ctx context.Context, userLab *model.UserLab) (*model.UserLab, error) {
-	rows, err := r.conn.NamedQueryContext(ctx, beginLab, userLab)
+	rows, err := r.conn.NamedQueryContext(ctx, getStartTime, userLab)
+	if err != nil {
+		r.logger.LogWarning(opBeginLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+		return nil, err
+	}
+	if rows.Next() {
+		if err := rows.Scan(&userLab.StartTime); err != nil {
+			r.logger.LogWarning(opBeginLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
+			return nil, err
+		}
+		return userLab, nil
+	}
+
+	rows, err = r.conn.NamedQueryContext(ctx, beginLab, userLab)
 	if err != nil {
 		r.logger.LogWarning(opBeginLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
 		return nil, err
@@ -162,12 +176,14 @@ func (r *studentRepository) FinishLab(ctx context.Context, userLab *model.UserLa
 func (r *studentRepository) SendAnswers(ctx context.Context, userLab *model.UserLabAnswer) (*model.UserLabAnswer, error) {
 	rows, err := r.conn.NamedQueryContext(ctx, selectUserLabTask, userLab)
 	if err != nil {
-		return nil, err
+		r.logger.LogWarning(opFinishLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.TaskID})
+		return nil, fmt.Errorf("userlab not fount")
 	}
 
 	if rows.Next() {
 		if err := rows.StructScan(&userLab); err != nil {
-			return nil, err
+			r.logger.LogWarning(opFinishLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.TaskID})
+			return nil, fmt.Errorf("failed to struct scan")
 		}
 	}
 
@@ -175,7 +191,7 @@ func (r *studentRepository) SendAnswers(ctx context.Context, userLab *model.User
 	err = r.conn.QueryRowxContext(ctx, checkLabActive, userLab.UserLabID).Scan(&isActive)
 	if err != nil {
 		r.logger.LogWarning(opFinishLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.TaskID})
-		return nil, err
+		return nil, fmt.Errorf("failed to check active lab")
 	}
 	if !isActive {
 		return nil, ErrTimeExceeded
@@ -183,7 +199,7 @@ func (r *studentRepository) SendAnswers(ctx context.Context, userLab *model.User
 
 	err = r.conn.QueryRowxContext(ctx, insertScore, userLab.UserLabID, userLab.TaskID, userLab.Answer, userLab.Score).Scan(&userLab.TaskID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to insert score")
 	}
 	if userLab.TaskID == -1 {
 		return nil, ErrAnswerAlreadySent
