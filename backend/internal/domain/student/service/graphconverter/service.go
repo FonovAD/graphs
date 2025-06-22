@@ -56,7 +56,6 @@ func (gc *graphConverter) ConvertJSONStructsToGraph(ctx context.Context, nodes_j
 			node_json.Position.X,
 			node_json.Position.Y)
 	}
-
 	for _, edge := range edges_json {
 		src, err := graph.FindNodeById(node_id_map[edge.EdgeData.Source])
 		if err != nil {
@@ -66,13 +65,17 @@ func (gc *graphConverter) ConvertJSONStructsToGraph(ctx context.Context, nodes_j
 		if err != nil {
 			return graph, err
 		}
+		weight_edge, err := strconv.Atoi(edge.EdgeData.Label)
+		if err != nil {
+			weight_edge = 0
+		}
 		graph.AddEdgeByInfo(
 			src,
 			trg,
 			edge.EdgeData.Id,
 			edge.EdgeData.Label,
 			edge.EdgeData.Color,
-			0)
+			weight_edge)
 	}
 	return graph, nil
 }
