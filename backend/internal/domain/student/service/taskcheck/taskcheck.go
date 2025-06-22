@@ -300,6 +300,7 @@ func (ch *checker) CheckEulerGraph(input_data *InputData) int {
 // Проверка модуля "Кратчайший путь"
 // Веса должны быть положительными
 func (ch *checker) CheckMinPath(input_data *InputData) int {
+	fmt.Println(input_data)
 	// task := input_data.TaskGraph1
 	task := input_data.AnswerGraph
 	Source := "0"
@@ -319,6 +320,7 @@ func (ch *checker) CheckMinPath(input_data *InputData) int {
 	}
 	min_path, weights_path := task.MinPath(Source_node, Target_node, true)
 	if min_path != MinPathAns {
+		fmt.Println("1")
 		return 0
 	}
 	err_count := 0
@@ -335,8 +337,10 @@ func (ch *checker) CheckMinPath(input_data *InputData) int {
 		}
 	}
 	if min_path_check != min_path {
+		fmt.Println("2")
 		return 0
 	}
+	fmt.Println(err_count)
 	return Max_(0, 100-err_count*MIN_PATH_MODULE_COEFF)
 }
 
