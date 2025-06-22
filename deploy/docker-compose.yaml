@@ -3,6 +3,9 @@ version: '3.5'
 networks:
   graphs:
 
+volumes:
+  db_data:
+
 services:
   # grafana:
   #   image: grafana/grafana
