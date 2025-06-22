@@ -126,5 +126,6 @@ services:
       retries: 5
     volumes:
       - ../scripts/init.sql:/docker-entrypoint-initdb.d/create_tables.sql
+      - db_data:/var/lib/postgresql/data 
     networks:
       - graphs
