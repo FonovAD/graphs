@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -133,13 +134,14 @@ func (u *studentUseCase) SendAnswers(ctx context.Context, in *SendAnswersDTOIn) 
 }
 
 func (u *studentUseCase) BeginLab(ctx context.Context, in *BeginLabDTOIn) (*BeginLabDTOOut, error) {
-	userLab := &model.UserLab{UserID: in.UserID, LabID: in.LabID, StartTime: time.Now()}
+	userLab := &model.UserLab{UserID: in.UserID, LabID: in.LabID}
+	userLab.StartTime = sql.NullTime{Time: time.Now(), Valid: true}
 	out, err := u.studentRepo.BeginLab(ctx, userLab)
 	if err != nil {
 		return &BeginLabDTOOut{}, err
 	}
 
-	return &BeginLabDTOOut{LabID: out.LabID, StartTime: userLab.StartTime}, nil
+	return &BeginLabDTOOut{LabID: out.LabID, StartTime: userLab.StartTime.Time}, nil
 }
 
 func (u *studentUseCase) FinishLab(ctx context.Context, in *FinishLabDTOIn) (*FinishLabDTOOut, error) {

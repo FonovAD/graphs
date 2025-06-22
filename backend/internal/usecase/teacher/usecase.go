@@ -168,7 +168,6 @@ func (u *teacherUseCase) AssignLab(ctx context.Context, in *AssignLabDTOIn) (*As
 		UserID:         in.UserID,
 		LabID:          in.LabID,
 		AssignmentDate: time.Now(),
-		StartTime:      in.StartTime,
 		TeacherID:      in.AssigneID,
 		Deadline:       in.Deadline,
 	}

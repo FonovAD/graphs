@@ -532,7 +532,7 @@ func (ch *checker) CheckLexicographicalProduct(input_data *InputData) int {
 }
 
 func (ch *checker) CheckHamiltonian(input_data *InputData) int {
-	task := input_data.TaskGraph1
+	task := input_data.AnswerGraph
 	AnswerGraph := input_data.AnswerGraph
 	IsHamiltonianAns := input_data.IsHamiltonianAns
 	if AnswerGraph == nil {

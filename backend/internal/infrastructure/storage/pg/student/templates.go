@@ -12,7 +12,7 @@ const (
 	join user_task ut on t.task_id = ut.task_id
 	JOIN user_lab ul ON ut.user_lab_id  = ul.user_lab_id
 	JOIN users u ON ul.user_id = u.usersid
-	LEFT JOIN user_answer ua ON t.task_id = ua.task_id
+	LEFT JOIN user_answer ua ON t.task_id = ua.task_id and ul.user_lab_id = ua.user_lab_id
 	WHERE u.usersid = $1 AND m.module_id = $2;
 	`
 
@@ -50,7 +50,7 @@ const (
 	`
 
 	getStartTime = `
-	select start_time 
+	select user_lab_id, start_time 
 	from user_lab ul 
 	where ul.user_id = :user_id and ul.lab_id = :lab_id;
 	`
@@ -60,7 +60,7 @@ const (
 		start_time = :start_time
 	where 
 		lab_id = :lab_id and user_id = :user_id
-	returning user_lab.lab_id, user_lab.start_time;
+	returning user_lab.lab_id, start_time;
 	`
 
 	finishLab = `

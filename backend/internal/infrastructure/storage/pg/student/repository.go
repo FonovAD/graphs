@@ -132,11 +132,23 @@ func (r *studentRepository) BeginLab(ctx context.Context, userLab *model.UserLab
 		return nil, err
 	}
 	if rows.Next() {
-		if err := rows.Scan(&userLab.StartTime); err != nil {
+		var startTime sql.NullTime
+		if err := rows.Scan(&userLab.UserLabID, &startTime); err != nil {
 			r.logger.LogWarning(opBeginLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
 			return nil, err
 		}
-		return userLab, nil
+
+		if startTime.Valid {
+			r.logger.LogInfo(opBeginLab, fmt.Errorf("lab already began"), map[string]any{
+				"userID":    userLab.UserID,
+				"labID":     userLab.LabID,
+				"userLabID": userLab.UserLabID,
+				"startTime": startTime,
+			})
+			userLab.StartTime = startTime
+
+			return userLab, nil
+		}
 	}
 
 	rows, err = r.conn.NamedQueryContext(ctx, beginLab, userLab)
@@ -146,7 +158,7 @@ func (r *studentRepository) BeginLab(ctx context.Context, userLab *model.UserLab
 	}
 
 	if rows.Next() {
-		if err := rows.Scan(&userLab.LabID); err != nil {
+		if err := rows.Scan(&userLab.UserLabID, &userLab.StartTime); err != nil {
 			r.logger.LogWarning(opBeginLab, err, map[string]any{"userID": userLab.UserID, "labID": userLab.LabID})
 			return nil, err
 		}
