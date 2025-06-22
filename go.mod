@@ -3,7 +3,7 @@ module golang_graphs
 go 1.24.1
 
 require (
-	github.com/golang-jwt/jwt v3.2.2+incompatible
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/heetch/confita v0.10.0
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/labstack/echo/v4 v4.13.3
