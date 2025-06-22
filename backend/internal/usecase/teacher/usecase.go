@@ -186,7 +186,6 @@ func (u *teacherUseCase) AssignLabGroup(ctx context.Context, in *AssignLabGroupD
 	groupLab := &model.UserLabGroup{
 		LabID:          in.LabID,
 		AssignmentDate: time.Now(),
-		StartTime:      in.StartTime,
 		TeacherID:      in.AssigneID,
 		Deadline:       in.Deadline,
 		GroupID:        in.GroupID,

@@ -71,10 +71,10 @@ const (
 	insertLabToStudentGroup = `
 	WITH inserted_user_labs AS (
 		INSERT INTO user_lab (
-			user_id, lab_id, assignment_date, start_time, teacher_id, deadline, score
+			user_id, lab_id, assignment_date, teacher_id, deadline, score
 		)
 		SELECT 
-			s.usersid, :lab_id, :assignment_date, :start_time, :teacher_id, :deadline, NULL                       
+			s.usersid, :lab_id, :assignment_date, :teacher_id, :deadline, NULL                       
 		FROM students s
 		WHERE s.groupsid = :groups_id
 		ON CONFLICT (user_id, lab_id) DO NOTHING

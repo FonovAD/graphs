@@ -81,7 +81,6 @@ type AssignLabDTOOut struct {
 type AssignLabGroupDTOIn struct {
 	LabID          int64     `json:"labId"`
 	AssignmentDate time.Time `json:"assignmentDate"`
-	StartTime      time.Time `json:"startTime"`
 	AssigneID      int64     `json:"assigneId"`
 	Deadline       time.Time `json:"deadline"`
 	GroupID        int64     `json:"groupId"`
