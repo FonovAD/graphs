@@ -250,7 +250,9 @@ func (g *Graph) MinPath(source Node, target Node, edges_have_weights bool) (int,
 		visited[node.Label] = false
 		weights_path[node.Label] = math.MaxInt
 	}
+
 	weights_path[source.Label] = 0
+	fmt.Println(g.Nodes)
 	weights_matrix := make(map[string]map[string]int)
 	for _, node1 := range g.Nodes {
 		weights_matrix[node1.Label] = make(map[string]int)
@@ -288,6 +290,7 @@ func (g *Graph) MinPath(source Node, target Node, edges_have_weights bool) (int,
 			}
 			visited[min_node] = true
 		}
+		fmt.Println(weights_path)
 	}
 	return weights_path[target.Label], weights_path
 }

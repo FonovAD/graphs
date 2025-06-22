@@ -1,6 +1,7 @@
 package taskcheck
 
 import (
+	//"fmt"
 	"fmt"
 	"golang_graphs/backend/internal/domain/model"
 	"math"
@@ -17,9 +18,6 @@ const (
 	DEFAULT_COLOR                    string = ""
 )
 
-func p() {
-	fmt.Println()
-}
 func createGographWithoutInfo(graph *model.Graph) *gograph.Mutable {
 	if len(graph.Nodes) == 0 {
 		return gograph.New(0)

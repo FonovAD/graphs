@@ -44,7 +44,6 @@ func (gc *graphConverter) ConvertJSONStructsToGraph(ctx context.Context, nodes_j
 	curr_id := 0
 	for _, node_json := range nodes_json {
 		node_id_map[node_json.NodeData.Id] = curr_id
-		curr_id++
 		weight, err := strconv.Atoi(node_json.NodeData.Weight)
 		if err != nil {
 			weight = 0
@@ -54,7 +53,9 @@ func (gc *graphConverter) ConvertJSONStructsToGraph(ctx context.Context, nodes_j
 			node_json.NodeData.Color,
 			weight,
 			node_json.Position.X,
-			node_json.Position.Y)
+			node_json.Position.Y,
+		)
+		curr_id++
 	}
 	for _, edge := range edges_json {
 		src, err := graph.FindNodeById(node_id_map[edge.EdgeData.Source])
