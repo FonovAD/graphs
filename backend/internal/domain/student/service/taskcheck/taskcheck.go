@@ -319,8 +319,9 @@ func (ch *checker) CheckMinPath(input_data *InputData) int {
 		}
 	}
 	min_path, weights_path := task.MinPath(Source_node, Target_node, true)
+	fmt.Println(min_path, weights_path)
 	if min_path != MinPathAns {
-		fmt.Println("1")
+		fmt.Println("min_path_test", min_path)
 		return 0
 	}
 	err_count := 0
